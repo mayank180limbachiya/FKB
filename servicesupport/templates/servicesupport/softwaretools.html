@@ -1,0 +1,36 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+
+
+<div class="nav-scroller bg-body shadow-sm">
+  <nav class="nav nav-underline" aria-label="Secondary navigation">
+    <div class="nav-link" style="color: black ; font-weight: bold;">TOOLS</div>
+    <a class="nav-link" href="{% url 'vrdy' %}"> VRDY OFF </a>
+    <a class="nav-link" href="{% url 'wn69' %}"> WN 69</a>
+    <a class="nav-link" href="{% url 'nmi' %}"> PC50 & NMI </a>
+  </nav>
+</div>
+
+<div class="container" style="width: 300px;">
+  <div class="card">
+    <div class="card-body">
+      VRDY OFF <a class="btn btn-primary" href="{% url 'vrdy' %}"> Link</a>
+    </div>
+  </div>
+  <br>
+  <div class="card">
+    <div class="card-body">
+      WN 69 <a class="btn btn-primary" href="{% url 'wn69' %}"> Link</a>
+    </div>
+  </div>
+  <br>
+  <div class="card">
+    <div class="card-body">
+      PC50 & NMI. <a class="btn btn-primary" href="{% url 'nmi' %}"> Link </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

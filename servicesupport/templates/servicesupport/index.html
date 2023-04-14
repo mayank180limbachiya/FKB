@@ -1,0 +1,66 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+<br>
+{% load static %}
+<div class="container">
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+      <div class="card h-100">
+        <img src="{% static 'servicesupport/spec.png' %}" class="card-img-top" alt="Specifiaction" style="width: auto; height: 250px; object-fit: scale-down; "  >
+        <div class="card-body">
+          <h5 class="card-title">Part Specifiaction</h5>
+          <a href="{% url 'specification' %}" class="btn btn-primary">spec</a>
+          <p class="card-text">Search part spec & Its child parts. Also You can search any equvalant parts available in child parts.</p>
+        </div>
+        
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <img src="{% static 'servicesupport/tool.png' %}" class="card-img-top" alt="Tools" style="width: auto; height: 250px; object-fit: scale-down; " >
+        <div class="card-body">
+          <h5 class="card-title">Service Tools</h5>
+          <a href="{% url 'softwaretool' %}" class="btn btn-primary">Tools</a>
+          <p class="card-text">basic service tools will support to identify problem. tools like VRDY off alarm, WN69 alarm, PC 50 alarm.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <img src="{% static 'servicesupport/alarm.jpg' %}" class="card-img-top" alt="Alarm" style="width: auto; height: 250px; object-fit: scale-down; " >
+        <div class="card-body">
+          <h5 class="card-title">Alarm Search</h5>
+          <a href="{% url 'alarm' %}" class="btn btn-primary">Alarm</a>
+          <p class="card-text">Search Alarm based on system, With detailed disctiption</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+        <div class="card h-100">
+          <img src="{% static 'servicesupport/tain.jpg' %}" class="card-img-top" alt="Alarm" style="width: auto; height: 250px; object-fit: scale-down; " >
+          <div class="card-body">
+            <h5 class="card-title">Training Data</h5>
+            <a href="{% url 'training' %}" class="btn btn-primary">Training DOC</a>
+            <p class="card-text">this will have storage of Training & procedure </p>
+          </div>
+        </div>
+      </div>
+    
+    <div class="col">
+        <div class="card h-100">
+          <img src="{% static 'servicesupport/std.jpg' %}" class="card-img-top" alt="Alarm" style="width: auto; height: 250px; object-fit: scale-down; " >
+          <div class="card-body">
+            <h5 class="card-title">STD data</h5>
+            <a href="{% url 'std' %}" class="btn btn-primary">STD Data</a>
+            <p class="card-text">this will have storage of Service technical discusstion</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+</div>  
+{% endblock %}

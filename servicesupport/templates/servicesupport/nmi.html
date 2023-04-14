@@ -1,0 +1,327 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+<div class="nav-scroller bg-body shadow-sm">
+    <nav class="nav nav-underline" aria-label="Secondary navigation">
+      <div class="nav-link" style="color: black ; font-weight: bold;">TOOLS</div>
+      <a class="nav-link" href="{% url 'vrdy' %}"> VRDY OFF </a>
+      <a class="nav-link" href="{% url 'wn69' %}"> WN 69</a>
+      <a class="nav-link" href="{% url 'nmi' %}"> PC50 & NMI </a>
+    </nav>
+</div>
+
+<script>
+    function NMImanual(){
+        NMIupdate("a_x");
+        NMIupdate("b_y")
+    }
+    function NMIupdate(data){
+        if (data=="a_x"){
+            var a_x_value = document.getElementById("a_x").value;
+            var bin_led = ("00000000"+((parseInt(a_x_value, 16)).toString(2))).slice(-8);
+            var array = bin_led.split('').reverse();
+            for (let i = 0; i < 8; i++){
+                var l= "1"+"."+i; 
+                document.getElementById(l).style.backgroundColor = "white";
+                document.getElementById(l).innerText = "0";
+                if (array[i]==1){
+                document.getElementById(l).style.backgroundColor = "lightCoral";
+                document.getElementById(l).innerText = "1";
+                }
+            }
+        }
+        else if(data =="b_y"){
+            var b_y_value = document.getElementById("b_y").value;
+            var bin_led1 = ("00000000"+((parseInt(b_y_value, 16)).toString(2))).slice(-8);
+            var array1 = bin_led1.split('').reverse();
+            for (let k = 0; k < 8; k++){
+                var j= "2"+"."+k;
+                document.getElementById(j).style.backgroundColor = "white";
+                document.getElementById(j).innerText = "0";
+                if (array1[k]==1){
+                document.getElementById(j).style.backgroundColor = "lightCoral";
+                document.getElementById(j).innerText = "1";
+                }
+            }
+        }
+
+    }
+
+</script>    
+
+<div class="container">
+        <br>
+        <h3>
+            PC50 Alarm / 971 NMI occured / SLC Error
+        </h3>
+        <br>
+        <div class="card">
+            <div class="card-body" style="color:light">
+            <h4 class="card-title">About Alarm:</h4>
+            <p class="card-text">When I/O Link communication fails, System Alarm is issued with one of the following messages. The Message changes according to the series and edition of PMC management Software, However, Its Meaning and the process of troubleshooting are common.</p>
+            </div>
+        </div>
+        <br>
+        <h4 class="card-title">Input:</h4>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td colspan="5">Here "a1b1" for Channel-1, "a2b2" for Channel-2 for Earlier values (before Alarm Register value)</td>
+                </tr>
+                <tr>
+                    <td colspan="5">Here "x1y1" for Channel-1, "x2y2" for Channel-2 for Later values (after Alarm Register value)</td>
+                </tr>     
+                <tr>
+                    <td class="text-center">Enter "a" "x" Value:</td>
+                    <td class="text-center"><input type="text" style="width: 100px;" id="a_x" onchange="NMIupdate('a_x');"></td>
+                    <td class="text-center">Enter "b" "y" Value:</td>
+                    <td class="text-center"><input type="text" style="width: 100px;" id="b_y" onchange="NMIupdate('b_y');"></td>
+                    <td><button type="button" class="btn btn-secondary" onclick="NMImanual()">EXCE</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <h4 class="card-title">Output:</h4>  
+        <h6 > Xn#7 Values</h6>
+        <table class="table table-bordered">
+            <tbody>
+                <tr>
+                    <td style="width: 150px;" class="table-primary">Bit Xn#7</td>
+                    <td style="width: 150px;" class="table-primary">Bit 6</td>
+                    <td style="width: 150px;" class="table-primary">Bit 5</td>
+                    <td  style="width: 150px;"class="table-primary">Bit 4</td>
+                    <td style="width: 150px;" class="table-primary">Bit 3</td>
+                    <td style="width: 150px;" class="table-primary">Bit 2</td>
+                    <td style="width: 150px;" class="table-primary">Bit 1</td>
+                    <td style="width: 150px;" class="table-primary">Bit 0</td>
+                </tr>
+                <tr>
+                    <td id="1.7">0</td>
+                    <td id="1.6">0</td>
+                    <td id="1.5">0</td>
+                    <td id="1.4">0</td>
+                    <td id="1.3">0</td>
+                    <td id="1.2">0</td>
+                    <td id="1.1">0</td>
+                    <td id="1.0">0</td>
+                </tr>
+                <tr>
+                    <td class="table-light text-center" colspan="3">5-7 Meaning less</td>
+                    <td class="table-light text-center">Parity error in I/O RAM, Exchange PMC controller module or the board with i/o link connector</td>
+                    <td class="table-light text-center">SLC,I/O link controller LSI, detect Parity error in internal RAM . Exchange PMC control module , or the board with i/o link connector</td>
+                    <td class="table-light text-center">Slave Did not respond. Link was discconected</td>
+                    <td class="table-light text-center">slave device detect an error, see Yn for more details</td>
+                    <td class="table-light text-center">bad data was received : xn#1 is 1,xn#0 will always be so check xn#1 first</td>
+                </tr>
+            </tbody>    
+        </table>   
+        <br>
+        <h6 > Yn#7 Values</h6>
+        <table class="table table-bordered">
+            <tbody style="width: 150px;">
+                <tr>
+                    <td style="width: 150px;" class="table-primary">Bit Yn#7</td>
+                    <td style="width: 150px;" class="table-primary">Bit 6</td>
+                    <td style="width: 150px;" class="table-primary">Bit 5</td>
+                    <td style="width: 150px;" class="table-primary">Bit 4</td>
+                    <td style="width: 150px;" class="table-primary">Bit 3</td>
+                    <td style="width: 150px;" class="table-primary">Bit 2</td>
+                    <td style="width: 150px;" class="table-primary">Bit 1</td>
+                    <td style="width: 150px;" class="table-primary">Bit 0</td>
+                </tr>
+                <tr>
+                    <td id="2.7">0</td>
+                    <td id="2.6">0</td>
+                    <td id="2.5">0</td>
+                    <td id="2.4">0</td>
+                    <td id="2.3">0</td>
+                    <td id="2.2">0</td>
+                    <td id="2.1">0</td>
+                    <td id="2.0">0</td>
+                </tr>
+                <tr>
+                    <td class="table-light text-center">Slave Detected  watchdog error or parity error.(not effective if xn#1 is 0)</td>
+                    <td class="table-light text-center">slave raised system alarm othger that one about I/O link. Check what system alarm was raised at slave.(not effective if xn#1 is 0)</td>
+                    <td class="table-light text-center">Slave Detected Communication error.(not effective if xn#1 is 0)</td>
+                    <td class="table-light text-center" colspan="5">number to identify slave: The Value is "group number+1" where the 1st slave is group 0, the value 4 means the group 3, which is 4th slave form master <p><img src="{% static 'servicesupport/NMI/group.png' %}" width="400"></p></td>
+                </tr>
+                <tr>
+                    <td colspan="8">When slave detected communication error(in case xn#1 is 1), this value shows the slave number and the details of the error. otherwise(in case xn#1 is 0), this byte will be the slave number of which master communicated last, or of which master was trying to commuincated last, or of which master was trying to communicate.But this slave number does not mean the very slave with problem. For example , in case that connection between 1st slave and 2nd slave was cut when master was trying to communicate with 3rd slave, this byte will show the number for 3rd slave.</td>
+                </tr>    
+            </tbody>    
+        </table> 
+        <br>
+        <div class="container">
+            <div class="row">
+                <div class="col-6">    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">*PC050 IOLINK ER1 CHn:GRPn: n1</li>
+                        <li class="list-group-item">*PC051 IOLINK ER2 CHn:v1:n1:x1:y1</li>
+                        <li class="list-group-item">*PC050 IOLINK CH1 a1b1-x1y1:x2y2</li>
+                        <li class="list-group-item">*PC050 IOLINK CH2 x1y1:a2b2-x2y2</li>
+                        <li class="list-group-item">*PC050 I/O LINK (CHn) x1:y1 x2:y2</li>
+                        <li class="list-group-item">*PC050 NMI SLC(CHn) x1:y1 x2:y2</li>
+                    </ul>
+                </div>
+                <div class="col-6">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">*PC050 NMI SLC x1:y1</li>
+                        <li class="list-group-item">*PC150 NMI SLC x1:y1</li>
+                        <li class="list-group-item">*971 NMI OCCURRED IN SLC (Note)</li>
+                        <li class="list-group-item">*SLC ERROR x1(y1) : PC050</li>
+                        <li class="list-group-item">*SLC ERROR x1 : PC050</li>
+                    </ul>    
+                </div>
+            </div>
+        </div>
+        <br>
+        <p class="lead">
+            (Note : 971 NMI OCCURRED IN SLC  has the register value "x1y1" in memory dump. The SLC's register value is not shown in the error message itself. however register value shown in dumo display.)
+        </p>
+        <br>
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">CHn (n>0):</th>
+                    <td>Channel of communication failure. The messages without "CHn" menas the error war detected in channel 1.</td>
+                </tr>
+                <tr>
+                    <th scope="row">GRPn (15>n>0) :</th>
+                    <td>Group of I/O link slave device, which has a possibility that some problem occurs.</td>
+                </tr>
+                <tr>
+                    <th scope="row">n1 :</th>
+                    <td>Means the count of communication error. Retry Counter.</td>
+                </tr>
+                <tr>
+                    <th scope="row">"a1b1","x1y1","a2b2","x2y2":</th>
+                    <td>The register values of SLC, which is I/O link communication controller LSI. 
+                        <p>
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th scope="row"></th>
+                                        <td>Earlier</td>
+                                        <td>Later</td>
+                                    </tr> 
+                                    <tr>
+                                        <th scope="row">CH1</th>
+                                        <td>a1b1</td>
+                                        <td>x1y1</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">CH2</th>
+                                        <td>a2b2</td>
+                                        <td>x2y2</td>
+                                    </tr>    
+                                </tbody>    
+                            </table> 
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">The register values are clues certainly, however, they may not be enough evidence to find out the cause of trobles because of folloeing reasons:</td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="container">
+                            <ul>
+                                <li>These values are not the values at the instant when the first communication error was detected,but are the values when the communication disconneted finally. this means that the values may not reflect the direct cause, and can reflect its side effect.</li>
+                                <li>In case of hardware malfuction or electric noises, the register value may become improper value</li>
+                                <li>The same causes may show different register value dpending on the timing of error.</li>
+                            </ul>
+                        </div>    
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">Therefore, it is important to analyze not only register value, but also the situation how the alarm occured.</td>
+                </tr>    
+            </tbody>
+        </table>
+        <br>
+        <h6>OLD SYSTEM  | DUMP with Register names</h6>
+        <div class="container">
+            <p>In some CNC and PMC model, the following screen is displayed at I/O link commuinication failure. Register Value Can be pick up from the following dump display</p>
+        </div> 
+    </div> 
+    <table class="table">
+        <tbody>
+            <tr>
+                <td class="text-center">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>MODEL</th>
+                                <th>PMC models</th>
+                            </tr>
+                            <tr>
+                                <td>21i A/B</td>
+                                <td>PMC-SA1</td>
+                            </tr>  
+                            <tr>
+                                <td>16B</td>
+                                <td>PMC-SB3/SB4</td>
+                            </tr>
+                            <tr>
+                                <td>18B</td>
+                                <td>PMC-SA1/SA3</td>
+                            </tr> 
+                            <tr>
+                                <td>21MB</td>
+                                <td>PMC-SA1/SA3</td>
+                            </tr>    
+                            <tr>
+                                <td>21TB (B type)</td>
+                                <td>PMC-SA1/SA3</td>
+                            </tr> 
+                        </tbody>    
+                    </table>    
+                </td>
+                <td class="text-center">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <th>MODEL</th>
+                                <th>PMC models</th>
+                            </tr>
+                            <tr>
+                                <td>16 A</td>
+                                <td>PMC -SB/SB2/SB3</td>
+                            </tr>  
+                            <tr>
+                                <td>18 A</td>
+                                <td>PMC-SA1/SA3</td>
+                            </tr>
+                            <tr>
+                                <td>21-TB(A Type)</td>
+                                <td>PMC-SA1/SA3</td>
+                            </tr> 
+                            <tr>
+                                <td>Power Mate -D</td>
+                                <td>PMC-PA1/PA3</td>
+                            </tr>    
+                            <tr>
+                                <td>Power Mate -H</td>
+                                <td>PMC-PA3</td>
+                            </tr> 
+                        </tbody>    
+                    </table>    
+                </td>
+            </tr>    
+            <tr>
+                <td class="text-center">
+                    <img src="{% static 'servicesupport/NMI/alarm.png' %}" width="400">
+                </td>
+                <td class="text-center">
+                    <img src="{% static 'servicesupport/NMI/alarm2.png' %}" width="500">
+                </td>        
+            </tr>  
+        </tbody>
+    </table>
+
+
+</div>    
+   
+</div>
+
+{% endblock %}

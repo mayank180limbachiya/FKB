@@ -1,0 +1,162 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+<div class="nav-scroller bg-body shadow-sm">
+    <nav class="nav nav-underline" aria-label="Secondary navigation">
+      <!--<div class="nav-link" style="color: black ; font-weight: bold;">TOOLS</div> -->
+      <a class="nav-link" href="{% url 'alarmbyled' %}"> by LED </a>
+      <a class="nav-link" href="{% url 'alarmbytext' %}"> by text</a>
+      <a class="nav-link" href="{% url 'alarmbynumber' %}"> by number </a>
+      <a class="nav-link" href="#"> Request to add alarm </a>
+    </nav>
+</div>
+<br>
+<script>
+    function LED(data){
+        var LED_Bit= data;
+        var color = document.getElementById(data).style.backgroundColor
+        
+        if (color =="lightblue"){
+            document.getElementById(data).style.backgroundColor = "red";
+        }else {
+            document.getElementById(data).style.backgroundColor = "lightblue"; 
+        }
+        var A = document.getElementById('A').style.backgroundColor
+        var B = document.getElementById('B').style.backgroundColor
+        var C = document.getElementById('C').style.backgroundColor
+        var D = document.getElementById('D').style.backgroundColor
+        var E = document.getElementById('E').style.backgroundColor
+        var F = document.getElementById('F').style.backgroundColor
+        var G = document.getElementById('G').style.backgroundColor
+        var dot = document.getElementById('dot').style.backgroundColor
+        const data_list = [A, B, C,D, E , F,G,dot];
+        const LED_bitData = [];
+
+        for (let i = 0; i < data_list.length; i++) {
+            console.log(data_list[i])
+            if (data_list[i] == "red"){
+                LED_bitData.push("1")
+            }
+            else {
+                LED_bitData.push("0")
+            }
+        }
+        let text = LED_bitData.join("");
+        var hexa = parseInt(text, 2).toString(16).toUpperCase();
+        document.getElementById("LED_Hex").value = hexa;
+    }  
+
+    window.onload = function() {
+        SevenSegment("{{LED_data}}");
+    };
+
+    function SevenSegment(data){
+        if (data != "None"){
+            const data_list = ["A", "B","C","D", "E" , "F","G","dot"];
+            const LED_bitData = [];
+            bin_led = ("00000000"+((parseInt(data, 16)).toString(2))).slice(-8)
+            var array = bin_led.split('');
+            for (let i = 0; i < data_list.length; i++){
+                if (array[i]==1){
+                document.getElementById(data_list[i]).style.backgroundColor = "red";
+                }
+            }
+            document.getElementById("LED_Hex").value = data;
+        }
+    }
+
+</script>
+<a href="{% static 'servicesupport/0ic.pdf' %}" target="_new">Hello</a>
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">System LED</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Drive LED</button>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <br>
+        <div class="container">
+            <div class="row align-items-center">
+
+                <div class="col-1">            
+                    <table>
+                        <tr>
+                            <td style="height: 10px; width: 10px;"></td>
+                            <td style="height: 10px; width: 40px; background-color:lightblue" onclick="LED('A')" id="A"></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="height: 40px; width: 10px;background-color:lightblue" onclick="LED('F')" id="F" ></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                            <td style="height: 40px; width: 10px;background-color:lightblue" onclick="LED('B')" id ="B" ></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="height: 10px; width: 10px;"></td>
+                            <td style="height: 10px; width: 40px; background-color:lightblue" onclick="LED('G')" id="G" ></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="height: 40px; width: 10px;background-color:lightblue" onclick="LED('E')" id="E"></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                            <td style="height: 40px; width: 10px;background-color:lightblue" onclick="LED('C')" id="C"></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                        </tr>
+                        <tr>
+                            <td style="height: 10px; width: 10px;"></td>
+                            <td style="height: 10px; width: 40px; background-color: lightblue;" onclick="LED('D')"id="D" ></td>
+                            <td style="height: 10px; width: 10px;"></td>
+                            <td style="height: 10px; width: 10px; background-color:white" onclick="LED('dot')" id="dot"></td>
+                        </tr>
+                    </table>
+                </div>
+                    
+                    <div class="col-2">
+                        <div class="row">
+                            <div class="col-6">
+                                <form method="post" action="{% url 'alarmbytext' %}"> 
+                                    {% csrf_token %}
+                                <label  class="form-label"><h5>Product</h5></label>
+                            </div>
+                            <div class="col-6">
+                                <select class="form-select" aria-label="Default select example" name="system" required>
+                                    {% if system %}
+                                    <option value="{{system}}">{{system}}</option>
+                                    {% endif %}
+                                    <option value="all">all</option>
+                                    {% for product in product_type %}
+                                    <option value="{{product.system_names}}">{{product.nick_names}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">    
+                            <div class="col">       
+                                <input class="form-control" type="text" placeholder="Disabled input" aria-label="Disabled input example" id="LED_Hex" disabled>    
+                            </div>
+                        </div>    
+                    </div>
+                    <div class="col-1" >
+                        <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+                    </div>       
+                </form>        
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <br>
+        <div class="container">
+            <iframe src="{% static 'servicesupport/0iTFPLUS.pdf' %}" width="100%" height="700px"></iframe>
+        </div>    
+    </div>
+</div>
+
+{% endblock %}

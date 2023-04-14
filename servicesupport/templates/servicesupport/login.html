@@ -1,0 +1,50 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+<div class="container-fluid"> 
+    <div class="row align-items-center" style="background-color:black; height: 640px;">
+        <div class="col-md-6 col-sm-12 ">
+            <br> 
+            <div class="row">
+                <div class="col">
+                    <div class="login-main-text" style="color: white;" >
+                        <h2>Support |<br><br> Login Page</h2>
+                        <p>Login or Register to access complete functionality.</p>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group">
+                        <a href="{% url 'index' %}"><button class="btn btn-light" > Home Page </button> </a>- Without login You can check active Auctions & listing Page
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-sm-12 " style="background-color:whitesmoke; height: auto; border-radius: 2%;" >
+            <br>
+            <div class="container" >
+                <h3>Login Form</h3>       
+                <form action="{% url 'login' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <input autofocus class="form-control" type="text" name="username" placeholder="Username">
+                    </div>
+                    <div class="form-group">
+                        <input class="form-control" type="password" name="password" placeholder="Password">
+                    </div>
+                    <div class="form-group">
+                        <input class="btn btn-dark" type="submit" value="Login">
+                    </div>
+                </form>
+                <div class="form-group">
+                    Don't have an account? 
+                    <a href="{% url 'register' %}"><button class= "btn btn-secondary">Register here.</button></a>
+                </div>
+            </div>
+        </div>
+    </div>           
+    </div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+<div class="nav-scroller bg-body shadow-sm">
+    <nav class="nav nav-underline" aria-label="Secondary navigation">
+      <!--<div class="nav-link" style="color: black ; font-weight: bold;">TOOLS</div> -->
+      <a class="nav-link" href="{% url 'alarmbyled' %}"> by LED </a>
+      <a class="nav-link" href="{% url 'alarmbytext' %}"> by text</a>
+      <a class="nav-link" href="{% url 'alarmbynumber' %}"> by number </a>
+      <a class="nav-link" href="#"> Request to add alarm </a>
+    </nav>
+</div>
+<script>
+    function myFunction(data) {
+        // Get the text field
+        var Alarm_number = "Alarm"+data
+        var Alarm_details = "Alarm_details"+data
+        var Alarm_tips = "Alarm_tips"+data      
+        console.log(Alarm_number);
+        var copyText = document.getElementById(Alarm_number).innerText;
+        var copyText1 = document.getElementById(Alarm_details).innerText;
+        var copyText2 = document.getElementById(Alarm_tips).innerText;
+        
+        var all_data = copyText  +"\n"+ copyText1 + "\n"+ copyText2;
+        console.log(copyText.bold())
+        console.log(all_data)
+        navigator.clipboard.writeText(all_data);
+        alert("Copied the text");
+    }
+</script>
+
+<br>
+
+<div class="container">
+    <form method="post" action="{% url 'alarmbynumber' %}"> 
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-1">
+            <label  class="form-label"><h5>Product</h5></label>
+        </div>
+        <div class="col-2">
+            <select class="form-select" aria-label="Default select example" name="system" required>
+                {% if system %}
+                <option value="{{system}}">{{system}}</option>
+                {% endif %}
+                <option value="all">all</option>
+                {% for product in product_type %}
+                <option value="{{product.system_names}}">{{product.nick_names}}</option>
+                {% endfor %}
+            </select>
+        </div>    
+        
+        <div class="col-1">
+        </div>    
+        <div class="col-5">
+                <a class="btn btn-warning" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">
+                  Info to Select
+                </a>
+              <div class="collapse" id="collapseExample1">
+                <div class="card card-body">
+                  Kindly Select Product & System types - if All than all Alarm will be searched.
+                </div>
+              </div>
+        </div>         
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-2">
+            <h5> Alarm by Num:</h5>
+        </div>
+        <div class="col-4">              
+            <input type="number" class="form-control" name="Alarm_number" value="{%if alarm_number_ser %}{{alarm_number_ser}}{%endif%}"  placeholder="Alarm Number" id="Alarm_number">
+        </div>
+        <div class="col-1" >
+            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+        </div>
+        <div class="col-5">
+            <a class="btn btn-warning" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample3">
+              Info for NUM
+            </a>
+            <div class="collapse" id="collapseExample3">
+                <div class="card card-body">
+                    Please enter Num to serch, for SV,SP,PS,OT tag type alarm will apear after EXCE  
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>     
+<br>   
+    {% for result in search_data %}
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col" id ="Alarm{{ forloop.counter0 }}">
+                {{result.alarm_number}}  | {{result.alarm_description}} 
+                </div>
+                <div style="text-align: right" class="col">
+                    {{result.system_type}}
+                    <button onclick="myFunction('{{forloop.counter0}}');" class="button"><img src="{% static 'servicesupport/copy.png' %}" alt="copy" style="border: 0;"> </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <!--<h5 class="card-title">Special title treatment</h5> -->
+
+            <p class="card-text" id="Alarm_details{{ forloop.counter0 }}">{{result.alarm_data}}</p>
+            <p class="card-text" id="Alarm_tips{{ forloop.counter0 }}">Tips : {{result.special_tips}}</p>
+            <div class="card-header">
+            <p class="card-text"><small>Manual : {{result.manual_name_number}}</small></p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}        
+</div> 
+{% endblock %}
