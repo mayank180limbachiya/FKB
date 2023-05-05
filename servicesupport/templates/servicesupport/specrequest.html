@@ -1,3 +1,91 @@
+<<<<<<< HEAD
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+<div class="nav-scroller bg-body shadow-sm">
+    <nav class="nav nav-underline" aria-label="Secondary navigation">
+      <!--<div class="nav-link" style="color: black ; font-weight: bold;">TOOLS</div> -->
+      <a class="nav-link" href="{% url 'specification' %}"> by Parent Spec</a>
+      <a class="nav-link" href="{% url 'equ' %}"> Find Equvivalant Spec</a>
+      <a class="nav-link" href="{% url 'specrequest' %}"> Request for Part add </a>
+    </nav>
+</div>
+<br>
+
+<div class="container">
+<form method="post" action="{% url 'specrequest' %}">
+    {% csrf_token %}
+    <div class="row mb-3">
+      <label  class="col-sm-2 col-form-label">Specification</label>
+      <div class="col-sm-8 col-md-6">
+        <input type="text" class="form-control" name="shortdetail" id="shortdetail" value="{% if thisdict %}{{thisdict.spec}}{%endif%}"  required>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <label  class="col-sm-2 col-form-label">Select Issue:</label>
+      <div class="col-sm-8 col-md-6">
+        <select class="form-select" aria-label="Default select example" name="dropdown" required>
+          {% if thisdict %} 
+          {% if thisdict.dropdown == "ADD" %}
+          <option value="ADD"  selected >ADD PART</option>
+          <option value="Update">Update Part</option>
+          <option value="Wrong">Incorrect Part Spec / Details </option>
+          <option value="Other">Others</option>
+          {% elif thisdict.dropdown == "Update" %}
+          <option value="ADD" >ADD PART</option>
+          <option value="Update" selected>Update Part</option>
+          <option value="Wrong">Incorrect Part Spec / Details </option>
+          <option value="Other">Others</option>
+          {% elif thisdict.dropdown == "Wrong" %}
+          <option value="ADD" >ADD PART</option>
+          <option value="Update" >Update Part</option>
+          <option value="Wrong" selected>Incorrect Part Spec / Details </option>
+          <option value="Other">Others</option>
+          {% elif thisdict.dropdown == "Other" %}
+          <option value="ADD" >ADD PART</option>
+          <option value="Update" >Update Part</option>
+          <option value="Wrong">Incorrect Part Spec / Details </option>
+          <option value="Other" selected>Others</option>
+          {% endif %}
+          {% else %}
+          <option >Please Select</option>
+          <option value="ADD">ADD PART</option>
+          <option value="Update">Update Part</option>
+          <option value="Wrong">Incorrect Part Spec / Details </option>
+          <option value="Other">Others</option>
+          {% endif %}          
+        </select>
+      </div>  
+    </div>  
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Details</label>
+      <div class="col-sm-10">
+         <textarea class="form-control" name="details" id="details" style="height: 100px"  required>{% if thisdict %}{{thisdict.details}}{% endif %}</textarea>
+      </div>
+    </div> 
+
+    <fieldset class="row mb-3">
+      <legend class="col-form-label col-sm-2 pt-0">Need to change In</legend>
+      <div class="col-sm-10">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="option" id="gridRadios1" value="Parent SPEC" checked>
+          <label class="form-check-label" for="gridRadios1">
+            Edit/ Add in Parent Spec
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="option" id="gridRadios2" value="Equvivalant SPEC">
+          <label class="form-check-label" for="gridRadios2">
+            Edit/ Add in Eqvivalent Spec
+          </label>
+        </div>
+      </div>
+    </fieldset>
+    <button type="submit" class="btn btn-primary">EXEC</button>
+  </form>
+ </div>
+
+=======
 {% extends "servicesupport/layout.html" %}
 
 {% block body %}
@@ -71,4 +159,5 @@
       <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
   </div>    
 </div> 
+>>>>>>> master
 {% endblock %}

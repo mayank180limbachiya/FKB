@@ -1,3 +1,43 @@
+<<<<<<< HEAD
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+</br>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">By Alarm Number</h5>
+                    <p class="card-text">Search Alarm Based on Alarm Number</p>
+                    <a href="{% url 'alarmbynumber' %}" class="btn btn-primary">Number</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">By Alarm Text</h5>
+                    <p class="card-text">Search Alarm based on Text.</p>
+                    <a href="{% url 'alarmbytext' %}" class="btn btn-primary">text</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">By System/Drive LED</h5>
+                    <p class="card-text">Search Alarm By System And Drive LED </p>
+                    <a href="{% url 'alarmbyled' %}" class="btn btn-primary">LED</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+=======
 {% extends "servicesupport/layout.html" %}
 
 {% block body %}
@@ -41,3 +81,4 @@
 </div>  
 
 {% endblock %}
+>>>>>>> master

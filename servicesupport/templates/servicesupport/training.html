@@ -1,3 +1,90 @@
+<<<<<<< HEAD
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+<br>
+<div class="container">
+    <form method="post" action="{% url 'training' %}"> 
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-1">
+            <label  class="form-label"><h5>Product</h5></label>
+        </div>
+        <div class="col-2">
+            <select class="form-select" aria-label="Default select example" name="Product" required>
+                {% if Product_Ser != None %}
+                <option value="{{Product_Ser}}">{{Product_Ser}}</option>
+                {% endif %}
+                <option value="all">all</option>
+                {% for productdata in product_type %}
+                <option value="{{productdata.product}}">{{productdata.product}}</option>
+                {% endfor %}
+            </select>
+        </div>    
+        
+        <div class="col-1">
+        </div>    
+        <div class="col-5">
+                <a class="btn btn-warning" data-bs-toggle="collapse" href="#collapseExample1" role="button" aria-expanded="false" aria-controls="collapseExample1">
+                  Info to Select
+                </a>
+              <div class="collapse" id="collapseExample1">
+                <div class="card card-body">
+                  Kindly Select Product - if All than all Procedure will show
+                </div>
+              </div>
+        </div>         
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-2">
+            <h5> Training Search:</h5>
+        </div>
+        <div class="col-4">              
+            <input type="text" class="form-control" name="Training_Data" value="{%if Training_Data_ser %}{{Training_Data_ser}}{%endif%}"  placeholder="Search Training Document" id="Training_Data">
+        </div>
+        <div class="col-1" >
+            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+        </div>
+        <div class="col-5">
+            <a class="btn btn-warning" data-bs-toggle="collapse" href="#collapseExample3" role="button" aria-expanded="false" aria-controls="collapseExample3">
+              Information
+            </a>
+            <div class="collapse" id="collapseExample3">
+                <div class="card card-body">
+                    Please enter Text to search Procedure/ Training
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>     
+    <br>
+    <div class="container">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Product</th>
+                    <th scope="col">System_name</th>
+                    <th scope="col">Training_Name</th>
+                    <th scope="col">Link</th>
+                  </tr>
+            </thead>      
+            <tbody>
+            {% for Trainingdata in search_data %}
+            <tr>
+                <th scope="row">{{forloop.counter0}}</th>
+                <td>{{Trainingdata.Product_name}}</td>
+                <td>{{Trainingdata.System_name}}</td>
+                <td>{{Trainingdata.Training_Name}}</td>
+                <td><a href="/static{{Trainingdata.Training_storage.url}}" target="_new" class="btn btn-secondary">Link</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>    
+    </div>
+</div>    
+=======
 {% extends "servicesupport/layout.html" %}
 
 {% block body %}
@@ -171,4 +258,5 @@
 </div>
 {% endif %}
 
+>>>>>>> master
 {% endblock %}
