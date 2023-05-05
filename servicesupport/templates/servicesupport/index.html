@@ -1,0 +1,150 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+<!--<div class="background" style=" background-image: url({% static 'servicesupport/background.jpg' %}); ">-->
+  <br>
+<div>
+<div class="container">
+  <!--
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+      <div class="card h-100">
+        <img src="{% static 'servicesupport/spec.png' %}" class="card-img-top" alt="Specification" style="width: auto; width: 150px; object-fit: scale-down; "  >
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-9">
+              <h5 class="card-title">Part Specification</h5>
+            </div>
+            <div class="col">  
+              <a href="{% url 'specification' %}" class="btn btn-primary float-end">spec</a>
+            </div>
+          </div>    
+          <p class="card-text">Search part spec & Its child parts. Also You can search any equvalant parts available in child parts.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <img src="{% static 'servicesupport/tool.png' %}" class="card-img-top" alt="Tools" style="width: auto; height: 150px; object-fit: scale-down; " >
+        <div class="card-body">
+          <h5 class="card-title">Service Tools</h5>
+          <a href="{% url 'softwaretool' %}" class="btn btn-primary">Tools</a>
+          <p class="card-text">basic service tools will support to identify problem. tools like VRDY off alarm, WN69 alarm, PC 50 alarm.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="card h-100">
+        <img src="{% static 'servicesupport/alarm.jpg' %}" class="card-img-top" alt="Alarm" style="width: auto; height: 150px; object-fit: scale-down; " >
+        <div class="card-body">
+          <h5 class="card-title">Alarm Search</h5>
+          <a href="{% url 'alarm' %}" class="btn btn-primary">Alarm</a>
+          <p class="card-text">Search Alarm based on system, With detailed disctiption</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="col">
+        <div class="card h-100">
+          <img src="{% static 'servicesupport/tain.jpg' %}" class="card-img-top" alt="Alarm" style="width: auto; height: 250px; object-fit: scale-down; " >
+          <div class="card-body">
+            <h5 class="card-title">Training Data</h5>
+            <a href="{% url 'training' %}" class="btn btn-primary">Training DOC</a>
+            <p class="card-text">this will have storage of Training & procedure </p>
+          </div>
+        </div>
+      </div>
+    
+    <div class="col">
+        <div class="card h-100">
+          <img src="{% static 'servicesupport/std.jpg' %}" class="card-img-top" alt="Alarm" style="width: auto; height: 250px; object-fit: scale-down; " >
+          <div class="card-body">
+            <h5 class="card-title">STD data</h5>
+            <a href="{% url 'std' %}" class="btn btn-primary">STD Data</a>
+            <p class="card-text">this will have storage of Service technical discusstion</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    -->
+  <div class="row">  
+    <div class="col-6">
+      <div class="card mb-3" style="max-width: 540px;">
+        <div class="row no-gutters align-items-center">
+          <div class="col-md-4 text-center ">
+            <a href="{% url 'specification' %}" >
+            <img style="width: 120px;" src="{% static 'servicesupport/spec.png' %}" class="card-img" alt="Specification">
+              </a>
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">Part Specification</h5>
+              <p class="card-text">Search part spec & Its child parts. Also You can search any equivalent parts available in child parts.</p>
+              <!--<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>-->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="card mb-3" style="max-width: 540px;">
+        <div class="row no-gutters align-items-center">
+          <div class="col-md-4 text-center ">
+            <a href="{% url 'softwaretool' %}">
+            <img style="width: 120px;" style="height: 130px;" src="{% static 'servicesupport/tool.png' %}" class="card-img" alt="Tools">
+          </a>
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">Service Tools</h5>
+              <p class="card-text">basic service tools will support to identify problem. tools like VRDY off alarm, WN69 alarm, PC 50 alarm.</p>
+          
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>  
+  <div class="row">  
+    <div class="col-6">
+      <div class="card mb-3" style="max-width: 540px;">
+        <div class="row no-gutters align-items-center">
+          <div class="col-md-4 text-center ">
+            <a href="{% url 'alarm' %}" >
+              <img style="width: 120px;" src="{% static 'servicesupport/alarm.jpg' %}" class="card-img" alt="Alarm">
+            </a>
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title">Alarm Search</h5>
+              <p class="card-text">Search Alarm based on system, With detailed description</p>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>  
+    <div class="col-6">
+    <div class="card mb-3" style="max-width: 540px;">
+      <div class="row no-gutters align-items-center">
+        <div class="col-md-4 text-center ">
+          <a href="{% url 'training' %}" >
+          <img style="width: 120px;" src="{% static 'servicesupport/tain.jpg' %}" class="card-img" alt="Training">
+          </a>
+        </div>
+        <div class="col-md-8">
+          <div class="card-body">
+            <h5 class="card-title">Training Data</h5>
+            <p class="card-text">this will have storage of Training & procedure</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div> 
+</div>  
+</div>
+{% endblock %}

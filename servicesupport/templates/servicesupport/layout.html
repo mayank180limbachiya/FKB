@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        {% load static %}
+        <title>{% block title %}Service Support{% endblock %}</title> 
+        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">  
+        <script src="{% static 'js/bootstrap.min.js' %}"></script>
+       
+       
+        <link rel="shortcut icon" type="image/png" href="{% static 'servicesupport/fav.png' %}"/>
+        <!-- Latest compiled and minified CSS 
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        -->
+        <!-- Latest compiled JavaScript 
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>  
+        <script src= "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>  
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet" type="text/css" /> -->
+    </head>
+    
+    <style>
+        .dropdown:hover>.dropdown-menu {
+            display: block;
+        }
+        .dropdown>.dropdown-toggle:active {
+            pointer-events: none;
+        }
+
+        table.table-fit {
+            width: auto !important;
+            table-layout: auto !important;
+        }
+        table.table-fit thead th, table.table-fit tfoot th {
+            width: auto !important;
+        }
+        table.table-fit tbody td, table.table-fit tfoot td {
+            width: auto !important;
+        }
+        .table {
+            margin: 0 auto;
+            width: 80%;
+        }
+   </style>
+        
+    <body>
+        {% load static %}
+        
+        {% if flag != 12 %}
+        <div class="sticky-top">
+        <nav class="navbar navbar-expand-md navbar-light" style="background-color: #FFDD00;">
+            <a class="navbar-brand" href="{% url 'index' %}"><h2>Support </h2> </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent"> 
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item ">
+                        <a class="nav-link fs-5 {% if flag == 1 %}active{% endif %}" href="{% url 'index' %}"> {% if flag == 1 %}<Kbd class="card-text">{% endif %}Home{% if flag == 1 %}</Kbd>{% endif %} </a>
+                    </li>    
+                    <li class="nav-item">
+                        <a class="nav-link fs-5 {% if flag == 6 %}active{% endif %}" href="{% url 'alarm' %}">{% if flag == 6 %}<Kbd class="card-text">{% endif %}Alarm {% if flag == 6 %}</Kbd>{% endif %}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link fs-5 {% if flag == 7 %}active{% endif %}" href="{% url 'specification' %}">{% if flag == 7 %}<Kbd class="card-text">{% endif %}Specification{% if flag == 7 %}</Kbd>{% endif %}</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link fs-5 {% if flag == 4 %}active{% endif %}" href="{% url 'training' %}">{% if flag == 4 %}<Kbd class="card-text">{% endif %}Training{% if flag == 4 %}</Kbd>{% endif %}</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link fs-5 {% if flag == 5 %}active{% endif %}" href="{% url 'softwaretool' %}">{% if flag == 5 %}<Kbd class="card-text">{% endif %}Software Tools{% if flag == 5 %}</Kbd>{% endif %}</a>
+                    </li>
+                    <!--
+                    <li class="nav-item ">
+                        <a class="nav-link {% if flag == 3 %}active{% endif %}" href="{% url 'std' %}"> STD Data </a>
+                    </li>
+                    -->
+                    <li class="nav-item ">
+                        <a class="nav-link fs-5 {% if flag == 10 %}active{% endif %}" href="{% url 'manual' %}">{% if flag == 10 %}<Kbd class="card-text">{% endif %}Manual{% if flag == 10 %}</Kbd>{% endif %} </a>
+                    </li>
+                </ul>
+                {% if user.is_authenticated %}
+                <ul class="navbar-nav ml-auto">    
+                    <li class="nav-item ">
+                        <a class="nav-link fs-5" href="{% url 'logout' %}">Sign Out</a>
+                    </li>
+                </ul>
+                {% else %}
+                <ul class="navbar-nav ml-auto">    
+                    <li class="nav-item ">
+                        <a class="nav-link fs-5" href="{% url 'login' %}">Sign In/ Register</a>
+                    </li>
+                </ul>
+                {% endif %}
+
+            </div>
+        </nav>
+        <div class="text-white" style="padding: 5px; background-color: black">
+                <small>
+                    <div style="float:left;">
+                        {% if flag == 6 %}
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <a href="{% url 'alarmbytext' %}"><button type="button"  style="background-color: black;" class="btn btn-dark btn-sm">AL by Text</button></a>
+                            <a href="{% url 'alarmbynumber' %}"><button type="button"  style="background-color: black;" class="btn btn-dark btn-sm">AL by Number</button></a>
+                            <a href="{% url 'alarmbyled' %}"><button type="button"  style="background-color: black;" class="btn btn-dark btn-sm">AL by LED</button></a>
+                        </div>
+                        {% endif %}
+                        {% if flag == 7 %}
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <a href="{% url 'specification' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">Search by Parent Spec</button></a>
+                            <a href="{% url 'equ' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">Search Equivalent/Parent Spec</button></a>
+                            <a href="{% url 'specrequest' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">Request for Part add</button></a>
+                        </div>
+                        {% endif %}
+                        {% if flag == 5 %}
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <a href="{% url 'vrdy' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">VRDY OFF</button></a>
+                            <a href="{% url 'wn69' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">WN 69</button></a>
+                            <a href="{% url 'nmi' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">PC50 & NMI</button></a>
+                        </div>
+                            {% endif %}
+
+                    </div>
+                    <div style="float:right;">
+                        {% if user.is_authenticated %}
+                            Signed in as <strong>{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</strong>
+                        {% else %}
+                            Not signed In.
+                        {% endif %}
+                    </div>
+                </small>
+            <div style="clear: both;"></div>       
+        </div>
+        </div>
+        {% endif %}
+       
+        {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+            </button>
+        </div>
+        {% endfor %}
+
+        {% block body %}
+        {% endblock %}
+
+        {% if flag == 1 %}
+        <div class="fixed-bottom">
+            <div class="text-center" style="padding: 5px; border-top: #737373 solid 0.2px; background-color: white">
+                <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
+            </div>    
+        </div>  
+        {% endif %}      
+    </body>
+</html>

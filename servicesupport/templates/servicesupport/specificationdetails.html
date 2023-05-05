@@ -1,0 +1,214 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+
+<br>
+<!--
+<div class="container">
+    <form method="post" action="{% url 'specification' %}"> 
+    {% csrf_token %}
+    <div class="row ">
+        <div class="col text-center">
+            <div class="float-end"><h5> Parent Spec:</h5></div>
+        </div>
+        <div class="col">            
+            <input type="text" class="form-control" name="specno" placeholder="Type Parent Spec" id="specno">
+        </div>
+        <div class="col" >
+            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+        </div>
+    </div>
+    </form>    
+</div>   
+--> 
+
+<style>
+
+
+</style>
+
+<br>
+<div class="container">
+    <div class="row">
+        <div class="col-2" style=" border-bottom: 1px solid black;">
+            <h5>Parent Spec:</h5> 
+        </div>
+        <div class="col-auto" style=" border-bottom: 1px solid black;">
+            {{First_data.parentspec}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-2" style=" border-bottom: 1px solid black;">
+            <h5>Parent Name:</h5> 
+        </div>
+        <div class="col-auto" style=" border-bottom: 1px solid black;">
+            {{First_data.parentname}}
+        </div>
+    </div>
+</div>    
+<br>
+
+<div class="table ">
+    <table class="table table-striped table-hover table-bordered" style=" width: 1100px;">
+        <thead>
+            <tr> 
+                <th style=" width: 5%;" >No.</th>  
+                <th>Parent Spec</th>
+                <th style="width: 50px;">Spec Parent</th>
+                <th style="width: auto;">Spec Parts Name</th>
+                <th class="table-primary" style=" width: auto;">Child Spec</th>
+                <th class="table-primary">Child Name</th>
+                <th style=" width: 5%;" >QTY</th>
+                <th style=" width: 9%;">Spare Type</th>
+                <th>Old</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--
+            {% for write in Main_data %} 
+                {% if write.parentspec == write.childspec %}  
+                    <tr class="table-primary">
+                        <td></td>
+                        <td>{{ write.parentspec }}</td>
+                        <td>{{ write.parentname }}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            -->
+            {% for write in Main_data %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td style=" white-space: nowrap;">{{ write.parentspec }}</td>
+                        <td style=" white-space: nowrap;">{{ write.spec_parent }}</td>
+                        <td id="table_name">{{ write.spec_PartsName }}</td>
+                        <td class="table-primary" style=" white-space: nowrap;">{{ write.childspec }} {% for data in store3 %}{% if write.childspec == data.spec %}<a class="link-danger">N-E*</a>{% endif %}{% endfor %}{% for data in store4 %} {% if write.childspec == data.equspec%}<a class="link-danger">O-E*</a>{% endif %}{% endfor %}</td>
+                        <td class="table-primary" id="table_name">{{ write.childname }}</td>
+                        <td>{{ write.qty }}</td>
+                        <td>{{ write.spare_type }} </td>
+                        <td>{{write.old}}</td>
+                    </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>       
+
+<br>
+
+<div class="container">
+{% if store3.count != 0 or store4.count != 0 %}
+    <div class="accordion" id="accordionExample">
+        {% if store3.count != 0 %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              Equ Spec Search result
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body"> 
+                <div class="container text-center">
+                    <div class="table-responsive">
+                        <table class="table table-fit table-bordered">
+                            <thead>
+                                <tr> 
+                                    <th scscope="col"> Spec</th>
+                                    <th scscope="col"> Description</th>
+                                    <th scscope="col"> Reuse</th>
+                                    <th scscope="col"> Info </th>
+                                    <th scscope="col"> Equ spec</th>
+                                    <th scscope="col"> SR NO</th>
+                                    <th scscope="col"> TR NO</th>
+                                    <th scscope="col"> Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in store3 %}  
+                                    <tr >
+                                    <td class="table-primary">{{ data.spec }}</td>
+                                    <td> {{ data.discription }}</td>
+                                    <td>{% if data.reuse == 1 %}<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bootstrap-reboot" viewBox="0 0 16 16">
+                                        <path d="M1.161 8a6.84 6.84 0 1 0 6.842-6.84.58.58 0 1 1 0-1.16 8 8 0 1 1-6.556 3.412l-.663-.577a.58.58 0 0 1 .227-.997l2.52-.69a.58.58 0 0 1 .728.633l-.332 2.592a.58.58 0 0 1-.956.364l-.643-.56A6.812 6.812 0 0 0 1.16 8z"/>
+                                        <path d="M6.641 11.671V8.843h1.57l1.498 2.828h1.314L9.377 8.665c.897-.3 1.427-1.106 1.427-2.1 0-1.37-.943-2.246-2.456-2.246H5.5v7.352h1.141zm0-3.75V5.277h1.57c.881 0 1.416.499 1.416 1.32 0 .84-.504 1.324-1.386 1.324h-1.6z"/>
+                                    </svg> {% endif %}</td>
+                                    <td>{{ data.info }}</td>
+                                    <td>{{ data.equspec }}</td>
+                                    <td>{{ data.srno }}</td>
+                                    <td>{{ data.trno }}</td>
+                                    <td>{{ data.remark }}</td>
+                                    </tr>    
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>       
+                </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% if store4.count != 0 %}
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                Old Equ Search result  
+            </button>
+          </h2>
+          <div id="collapseTwo" class="accordion-collapse collapse " aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <div class="container text-center">
+                    <div class="table-responsive">
+                        <table class="table table-fit table-bordered">
+                            <thead>
+                                <tr> 
+                                    <th scscope="col"> Spec</th>
+                                    <th scscope="col"> Description</th>
+                                    <th scscope="col"> Reuse</th>
+                                    <th scscope="col"> Info </th>
+                                    <th scscope="col"> Equ spec</th>
+                                    <th scscope="col"> SR NO</th>
+                                    <th scscope="col"> TR NO</th>
+                                    <th scscope="col"> Remark</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in store4 %}  
+                                    <tr >
+                                    <td>{{ data.spec }}</td>
+                                    <td> {{ data.discription }}</td>
+                                    <td>{% if data.reuse == 1 %}<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bootstrap-reboot" viewBox="0 0 16 16">
+                                        <path d="M1.161 8a6.84 6.84 0 1 0 6.842-6.84.58.58 0 1 1 0-1.16 8 8 0 1 1-6.556 3.412l-.663-.577a.58.58 0 0 1 .227-.997l2.52-.69a.58.58 0 0 1 .728.633l-.332 2.592a.58.58 0 0 1-.956.364l-.643-.56A6.812 6.812 0 0 0 1.16 8z"/>
+                                        <path d="M6.641 11.671V8.843h1.57l1.498 2.828h1.314L9.377 8.665c.897-.3 1.427-1.106 1.427-2.1 0-1.37-.943-2.246-2.456-2.246H5.5v7.352h1.141zm0-3.75V5.277h1.57c.881 0 1.416.499 1.416 1.32 0 .84-.504 1.324-1.386 1.324h-1.6z"/>
+                                    </svg> {% endif %}</td>
+                                    <td>{{ data.info }}</td>
+                                    <td class="table-primary">{{ data.equspec }}</td>
+                                    <td>{{ data.srno }}</td>
+                                    <td>{{ data.trno }}</td>
+                                    <td>{{ data.remark }}</td>
+                                    </tr>    
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>       
+                </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+    </div>
+{% endif %}
+</div>
+        
+
+
+
+
+
+{% endblock %}

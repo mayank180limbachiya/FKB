@@ -1,0 +1,109 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+<script>
+    function maxlenghth_login_user() {
+      var user_name = document.getElementById("username").value;
+      if (user_name.length == 30) {
+        alert("UserName limit is 30 Char");
+      }
+    }
+    function maxlength_login_pass() {
+      var user_name = document.getElementById("password").value;
+      if (user_name.length == 20) {
+        alert("Password limit is 20 Char");
+      }
+    }
+    function maxlength_login_first(){
+        var user_name = document.getElementById("first").value;
+        if (user_name.length == 16) {
+            alert("First Name limit is 16 Char");
+        }
+    }
+    function maxlength_login_last(){
+        var user_name = document.getElementById("last").value;
+        if (user_name.length == 16) {
+            alert("Last Name limit is 16 Char");
+        }
+    }
+</script>
+
+<section class="h-100">
+    <div class="container h-100">
+        <div class="row justify-content-sm-center h-100">
+            <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
+                <div class="row">
+                    <div class="col">
+                        <div class="text-center my-5">
+                            <img src="{% static 'servicesupport/oneFanuc.png' %}" alt="logo" width="150">
+                        </div>
+                    </div>
+                    <div class="col">    
+                        <div class="text-center my-5">
+                            <img src="{% static 'servicesupport/Service First Logo.png' %}" alt="logo" width="200">
+                        </div>
+                    </div>
+                </div>        
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <h1 class="fs-4 card-title fw-bold mb-4">Register</h1>
+                        <form method="POST" class="needs-validation" novalidate="" autocomplete="off" action="{% url 'register' %}" method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label class="mb-2 text-muted" for="email">User Name</label>
+                                <input id="username" type="text" maxlength = "30" name="username" class="form-control" id="username" value="{%if user_data.username %}{{user_data.username}}{%endif%}" onkeyup='maxlenghth_login_user()' required autofocus>
+                            </div>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-1 w-50">
+                                            <label class="text-muted"   for="password">First Name</label>
+                                        </div>
+                                        <input id="first" type="text" maxlength = "16" class="form-control" onkeyup="maxlength_login_first()" name="first" value="{%if user_data.first %}{{user_data.first}}{%endif%}" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-1 w-50">
+                                        <label class="text-muted"   for="password">Last Name</label>
+                                        </div>
+                                        <input id="last" type="text" maxlength = "16" class="form-control" onkeyup="maxlength_login_last()" name="last" value="{%if user_data.last %}{{user_data.last}}{%endif%}" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="mb-2 text-muted" for="email">Email id</label>
+                                <input id="username" type="email" maxlength = "70" name="email" class="form-control" id="email"  onkeyup='maxlength_login_email()' value="{%if user_data.email %}{{user_data.email}}{%endif%}" required >
+                            </div>
+                            <div class="mb-3">
+                                <div class="mb-2 w-100">
+                                    <label class="text-muted" for="password">Password</label>
+                                </div>
+                                <input id="password" type="password" maxlength = "20" class="form-control" onkeyup="maxlength_login_pass()" name="password" required>
+                            </div>
+                        
+                            <div class="mb-2">
+                                <div class="mb-2 w-100">
+                                    <label class="text-muted"  for="password">Confirm Password</label>
+                                </div>
+                                <input type="password"  id="confirmation" class="form-control"  name="confirmation" required>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                Back to <a class="text-dark" href="{% url 'login' %}"> Log in</a>
+                                <button type="submit" class="btn btn-primary ms-auto">
+                                    Register
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                    
+                </div>
+                <div class="text-center mt-5 text-muted">
+                    Copyright &copy; 2023 &mdash; ServiceSupport
+                </div>
+            </div>
+        </div>
+    </div>
+</section>   
+
+{% endblock %}

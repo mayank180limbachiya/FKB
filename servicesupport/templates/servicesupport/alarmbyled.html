@@ -1,0 +1,69 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+
+<ul class="nav nav-tabs m-2" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Drive LED</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">System LED</button>
+    </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <br>
+        <table class="table table-striped table-bordered table-hover  ">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <!--<th scope="col">Product</th>-->
+                    <th scope="col">PDF Name</th>
+                    <th scope="col">PDF Location</th>
+                    <th scope="col">Link</th>
+                  </tr>
+            </thead>      
+            <tbody>
+            {% for led in Led_drive_data %}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <!--<td>{{led.Product_name.system_names}}</td>-->
+                <td>{{led.pdf_name}}</td>
+                <td>{{led.pdf_storage}} </a></td>
+                <td><a href="/static{{led.pdf_storage.url}}" target="_new">Open</a></td>
+            </tr>
+            
+            {% endfor %}
+            </tbody>
+        </table> 
+    </div>
+    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <br>
+        <table class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th >#</th>
+                    <!--<th scope="col">Product</th>-->
+                    <th>PDF Name</th>
+                    <th>PDF Location</th>
+                    <th scope="col">Link</th>
+                  </tr>
+            </thead>      
+            <tbody>
+            {% for led in Led_system_data %}
+            <tr>
+                <th >{{forloop.counter}}</th>
+                <!--<td>{{led.Product_name.system_names}}</td>-->
+                <td>{{led.pdf_name}}</td>
+                <td>{{led.pdf_storage}}</td>
+                <td><a href="/static{{led.pdf_storage.url}}" target="_new">Open</a></td>
+            </tr>
+            
+            {% endfor %}
+            </tbody>
+        </table>     
+    </div>
+</div>
+
+{% endblock %}

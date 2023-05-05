@@ -1,0 +1,205 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+<div class=" container">
+    <br>
+    <h3>
+        SV401 Improper V_READY OFF
+        <small class="text-muted">VRDY</small>
+    </h3>
+    <br>
+    <div class="card">
+        <div class="card-body">
+        <h4 class="card-title">About Alarm:</h4>
+        <p class="card-text">This alarm is issued if the servo ready signal VRDY of a servo amplifier dose not turn on or if the signal turns off during operation.During alarm the ready signal (PRDY) of the position control was ON, the ready signal (VRDY) of the velocity control was OFF. which signal went OFF that can be find out via</p> <Kbd class="card-text">DGN 358</Kbd>
+        </div>
+    </div>
+    <br>
+    
+        <div class="container center">
+        <div class="row">
+            <div class="col">
+                <h4>DGN 358:</h4>
+            </div>  
+            <div class="col"> 
+                <input type="number" min="0" max="65535" class="form-control" placeholder="DGN Value" id="dgn">
+            </div>
+            <div class="col" ><button type="button" class="btn btn-secondary" onclick="dgn()" >EXEC</button>
+            </div>
+        </div>
+        </div>  
+    <br>
+    <p id="wnum"></p>
+    <div class="table-responsive">
+    <table class="table table-bordered"style="width:100%">
+        <tr class="table-primary" >
+            <td class="table-primary">Bit 15</td>
+            <td class="table-primary">Bit 14</td>
+            <td class="table-primary">Bit 13</td>
+            <td class="table-primary">Bit 12</td>
+            <td class="table-primary">Bit 11</td>
+            <td class="table-primary">Bit 10</td>
+            <td class="table-primary">Bit 9</td>
+            <td class="table-primary">Bit 8</td>
+            <td class="table-primary">Bit 7</td>
+            <td class="table-primary">Bit 6</td>
+            <td class="table-primary">Bit 5</td>
+            <td class="table-primary">Bit 4</td>
+            <td class="table-primary">Bit 3</td>
+            <td class="table-primary">Bit 2</td>
+            <td class="table-primary">Bit 1</td>
+            <td class="table-primary">Bit 0</td>
+        </tr>
+        <tr class="table-light">
+            <td class="table-light"></td>
+            <td class="table-light">SRDY</td>
+            <td class="table-light">DRDY</td>
+            <td class="table-light">INTL</td>
+            <td class="table-light">RLY</td>
+            <td class="table-light">CRDY</td>
+            <td class="table-light">MCOFF</td>
+            <td class="table-light">MCON-A</td>
+            <td class="table-light">MCON-S</td>
+            <td class="table-light">ESP</td>
+            <td class="table-light">HRDY</td>
+            <td class="table-light"></td>
+            <td class="table-light"></td>
+            <td class="table-light"></td> 
+            <td class="table-light"></td>
+            <td class="table-light"></td>
+        </tr>
+        <tr class="table-primary">
+            <td class="table-secondary" style= "text-align: center;" id="15">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="14">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="13">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="12">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="11">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="10">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="9">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="8">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="7">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="6">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="5">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="4">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="3">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="2">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="1">0</td>
+            <td class="table-secondary" style= "text-align: center;" id="0">0</td>
+        </tr>
+    </table>
+    </div>
+    <br>
+    <script>
+        function dgn() {
+            let x = document.getElementById("dgn").value;
+            let y = (x >>> 0).toString(2)
+            let num = y.split("").reverse().join("");
+            if (isNaN(x) || x < 1 || x > 65535) { 
+                document.getElementById("wnum").innerHTML = "Wrong Data more than 16 bit or negative value";
+                document.getElementById("0").innerHTML = "NA";
+            } 
+            else {
+                for (var j = 0; j < 16; j++) {
+                    document.getElementById(j).innerHTML = 0;
+                    document.getElementById(j).style.backgroundColor = 'WhiteSmoke';
+                }
+                for (var i = 0 ; i < num.length; i++) {
+                    document.getElementById(i).innerHTML = num.charAt(i);
+                    var k = num.charAt(i);
+                    if (k == "1")
+                    { document.getElementById(i).style.backgroundColor = 'LightGreen';}
+                }
+                for (var l = 0; l < 16; l++){
+                    let m = document.getElementById(l).innerHTML;
+                    if (m == "0" && l > "4" && l < "15"){
+                        document.getElementById(l).style.background ='LightCoral';
+                    }
+                }
+            }
+        }
+        </script>
+        <div class="row">
+            <div class= "col">       
+        <div class="table-responsive">
+        <table class="table" style="width: auto;">
+            <thead class="table-active">
+                <tr>
+                    <th>Bit</th>
+                    <th>Name</th>
+                    <th>Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5</td>  
+                <td>ESP</td>
+                <td>Emergency stop signal</td>
+                
+              </tr>
+              <tr>
+                <td>6</td>  
+                <td>MCONS</td>
+                <td>MCON Signal System</td>
+                
+              </tr>
+              <tr>
+                <td>7</td>  
+                <td>MCONA</td>
+                <td>MCON Signal Amplifier</td>
+                
+              </tr>
+              <tr>
+                <td>8</td>  
+                <td>MCOFF</td>
+                <td>MCON Signal Converter</td>
+                
+              </tr>
+              <tr>
+                <td>9</td>  
+                <td>CRDY</td>
+                <td>Covverter preparation completed signal</td>
+                
+              </tr>
+              <tr>
+                <td>10</td>  
+                <td>RLY</td>
+                <td>Relay Signal (DB relay energized)</td>
+                
+              </tr>
+              <tr>
+                <td>11</td>  
+                <td>INTL</td>
+                <td>Interlock signal (DB relay de-energized)</td>
+                
+              </tr>
+              <tr>
+                <td>12</td>  
+                <td>DRDY</td>
+                <td>Amplifier preparation completed signal</td>
+                
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        </div>
+        <div class="col">
+            <div class="row">
+            <div class="card">
+                <div class="card-body">
+                <h5 class="card-title">Details:</h5>
+                <p class="card-text">358 Value converted to binary representation, and check bits 5 - 14 of the binary.</p>
+                    <p>When amplifier excitation is turned on. these bits are set to 1 sequentially from the lowest bit (5th) to Highest bit (14bit).
+                    Check  the bits sequentially from the lowest bit to find the first bit that is set to 0. this bit indicated that the corresponding processing could not be completed and so the V ready-off alarm was caused.</p>
+                </div>
+            </div>
+            </div>
+            <br>
+               
+        </div>
+        </div>
+        <br> 
+</div>
+<br>
+
+{% endblock %}

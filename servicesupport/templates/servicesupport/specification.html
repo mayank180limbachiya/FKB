@@ -1,0 +1,143 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+<br>
+
+<script>
+    function maxlenghth_specification_spec() {
+        var user_name = document.getElementById("spec").value;
+        if (user_name.length == 40) {
+          alert("Spec enter limit is 40 Char");
+        }
+      }
+</script>
+
+<div class="container"  style="border-bottom: rgb(158, 158, 158) solid 1px;">
+    <form method="get" action="{% url 'specification' %}"> 
+    {% csrf_token %}
+    <div class="row align-items-center">
+        <div class="col-2">
+            <h5> Parent Spec:</h5>
+        </div>
+        <div class="col">            
+            <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_specification_spec()" class="form-control" name="specno" value="{%if user_data.specno %}{{user_data.specno}}{%endif%}" placeholder="Type Parent Spec" id="specno" required>
+        </div>
+        <div class="col" >
+            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+        </div>
+        <div class="col-2">
+            <div class="float-end">
+                <div class="input-group input-group-sm mb-0"> 
+                <h6> No. of Row:</h6></div>
+            </div>
+        </div>
+        <div class="col-1" > 
+            <div class="input-group input-group-sm mb-0">           
+                <input size="2"  min="1" max="200"  type="number" class="form-control" name="limit" value="{%if user_data.limit %}{{user_data.limit}}{%else%}25{%endif%}" id="specno">
+            </div>
+        </div>
+    </div>
+    </form>  
+    <br>  
+</div>    
+<br>
+
+{% if page_obj %}
+<div class="text-center">
+    <div class="table-responsive">
+        <table class="table  table-bordered table-striped table-hover ">
+            <thead>
+                <tr> 
+                    <th scscope="col" style=" white-space: nowrap;"> #</th>
+                    <th scscope="col" style=" white-space: nowrap;"> Parent Spec</th>
+                    <th scscope="col" style=" white-space: nowrap;"> Parent Name</th>
+                    <th scscope="col" style=" white-space: nowrap;"> Child Spec</th>
+                    <th scscope="col" style=" white-space: nowrap;"> Child Name</th>
+                    <th scscope="col" style=" white-space: nowrap;"> QTY</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for write in page_obj %} 
+                        <tr>
+                            <td class="text-end">{{forloop.counter}}</td>
+                            <td style=" white-space: nowrap;"><a href="{% url 'spec_details' write.id %}">{{ write.parentspec }}</a></td>
+                            <td class="text-start" style=" white-space: nowrap;">{{ write.parentname }}</td>
+                            <td class="text-start" style=" white-space: nowrap;">{{ write.childspec }}</td>
+                            <td class="text-start" style=" white-space: nowrap;">{{ write.childname }}</td>
+                            <td class="text-end" style=" white-space: nowrap;">{{ write.qty }}</td>
+                        </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>       
+</div>
+
+{% if page_obj.has_other_pages %}
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1&specno={{user_data.specno}}&limit={{user_data.limit}}">
+                        First
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
+                        Previous
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page_number in page_obj.paginator.page_range %}
+                {% comment %}
+                    This conditional allows us to display up to 3 pages before and after the current page
+                    If you decide to remove this conditional, all the pages will be displayed
+
+                    You can change the 3 to any number you want e.g
+                    To display only 5 pagination items, change the 3 to 2 (2 before and 2 after the current page)
+                {% endcomment %}
+                {% if page_number <= page_obj.number|add:3 and page_number >= page_obj.number|add:-3 %}
+                    {% if page_obj.number == page_number %}
+                        <li class="page-item active">
+                            <a class="page-link" href="?page={{ page_number }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
+                                {{ page_number }}
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_number }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
+                                {{ page_number }}
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
+                        Next
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
+                        Last
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+{% else %}
+<br>
+<div class="container">
+<div class="card">
+    <div class="card-body">
+        No Data Available - Kindly Search with Spec No.
+    </div>
+</div>
+</div>
+{% endif %}
+<br>
+{% endblock %}

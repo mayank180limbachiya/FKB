@@ -1,0 +1,43 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+</br>
+<div class="container">
+    <div class="row">
+        <div class="col-3">
+            <div class="card" style="width: 14rem;">
+                <div class="card-body">
+                    <h5 class="card-title">By Alarm Number</h5>
+                    <p class="card-text">Search Alarm by its number its will provide Alarm details with Tips.</p>
+                    <a href="{% url 'alarmbynumber' %}" class="card-link">OPEN</a>
+                </div>
+            </div>
+        </div>  
+        <div class="col-3">
+            <div class="card" style="width: 14rem;">
+                <div class="card-body">
+                    <h5 class="card-title">By Alarm Text</h5>
+                    <p class="card-text">Search Alarm by text input, it will give output of related alarm details.</p>
+                    <a href="{% url 'alarmbytext' %}" class="card-link">OPEN</a>
+                </div>
+            </div>
+        </div>  
+        <div class="col-3"> 
+            <div class="card" style="width: 14rem;">
+                <div class="card-body">
+                    <h5 class="card-title">By System/Drive LED</h5>
+                    <p class="card-text">It's contain System / Drive LED PDFs. you can go through PDFs.</p>
+                    <a href="{% url 'alarmbyled' %}" class="card-link">OPEN</a>
+                </div>
+            </div>
+        </div> 
+    </div>    
+</div>
+<div class="fixed-bottom">
+    <div class="text-center" style="padding: 5px; border-top: #737373 solid 0.2px; background-color: white">
+        <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
+    </div>    
+</div>  
+
+{% endblock %}
