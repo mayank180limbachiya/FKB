@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "servicesupport/layout.html" %}
 
 {% block body %}
@@ -155,4 +156,171 @@
 {% endif %}
 
 
+=======
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+<br>
+<script>
+function maxlenghth_equ_spec() {
+    var user_name = document.getElementById("spec").value;
+    if (user_name.length == 40) {
+      alert("Spec enter limit is 40 Char");
+    }
+  }
+</script>
+<div class="container" style="border-bottom: rgb(158, 158, 158) solid 1px;">
+    <form method="post" action="{% url 'equ' %}">
+    {% csrf_token %}
+    <div class="row ">
+        <div class="col text-center">
+            <div class="float-end"><h5>Specification:</h5></div>
+        </div>
+        <div class="col">            
+            <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_equ_spec()" class="form-control" value="{%if user_data %}{{user_data}}{%endif%}" name="specno" placeholder="Type Parent Spec" required>
+        </div>
+        <div class="col" >
+            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+        </div>
+    </div>
+    </form>    
+    <br>
+</div>    
+<br>
+<h4 class="container">Equvivalant Search</h4>
+{% if serchvalue.count != 0 %}
+<div class="container text-center">
+    <div class="table-responsive">
+        <table class="table table-fit table-bordered table-hover table-striped">
+            <thead>
+                <tr> 
+                    <th scscope="col"> Spec</th>
+                    <th scscope="col"> Discription</th>
+                    <th scscope="col"> Reuse</th>
+                    <th scscope="col"> Info </th>
+                    <th scscope="col"> Equ spec</th>
+                    <th scscope="col"> SR No</th>
+                    <th scscope="col"> TR No</th>
+                    <th scscope="col"> Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in serchvalue %}  
+                    <tr>
+                    <td class="table-primary" style=" white-space: nowrap;">{{data.spec}}</td>
+                    <td>{{data.discription}}</td>
+                    <td>{{data.reuse}}</td>
+                    <td>{{ data.info }}</td>
+                    <td style="white-space: nowrap;">{{ data.equspec }}</td>
+                    <td>{{ data.srno }}</td>
+                    <td>{{ data.trno }}</td>
+                    <td>{{ data.remark }}</td>
+                    </tr>    
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>       
+</div>
+{%else%}
+<div class="container">
+<div class="card">
+    <div class="card-body">
+        No Old Equ Data Available - Kindly Search with Spec No.
+    </div>
+</div>
+</div>
+{% endif %}
+<br>
+<h4 class="container">Old Equvivalant Search</h4>
+{% if serchvalue1.count != 0 %}
+<div class="container text-center">
+    <div class="table-responsive">
+        <table class="table table-fit table-bordered table-hover table-striped">
+            <thead>
+                <tr> 
+                    <th scscope="col"> Spec</th>
+                    <th scscope="col"> Discription</th>
+                    <th scscope="col"> Reuse</th>
+                    <th scscope="col"> Info </th>
+                    <th scscope="col"> Equ spec</th>
+                    <th scscope="col"> SR NO</th>
+                    <th scscope="col"> TR NO</th>
+                    <th scscope="col"> Remark</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in serchvalue1 %}  
+                    <tr >
+                    <td style=" white-space: nowrap;">{{ data.spec }}</td>
+                    <td> {{ data.discription }}</td>
+                    <td>{{data.reuse}}</td>
+                    <td>{{ data.info }}</td>
+                    <td style="white-space: nowrap;" class="table-primary">{{ data.equspec }}</td>
+                    <td>{{ data.srno }}</td>
+                    <td>{{ data.trno }}</td>
+                    <td>{{ data.remark }}</td>
+                    </tr>    
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>       
+</div>
+{%else%}
+<div class="container">
+<div class="card">
+    <div class="card-body">
+        No Old Equ Data Available - Kindly Search with Spec No.
+    </div>
+</div>
+</div>
+{% endif %}
+<br>
+{% if availparent.count != 0 %}
+<div class="container">
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Part In Parent Spec: 
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div class="accordion-body"> 
+                    <div class="container text-center">
+                        <div class="table-responsive"> 
+                            <table class="table table-fit table-bordered">
+                                <thead>
+                                    <tr> 
+                                        <th scscope="col"> Parent Spec</th>
+                                        <th scscope="col"> Parent Name</th>
+                                        <th scscope="col"> Child Spec</th>
+                                        <th scscope="col"> Child Spec Name</th>
+                                        <th scscope="col"> QTY</th>
+                                    </tr>   
+                                </thead>     
+                                <tbody>   
+                                    {% for write in availparent %}
+                                    {% if write.parentspec != write.childspec %}
+                                    <tr>
+                                        <td><a href="{% url 'spec_details' write.id %}">{{ write.parentspec }}</a></td>
+                                        <td> {{ write.parentname }}</td>
+                                        <td class="table-primary">{{ write.childspec }}</td>
+                                        <td class="table-primary">{{ write.childname }}</td>
+                                        <td>{{ write.qty}}</td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                </tbody>    
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>       
+    </div>
+</div>
+{% endif %}
+
+>>>>>>> master
 {% endblock %}

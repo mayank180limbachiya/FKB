@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "servicesupport/layout.html" %}
 
 {% block body %}
@@ -84,4 +85,79 @@
   </form>
  </div>
 
+=======
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+<br>
+
+<script>
+  function maxlenghth_specification_spec_req() {
+      var user_name = document.getElementById("spec").value;
+      if (user_name.length == 40) {
+        alert("Spec enter limit is 40 Char");
+      }
+    }
+    function maxlenghth_specification_spec_details() {
+      var user_name = document.getElementById("details").value;
+      if (user_name.length == 200) {
+        alert("Spec enter limit is 200 Char");
+      }
+    }  
+</script>
+
+<div class="container">
+<form method="post" action="{% url 'specrequest' %}">
+    {% csrf_token %}
+    <div class="row mb-3">
+      <label  class="col-sm-2 col-form-label">Specification</label>
+      <div class="col-sm-8 col-md-6">
+        <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_specification_spec_req()" maxlenth class="form-control" name="shortdetail" id="shortdetail" value="{% if thisdict %}{{thisdict.spec}}{%endif%}"  required>
+      </div> 
+    </div>
+    <div class="row mb-3">
+      <label  class="col-sm-2 col-form-label">Select Issue:</label>
+      <div class="col-sm-8 col-md-6">
+        <select class="form-select" aria-label="Default select example" name="dropdown" aria-placeholder="Please Select" required>
+          <option value="ADD"  {% if thisdict.dropdown == "ADD" %}selected {% endif %}>ADD PART</option>
+          <option value="Update"{% if thisdict.dropdown == "Update" %}selected {% endif %}>Update Part</option>
+          <option value="Wrong"{% if thisdict.dropdown == "Wrong" %}selected {% endif %}>Incorrect Part Spec / Details </option>
+          <option value="Other"{% if thisdict.dropdown == "Other" %}selected {% endif %}>Others</option>        
+        </select>
+      </div>  
+    </div>  
+    <div class="row mb-3">
+      <label class="col-sm-2 col-form-label">Details</label>
+      <div class="col-sm-10">
+         <textarea class="form-control" name="details" maxlength="200" onkeyup="maxlenghth_specification_spec_details()" id="details" style="height: 100px"  required>{% if thisdict %}{{thisdict.details}}{% endif %}</textarea>
+      </div>
+    </div> 
+
+    <fieldset class="row mb-3">
+      <legend class="col-form-label col-sm-2 pt-0">Need to change In</legend>
+      <div class="col-sm-10">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="option" id="gridRadios1" value="Parent SPEC" checked>
+          <label class="form-check-label" for="gridRadios1">
+            Edit/ Add in Parent Spec
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="option" id="gridRadios2" value="Equivalent SPEC">
+          <label class="form-check-label" for="gridRadios2">
+            Edit/ Add in Equivalent Spec
+          </label>
+        </div>
+      </div>
+    </fieldset>
+    <button type="submit" class="btn btn-primary">EXEC</button>
+  </form>
+ </div>
+ <div class="fixed-bottom">
+  <div class="text-center" style="padding: 5px; border-top: #737373 solid 0.2px; background-color: white">
+      <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
+  </div>    
+</div> 
+>>>>>>> master
 {% endblock %}

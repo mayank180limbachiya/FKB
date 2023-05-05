@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "servicesupport/layout.html" %}
 
 {% block body %}
@@ -33,4 +34,47 @@
   </div>
 </div>
 
+=======
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+<br>
+<div class="container">
+<div class="row">
+  <div class="col-3">
+    <div class="card" style="width: 15rem;">
+      <div class="card-body">
+        <h5 class="card-title">VRDY OFF</h5>
+        <p class="card-text">401 VRDY OFF alarm Diag. tool. It will give signal missing based on DGN 358 value</p>
+        <a href="{% url 'vrdy' %}" class="card-link">OPEN</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-3">  
+    <div class="card" style="width: 15rem;">
+      <div class="card-body">
+        <h5 class="card-title">WN 69</h5>
+        <p class="card-text">WN 69 diag. tool. It will give tentative problem at which DO module, Output signal having issue.</p>
+        <a href="{% url 'wn69' %}" class="card-link">OPEN</a>
+      </div>
+    </div>  
+  </div>
+  <div class="col-3">
+    <div class="card" style="width: 15rem;">
+      <div class="card-body">
+        <h5 class="card-title">PC50 & NMI</h5>
+        <p class="card-text">PC 50 Alarm or 971 NMI occurred alarm to diag. tool to find at which point communication interrupted.</p>
+        <a href="{% url 'nmi' %}" class="card-link">OPEN</a>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="fixed-bottom">
+  <div class="text-center" style="padding: 5px; border-top: #737373 solid 0.2px; background-color: white">
+      <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
+  </div>    
+</div>  
+>>>>>>> master
 {% endblock %}
