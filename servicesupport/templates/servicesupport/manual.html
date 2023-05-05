@@ -1,58 +1,3 @@
-<<<<<<< HEAD
-{% extends "servicesupport/layout.html" %}
-
-{% block body %}
-{% load static %}
-<script>
-
-</script>
-<br>
-<div class="container">
-<div class="row">
-    <div class="col-3">
-        <form method="post" action="{% url 'manual' %}">
-        {% csrf_token %}
-        {% for productdata in product %}
-            <button type="submit" id="Selection" name="Selection" value="{{productdata.system_names}}" class="btn btn-secondary">{{productdata.system_names}} | {{productdata.product_name}}</button>
-            <br>
-            <br>
-        {% endfor %}
-        </form>
-    </div>    
-    <div class="col-9">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Product</th>
-                    <th scope="col">Manual Number</th>
-                    <th scope="col">Manual Name</th>
-                    <th scope="col">Link</th>
-                  </tr>
-            </thead>      
-            <tbody>
-            {% for manualdata in manual %}
-            <tr>
-                <th scope="row">{{forloop.counter0}}</th>
-                <td>{{manualdata.Product_name}}</td>
-                <td>{{manualdata.Manual_number}}</td>
-                <td>{{manualdata.Manual_Name}}</td>
-                <td><a href="/static{{manualdata.Manual_storage.url}}" target="_new" class="btn btn-secondary">Link</a></td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>    
-    </div>    
-</div>
-</div>    
-
-
-
-
-
-
-{% endblock %}
-=======
 {% extends "servicesupport/layout.html" %}
 
 {% block body %}
@@ -199,4 +144,3 @@
     </div>    
 </div> 
 {% endblock %}
->>>>>>> master
