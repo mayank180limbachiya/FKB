@@ -32,7 +32,7 @@
             <h5> Training Search:</h5>
         </div>
         <div class="col-3">              
-            <input type="text" id="search" maxlength="50" onkeyup="max_length_training_search()" class="form-control" name="Training_Data" value="{%if User_input.Training %}{{User_input.Training}}{%endif%}"  placeholder="Search Training Document" id="Training_Data">
+            <input type="text" id="search" maxlength="50" onkeyup="max_length_training_search()" class="form-control" name="Training_Data" value="{%if User_input.Training %}{{User_input.value}}{%endif%}"  placeholder="Search Training Document" id="Training_Data">
         </div>
         <div class="col-1" >
             <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
@@ -94,7 +94,7 @@
         <tbody>  
         {% for Trainingdata in page_obj %}
         <tr>
-            <th class="text-end" scope="row">{{forloop.counter}}</th>
+            <th class="text-end" scope="row">{{ forloop.counter|add:User_input.line_index_adder }}</th>
             <td>{{Trainingdata.Product_name}}</td>
             <td>{{Trainingdata.System_name}}</td>
             <td>{{Trainingdata.Training_Name}}</td>

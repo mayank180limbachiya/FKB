@@ -60,7 +60,7 @@
             <tbody>
                 {% for write in page_obj %} 
                         <tr>
-                            <td class="text-end">{{forloop.counter}}</td>
+                            <td class="text-end">{{forloop.counter|add:user_data.line_index_adder}}</td>
                             <td style=" white-space: nowrap;"><a href="{% url 'spec_details' write.id %}">{{ write.parentspec }}</a></td>
                             <td class="text-start" style=" white-space: nowrap;">{{ write.parentname }}</td>
                             <td class="text-start" style=" white-space: nowrap;">{{ write.childspec }}</td>
