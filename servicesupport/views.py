@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.db import IntegrityError
 from django.db.models import Count
+# url handling
+from urllib.parse import quote
 import re
 
 # for Paginator << first Pre 1,2,3,4,5 Next Last >>
@@ -457,12 +459,12 @@ def alarmbyled(request):
 @login_required
 def spec(request):
     page_obj = None
-    User_input = {"specno": None, "limit": None}
+    User_input = {"specno": None, "limit": None,"value":None}
 
     if "specno" in request.GET and request.GET["specno"]:
         specno = request.GET["specno"]
         limit = request.GET["limit"]
-        User_input = {"specno": specno, "limit": limit}
+        User_input = {"specno": quote(specno), "limit": limit, "value":specno}
         search_value = specification.objects.filter(parentspec__contains=specno).all()
         paginator = Paginator(search_value, limit)
         page_number = request.GET.get("page")
