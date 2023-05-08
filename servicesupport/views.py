@@ -219,7 +219,7 @@ def std(request):
 @login_required
 def training(request):
     page_obj = None
-    user_data = {"Training": None, "Product": None, "limit": None}
+    User_input = {"Training": None, "Product": None, "limit": None, "line_index_adder":None}
     search_data = Training_model.objects.none()
     Product = Training_model.objects.values_list("Product_name", flat=True).distinct()
     Product_with_Training = product_type.objects.filter(id__in=Product).all()
@@ -227,11 +227,7 @@ def training(request):
         Product_Ser = request.GET["Product"]
         Training_Data_ser = request.GET["Training_Data"]
         limit = request.GET["limit"]
-        user_data = {
-            "Training": Training_Data_ser,
-            "Product": Product_Ser,
-            "limit": limit,
-        }
+        
         if Product_Ser == "all":
             search_data = Training_model.objects.filter(
                 Training_details__contains=Training_Data_ser
@@ -245,6 +241,8 @@ def training(request):
 
         paginator = Paginator(search_data, int(limit))
         page_number = request.GET.get("page")
+        if page_number==None:
+            page_number=1
         try:
             page_obj = paginator.get_page(
                 page_number
@@ -252,10 +250,19 @@ def training(request):
         except PageNotAnInteger:
             # if page_number is not an integer then assign the first page
             page_obj = paginator.page(1)
+            page_number = "1"
         except EmptyPage:
             # if page is empty then return last page
             page_obj = paginator.page(paginator.num_pages)
-
+            page_number = str(paginator.num_pages)
+        print(page_number)
+        User_input = {
+            "Training": quote(Training_Data_ser),
+            "Product": Product_Ser,
+            "limit": limit,
+            "value":Training_Data_ser,
+            "line_index_adder":((int(page_number)-1)*(int(limit))),
+        }
     return render(
         request,
         "servicesupport/training.html",
@@ -263,7 +270,8 @@ def training(request):
             "flag": 4,
             "product_type": Product_with_Training,
             "page_obj": page_obj,
-            "User_input": user_data,
+            "User_input": User_input,
+            
         },
     )
 
@@ -411,7 +419,7 @@ def alarmbytext(request):
                 )
                 .all()
             )
-        User_input = {"system": system, "alarm": alarm_text_ser, "limit": limit}
+        User_input = {"system": system, "alarm": quote(alarm_text_ser), "limit": limit, "value": alarm_text_ser}
 
         paginator = Paginator(search_data, limit)
         page_number = request.GET.get("page")
@@ -459,15 +467,16 @@ def alarmbyled(request):
 @login_required
 def spec(request):
     page_obj = None
-    User_input = {"specno": None, "limit": None,"value":None}
+    User_input = {"specno": None, "limit": None,"value":None,"line_index_adder":None,}
 
     if "specno" in request.GET and request.GET["specno"]:
         specno = request.GET["specno"]
         limit = request.GET["limit"]
-        User_input = {"specno": quote(specno), "limit": limit, "value":specno}
         search_value = specification.objects.filter(parentspec__contains=specno).all()
         paginator = Paginator(search_value, limit)
         page_number = request.GET.get("page")
+        if page_number == None:
+            page_number=1
         try:
             page_obj = paginator.get_page(
                 page_number
@@ -478,7 +487,7 @@ def spec(request):
         except EmptyPage:
             # if page is empty then return last page
             page_obj = paginator.page(paginator.num_pages)
-
+        User_input = {"specno": quote(specno), "limit": limit, "value":specno,"line_index_adder":((int(page_number)-1)*(int(limit))),}
     return render(
         request,
         "servicesupport/specification.html",
