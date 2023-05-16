@@ -1,0 +1,45 @@
+{% extends "servicesupport/layout.html" %}
+
+
+{% block body %}
+
+<div class="container">
+    <br>
+    <h3>
+        Belt tension Calculation based on Acoustic or Optical type meters
+    </h3>
+    <br>
+    <div class="card">
+        <div class="card-body" style="color:light">
+        <h4 class="card-title">About Belt tension:</h4>
+        <p class="card-text">The vibration frequency of a plucked string is dependent upon the tension of that string. As the tension is increased, the vibration frequency also increases.here is a direct relationship between belt tension and a belt’s natural frequency of vibration. This relationship holds true except for the very extreme high-tension zones (well above where any belt system can operate). For belt spans greater than 0.25m, this will provide results within 10% of the actual values.</p>
+        </div>
+    </div>
+    <br>
+    <form>
+        <h4 class="card-title">Belt Span Calculation:</h4>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">C-C Distance <small class="text-muted"> (in mm)</small></th>
+                <th scope="col">D Large Pulley dia <small class="text-muted"> (in mm)</small></th>
+                <th scope="col">d Small Pulley dia <small class="text-muted"> (in mm)</small></th>
+                <th scope="col">Span - l<small class="text-muted"> (in mm)</small></th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><input type="number" min="0" maxlength="30" class="form-control w-50 " name="CC" placeholder="C_C" id="cc"></td>
+                <td><input type="number" min="0" maxlength="30" class="form-control w-50 " name="D" placeholder="D" id="D"></td>
+                <td><input type="number" min="0" maxlength="30" class="form-control w-50 " name="d" placeholder="d" id="d"></td>
+                <td><input type="text" class="form-control w-50" style="background-color: lightgreen;" name="d" id="d" disabled></td>
+                <td></td>
+            </tr>
+            
+            </tbody>
+        </table>
+    </form>  
+</div>    
+
+{% endblock %}

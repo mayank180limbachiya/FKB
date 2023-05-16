@@ -14,6 +14,7 @@ urlpatterns = [
     path("softwaretool/VRDY", views.softvrdy, name="vrdy"),  # flag 5
     path("softwaretool/wn69", views.softwn69, name="wn69"),  # flag 5
     path("softwaretool/NMI", views.softnmi, name="nmi"),  # flag 5
+    path("softwaretool/belttention", views.belttension, name="belttention"),  # flag 5
     path("alarm", views.alarm, name="alarm"),  # flag 6
     path("alarm/bynumber", views.alarmbynumber, name="alarmbynumber"),  # flag 6
     path("alarm/text", views.alarmbytext, name="alarmbytext"),  # flag 6

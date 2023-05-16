@@ -15,13 +15,13 @@ function maxlenghth_equ_spec() {
     <form method="post" action="{% url 'equ' %}">
     {% csrf_token %}
     <div class="row ">
-        <div class="col text-center">
-            <div class="float-end"><h5>Specification:</h5></div>
+        <div class="col-12 col-md-auto">
+            <div ><h5>Specification:</h5></div>
         </div>
-        <div class="col">            
-            <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_equ_spec()" class="form-control" value="{%if user_data %}{{user_data}}{%endif%}" name="specno" placeholder="Type Parent Spec" required>
+        <div class="col-8 col-md-5">            
+            <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_equ_spec()" class="form-control" value="{%if user_data %}{{user_data}}{%endif%}" name="specno" placeholder="Type Child or parent Spec" required>
         </div>
-        <div class="col" >
+        <div class="col-4 col-md-auto" >
             <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
         </div>
     </div>
@@ -117,7 +117,7 @@ function maxlenghth_equ_spec() {
 </div>
 {% endif %}
 <br>
-{% if availparent.count != 0 %}
+{% if availparent %}
 <div class="container">
     <div class="accordion" id="accordionExample">
         <div class="accordion-item">

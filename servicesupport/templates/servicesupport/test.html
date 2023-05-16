@@ -2,23 +2,11 @@
 
 {% block body %}
 
-<h2>Deplicate values</h2>
-<table>
-    <thead>
-        <tr>
-            <th>id</th>
-            <th>spec</th>
-        </tr>    
-    </thead>
-    <tbody>
-        {% for details in data %}
-        <tr>
-            <td>{{details.id}}</td>
-            <td>{{details.spec}}</td>
-        <tr>
-        {% endfor %}        
-    </tbody>
-</table>
+{% load static %}
+<br>
+<div class="container">
+<a href="{% static 'servicesupport/test.docx' %}" target="_new" class="link">Open</a>
+</div>
 
 
 

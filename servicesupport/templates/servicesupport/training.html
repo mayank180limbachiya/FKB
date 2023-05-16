@@ -1,6 +1,7 @@
 {% extends "servicesupport/layout.html" %}
 
 {% block body %}
+{% load static %}
 <script>
     function max_length_training_search() {
         var user_name = document.getElementById("search").value;
@@ -14,10 +15,10 @@
     <form method="get" action="{% url 'training' %}"> 
     {% csrf_token %}
     <div class="row align-items-center">
-        <div class="col-1">
+        <div class="col-12 col-md-1">
             <h5>Product:</h5>
         </div>    
-        <div class="col-2">
+        <div class="col-6 col-md-2 mb-2">
             <select class="form-select" aria-label="Default select example" name="Product" required>
                 {% if User_input.Product != None %}
                 <option value="{{User_input.Product}}">{{User_input.Product}}</option>
@@ -28,22 +29,22 @@
                 {% endfor %}
             </select>
         </div>    
-        <div class="col-2">
+        <div class="col-12 col-md-2">
             <h5> Training Search:</h5>
         </div>
-        <div class="col-3">              
+        <div class="col-8 col-md-3 mb-3">              
             <input type="text" id="search" maxlength="50" onkeyup="max_length_training_search()" class="form-control" name="Training_Data" value="{%if User_input.Training %}{{User_input.value}}{%endif%}"  placeholder="Search Training Document" id="Training_Data">
         </div>
-        <div class="col-1" >
+        <div class="col-4 col-md-1 mb-3" >
             <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
         </div>
-        <div class="col-2">
+        <div class="col-6 col-md-2">
             <div class="float-end">
                 <div class="input-group input-group-sm mb-0 text-end"> 
                 <h6> No. of Row:</h6></div>
             </div>
         </div>
-        <div class="col-1" > 
+        <div class="col-3 col-md-1" > 
             <div class="input-group input-group-sm mb-0">           
                 <input  min="1" max="200" type="number" class="form-control" name="limit" value="{%if User_input.limit %}{{User_input.limit}}{%else%}10{%endif%}">
             </div>
@@ -52,35 +53,12 @@
     </form>        
     <br>
 </div>    
-    <div class="container">
-        {%if search_data%}
-        <table class="table table-striped table-bordered table-hover ">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Product</th>
-                    <th scope="col">System_name</th>
-                    <th scope="col">Training_Name</th>
-                    <th scope="col">Link</th>
-                  </tr>
-            </thead>      
-            <tbody>
-            {% for Trainingdata in search_data %}
-            <tr>
-                <th class="text-end" scope="row">{{forloop.counter}}</th>
-                <td>{{Trainingdata.Product_name}}</td>
-                <td>{{Trainingdata.System_name}}</td>
-                <td>{{Trainingdata.Training_Name}}</td>
-                <td><a href="/static{{Trainingdata.Training_storage.url}}" target="_new" class="link">Open</a></td>
-            </tr>
-            {% endfor %}
-                
-    </div>
-    {% endif %}
+        
 </div>    
 <div class="container">
     <br>
     {% if page_obj %}
+    <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover ">
         <thead>
             <tr>
@@ -102,7 +80,8 @@
         </tr>
         {% endfor %}
         </tbody>
-    </table>        
+    </table>   
+    </div>     
 </div> 
 <br>
 {% if page_obj.has_other_pages %}
@@ -156,7 +135,7 @@
     
 {% endif %}
 {% else %}
-<br>
+
 <div class="container">
 <div class="card">
     <div class="card-body">

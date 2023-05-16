@@ -319,6 +319,16 @@ def softnmi(request):
         },
     )
 
+@login_required
+def belttension(request):
+    return render(
+        request,
+        "servicesupport/belttension.html",
+        {
+            "flag": 5,
+        },
+    )
+
 
 @login_required
 def alarm(request):
@@ -717,9 +727,9 @@ def admin_data(request):
 
     return render(
         request,
-        "servicesupport/manual.html",
+        "servicesupport/test.html",
         {
-            "flag": 10,
+            "flag": None,
             "data": data,
             "dupes": dupes,
         },

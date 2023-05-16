@@ -9,6 +9,10 @@ from django.contrib.auth.models import User
 import os
 from django.urls import reverse
 
+#for no of visits
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
 # Create your models here.
 
 

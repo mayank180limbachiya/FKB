@@ -53,6 +53,7 @@ class specificationAdmin(ImportExportModelAdmin):
 @admin.register(alarm_detail)
 class alarmdetailsAdmin(ImportExportModelAdmin):
     resource_class = alarmsdetailResource
+    search_fields = ("alarm_number","alarm_description")
     list_display = ("system_type", "alarm_number", "alarm_description")
     pass
 

@@ -220,43 +220,44 @@
 
         }    
     </script>    
-      
-    <table class="table table-borderless" style="width: auto; height: 10%; text-align: center;">
-        <tr>
-            <td></td>
-            <td></td>
-            <td class="table-warning">n</td>
-            <td></td>
-            <td class="table-warning">xx</td>
-            <td></td>
-            <td class="table-warning">yy</td>
-            <td class="table-warning">zz</td>
-            <td></td>
-            <td class="table-warning">m</td>
-            <td></td>
-            <td class="table-warning">bbb</td>
-            <td></td>
-            <td class="table-warning">**</td>
-            <td></td>
-        </tr>
-        <tr>
-            <td style="border: 2px solid whitesmoke">WN69 I/O Link I DO ALARM</td>
-            <td class="table-primary">CH(</td>
-            <td><input type="number" style="width: 40px;" id="n" onchange="updateInput('n');"></td>
-            <td class="table-primary">G</td>
-            <td><input type="number" style="width: 50px;" id="xx" onchange="updateInput('xx');"></td>
-            <td class="table-primary">S</td>
-            <td><input type="number" style="width: 50px;" id="yy" value="1" onchange="updateInput('yy');"></td>
-            <td><input type="number" style="width: 50px;" id="zz" value="0" onchange="updateInput('zz');"></td>
-            <td class="table-primary">:PMC</td>
-            <td><input type="number" style="width: 40px;" id="m" onchange="updateInput('m');"></td>
-            <td class="table-primary">Y</td>
-            <td><input type="number" style="width: 60px;" id="bbb" onchange="updateInput('bbb');"></td>
-            <td class="table-primary">=</td>
-            <td><input type="text" style="width: 60px;" id="hexs" onchange="updateInput('hexs');"></td>
-            <td class="table-primary">H)</td>
-        </tr>     
-    </table>
+    <div class="table-responsive">
+        <table class="table table-borderless" style="width: auto; height: 10%; text-align: center;">
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="table-warning">n</td>
+                <td></td>
+                <td class="table-warning">xx</td>
+                <td></td>
+                <td class="table-warning">yy</td>
+                <td class="table-warning">zz</td>
+                <td></td>
+                <td class="table-warning">m</td>
+                <td></td>
+                <td class="table-warning">bbb</td>
+                <td></td>
+                <td class="table-warning">**</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="border: 2px solid whitesmoke">WN69 I/O Link I DO ALARM</td>
+                <td class="table-primary">CH(</td>
+                <td><input type="number" style="width: 40px;" id="n" onchange="updateInput('n');"></td>
+                <td class="table-primary">G</td>
+                <td><input type="number" style="width: 50px;" id="xx" onchange="updateInput('xx');"></td>
+                <td class="table-primary">S</td>
+                <td><input type="number" style="width: 50px;" id="yy" value="1" onchange="updateInput('yy');"></td>
+                <td><input type="number" style="width: 50px;" id="zz" value="0" onchange="updateInput('zz');"></td>
+                <td class="table-primary">:PMC</td>
+                <td><input type="number" style="width: 40px;" id="m" onchange="updateInput('m');"></td>
+                <td class="table-primary">Y</td>
+                <td><input type="number" style="width: 60px;" id="bbb" onchange="updateInput('bbb');"></td>
+                <td class="table-primary">=</td>
+                <td><input type="text" style="width: 60px;" id="hexs" onchange="updateInput('hexs');"></td>
+                <td class="table-primary">H)</td>
+            </tr>     
+        </table>
+    </div>
     </div>
     </div> 
     <br>
@@ -282,6 +283,7 @@
     </div>
     <br>
     <h4 class="card-title">Output:</h4>
+    <div class="table-responsive">
     <table class="table">
         <thead>
           <tr>
@@ -304,7 +306,7 @@
           </tr>
         </tbody>
       </table>
-     
+      </div>
 
     <br>  
     <h4>Details of module:</h4>  
@@ -312,7 +314,7 @@
 
     <br>
 </div>
-
+    <div class="table-responsive">
     <table class="table table-bordered">
         <thead>
             <tr>
@@ -375,6 +377,7 @@
             </tr> 
         </tbody>
     </table>
+    </div>
 <br>
     <div class="container">
     <iframe src="{% static 'servicesupport/WN69/MANUAL.pdf' %}" width="100%" height="700px"></iframe>

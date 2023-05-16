@@ -34,16 +34,16 @@
     <form method="get" action="{% url 'alarmbytext' %}"> 
     {% csrf_token %}
     <div class="row align-items-center text-center" >
-        <div class="col-2">
+        <div class="col-12 col-md-2">
             <h5> Alarm by Text:</h5>
         </div>
-        <div class="col-3">              
+        <div class="col-12 col-md-3">              
             <input type="text" id="alarm_text" maxlength="60" onkeyup="maxlenghth_alarmbytext_number()" class="form-control" name="Alarm_number" onkeyup="maxlenghth_alarmbytext_number()" value="{%if User_input.alarm %}{{User_input.value}}{%endif%}"  placeholder="Alarm Text" id="Alarm_number" required>
         </div>
-        <div class="col-1 align-items-center">
+        <div class="col-12 col-md-1 align-items-center">
             <h5>Product</h5>
         </div>
-        <div class="col-2">
+        <div class="col-8 col-md-2 mb-2">
             <select class="form-select" aria-label="Default select example" name="system" required>
                 {% if User_input.system %}
                 <option value="{{User_input.system}}" selected>{{User_input.system}}</option>
@@ -54,16 +54,16 @@
                 {% endfor %}
             </select>
         </div>    
-        <div class="col-1" >
+        <div class="col-4 col-md-1 mb-2" >
             <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
         </div>
-        <div class="col-2">
+        <div class="col-6 col-md-2 mt-2">
             <div class="float-end">
                 <div class="input-group input-group-sm mb-0"> 
                 <h6> No. of Row:</h6></div>
             </div>
         </div>
-        <div class="col-1" > 
+        <div class="col-3 col-md-1 mt-2" > 
             <div class="input-group input-group-sm mb-0">           
                 <input size="2"  min="1" max="200" type="number" class="form-control" name="limit" value="{%if User_input.limit %}{{User_input.limit}}{%else%}5{%endif%}" id="limit">
             </div>

@@ -17,22 +17,22 @@
     <form method="get" action="{% url 'specification' %}"> 
     {% csrf_token %}
     <div class="row align-items-center">
-        <div class="col-2">
+        <div class="col-12 col-md-2">
             <h5> Parent Spec:</h5>
         </div>
-        <div class="col">            
-            <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_specification_spec()" class="form-control" name="specno" value="{%if user_data.specno %}{{user_data.value}}{%endif%}" placeholder="Type Parent Spec" id="specno" required>
+        <div class="col-8 col-md-4 mb-3">            
+            <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_specification_spec()" class="form-control" name="specno" value="{%if user_data.specno %}{{user_data.value}}{%endif%}" placeholder="Type Parent Spec only " id="specno" required>
         </div>
-        <div class="col" >
+        <div class="col-4 col-md-2 mb-3" >
             <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
         </div>
-        <div class="col-2">
+        <div class="col-6 col-md-2">
             <div class="float-end">
                 <div class="input-group input-group-sm mb-0"> 
                 <h6> No. of Row:</h6></div>
             </div>
         </div>
-        <div class="col-1" > 
+        <div class="col-3 col-md-1" > 
             <div class="input-group input-group-sm mb-0">           
                 <input size="2"  min="1" max="200"  type="number" class="form-control" name="limit" value="{%if user_data.limit %}{{user_data.limit}}{%else%}25{%endif%}" id="specno">
             </div>
@@ -72,7 +72,7 @@
         </table>
     </div>       
 </div>
-
+<br>
 {% if page_obj.has_other_pages %}
     <nav>
         <ul class="pagination justify-content-center">
@@ -130,7 +130,7 @@
     </nav>
 {% endif %}
 {% else %}
-<br>
+
 <div class="container">
 <div class="card">
     <div class="card-body">
