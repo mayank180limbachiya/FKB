@@ -25,5 +25,7 @@ urlpatterns = [
     path("manuals", views.manuals, name="manual"),  # flag 10
     path("manuals/view", views.manualsview, name="manualview"),  # flag 10
     path("admin_data", views.admin_data, name="admin_data"),  # flag 10
+    path("analytic_view", views.analytic_view, name="analytic_view"),
     path("specification/<str:part_id>", views.Spec_details, name="spec_details"),
+    path('pdf',views.pdf, name='pdf'),
 ]

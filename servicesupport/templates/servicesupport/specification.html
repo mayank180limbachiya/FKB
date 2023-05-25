@@ -43,8 +43,21 @@
 </div>    
 <br>
 
+<script>
+    document.addEventListener("visibilitychange", function() {
+        var contentElement = document.getElementById("content");
+        
+        if (document.visibilityState === 'visible') {
+            // Window is in focus, show content
+            contentElement.classList.remove("hidden");
+        } else {
+            // Window is out of focus, hide content
+            contentElement.classList.add("hidden");
+        }
+    });
+</script>
 {% if page_obj %}
-<div class="text-center">
+<div class="text-center" id="content">
     <div class="table-responsive">
         <table class="table  table-bordered table-striped table-hover ">
             <thead>

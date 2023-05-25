@@ -4,10 +4,120 @@
 
 {% load static %}
 <br>
+{% load templatetags %}
 <div class="container">
-<a href="{% static 'servicesupport/test.docx' %}" target="_new" class="link">Open</a>
+    <div class="container" style="border-bottom: rgb(158, 158, 158) solid 1px;">
+        <form method="post" action="{% url 'admin_data' %}"> 
+        {% csrf_token %}
+        <div class="row align-items-center text-center" >
+            <div class="col-12 col-md-1">
+                <h5> User:</h5>
+            </div>
+            <div class="col-12 col-md-2">              
+                <select class="form-select" aria-label="Default select example" name="user_selected" required>
+                    {% if User_data.user_selected %}
+                    <option value="{{User_data.user_selected}}" selected>{% if User_data.user_selected == "all" %}all{%else%}{% get_username_from_user_id User_data.user_selected %}{%endif%}</option>
+                    {% endif %}
+                    <option value="all" {% if User_data.user_selected %}{%else%}selected{% endif %}>all</option>
+                    {% for person in person_list %}
+                    <option value="{{person.user}}"> {% get_username_from_user_id person.user%}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-auto align-items-center">
+                <h6>From Date</h6>
+            </div>
+            <div class="col-8 col-md-auto mb-2">
+                <input id="startDate" class="form-control" name="from_date" {% if User_data.from_date %}value="{{User_data.from_date}}"{% endif %} type="datetime-local" required />
+            </div>    
+            <div class="col-12 col-md-auto align-items-center">
+                <h6>To Date</h6>
+            </div>
+            <div class="col-8 col-md-auto mb-2">
+                <input id="todate" class="form-control" name="to_date" {% if User_data.to_date %}value="{{User_data.to_date}}"{% endif %} type="datetime-local" required/>
+            </div>  
+            <div class="col-4 col-md-1 mb-2" >
+                <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+            </div>
+        </div>
+        </form>    
+        <br>  
+    </div>
+    <canvas id="last_month" style="width:100%; height: 200px;"></canvas>
+    <canvas id="mixedChart"style="width:100%; height: 400px;" ></canvas>
+<div class="row">
+    <div class="col=12">   
+        <canvas id="myChart" style="width:100%;max-width:800px"></canvas>
+    </div>
+</div>        
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script>
+        const xlineValues = [{%for date in last_month_date %} "{{date|safe}}", {%endfor%}];
+        const ylineValues = [{%for data in last_month_Graph_data %} "{{data|safe}}", {%endfor%}];
+
+        new Chart("last_month", {
+        type: "line",
+        data: {
+            labels: xlineValues,
+            datasets: [{
+            fill: false,
+            lineTension: 0,
+            backgroundColor: "rgba(0,0,255,1.0)",
+            borderColor: "rgba(0,0,255,0.1)",
+            data: ylineValues
+            }]
+        },
+        options: {
+            legend: {display: false},
+            
+        }
+        });
+
+        var xbarValues = [{%for page in page_list %} "{{page|safe}}", {%endfor%}];
+        var ybarValues = [{%for data in Graph_data %} "{{data}}", {%endfor%}];
+    
+        new Chart("myChart", {
+        type: "horizontalBar",
+        data: {
+            labels: xbarValues,
+            datasets: [{
+            backgroundColor: 'rgba(75, 192, 192, 1)',
+            data: ybarValues
+            }]
+        },
+        options: {
+            legend: {display: false},
+            title: {
+            display: true,
+            text: "Views Per Pages"
+            }
+        }
+        });
+
+        const xmixValues = [{%for date in last_month_date %} "{{date|safe}}", {%endfor%}];
+  
+        new Chart("mixedChart", {
+        type: "line",
+        data: {
+            labels: xmixValues,
+            
+            datasets: [
+            {% for data in mixed_page_vise_last_month %}
+            {
+            data: [{%for d in data.page %}"{{d}}",{%endfor%}],
+            borderColor: "{{data.color}}",
+            label:"{{data.page_name}}",
+            fill: false
+            },
+            {%endfor%}
+            ]
+        },
+        options: {
+            legend: {display: false}
+        }
+        });
+    </script>
+     
 </div>
-
-
 
 {% endblock %} 

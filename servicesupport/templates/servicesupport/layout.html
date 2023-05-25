@@ -5,6 +5,17 @@
         <title>{% block title %}Service Support{% endblock %}</title> 
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">  
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+        {% if request.user.is_superuser %}
+        {% else %}
+        <script>
+            // Disable right-click
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+        </script>
+        {% endif %}
+        
         <meta name="viewport" content="width=device-width, initial-scale=1">
        
         <link rel="shortcut icon" type="image/png" href="{% static 'servicesupport/fav.png' %}"/>
@@ -19,7 +30,38 @@
         <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet" type="text/css" /> -->
     </head>
     
+    {% if request.user.is_superuser %}
     <style>
+        @media print {
+    body {
+        visibility: hidden;
+    }
+    #section-to-print {
+        visibility: visible;
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    }
+    </style>    
+    {% else %}
+    <style>
+    .hidden {
+        display: none;
+    }
+    body {
+            user-select: none;
+        }
+    
+    
+    </style>
+    <style  media="print">
+        BODY {display:none;visibility:hidden;}
+    </style>
+    {% endif %}
+    <style>
+       
+       
         .dropdown:hover>.dropdown-menu {
             display: block;
         }
@@ -41,13 +83,16 @@
             margin: 0 auto;
             width: 80%;
         }
+        
    </style>
+   
         
     <body>
+        
         {% load static %}
         
         {% if flag != 12 %}
-        <div class="sticky-top">
+        <div class="sticky-top" id="content">
         <nav class="navbar navbar-expand-md navbar-light" style="background-color: #FFDD00;">
             <a class="navbar-brand" href="{% url 'index' %}"><h2>Support </h2> </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">

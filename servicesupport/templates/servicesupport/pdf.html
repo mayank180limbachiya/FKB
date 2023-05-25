@@ -1,0 +1,6 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+{% load static %}
+<iframe src="{% static '/pdf_view/web/viewer.html' %}?file={% static link %}" width="100%" height="540px" frameborder="0"></iframe>
+{% endblock %} 

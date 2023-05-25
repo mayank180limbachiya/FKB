@@ -76,7 +76,13 @@
             <td>{{Trainingdata.Product_name}}</td>
             <td>{{Trainingdata.System_name}}</td>
             <td>{{Trainingdata.Training_Name}}</td>
-            <td><a href="/static{{Trainingdata.Training_storage.url}}" target="_new" class="link">Open</a></td>
+            <td>
+            <form method="get" action="{% url 'pdf' %}">
+                {% csrf_token %}
+                <button type="submit"  id="link" name="link" value="{{Trainingdata.Training_storage.url}}" class="btn btn-link btn-sm">Open</button>
+            </form>
+            </td>
+            <!--<td><a href="/static{{Trainingdata.Training_storage.url}}" target="_new" class="link">Open</a></td>-->
         </tr>
         {% endfor %}
         </tbody>

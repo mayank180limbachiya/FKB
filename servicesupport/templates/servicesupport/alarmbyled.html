@@ -32,8 +32,13 @@
                 <!--<td>{{led.Product_name.system_names}}</td>-->
                 <td  style=" white-space: nowrap;">{{led.pdf_name}}</td>
                 <td  style=" white-space: nowrap;">{{led.pdf_storage}} </a></td>
-                <!--<td><a href="/static{{led.pdf_storage.url}}" target="_new">Open</a></td>-->
-                <td><a href="{% static led.pdf_storage.url %}" target="_new">Open</a></td>
+                <td>
+                    <form method="get" action="{% url 'pdf' %}">
+                        {% csrf_token %}
+                        <button type="submit"  id="link" name="link" value="{{led.pdf_storage.url}}" class="btn btn-link btn-sm">Open</button>
+                    </form>
+                </td>    
+                <!-- <td><a href="{% static led.pdf_storage.url %}" target="_new">Open</a></td>-->
             </tr>
             
             {% endfor %}
@@ -61,7 +66,12 @@
                 <!--<td>{{led.Product_name.system_names}}</td>-->
                 <td  style=" white-space: nowrap;">{{led.pdf_name}}</td>
                 <td  style=" white-space: nowrap;">{{led.pdf_storage}}</td>
-                <td><a href="{% static led.pdf_storage.url %}" target="_new">Open</a></td>
+                <td>
+                    <form method="get" action="{% url 'pdf' %}">
+                        {% csrf_token %}
+                        <button type="submit"  id="link" name="link" value="{{led.pdf_storage.url}}" class="btn btn-link btn-sm">Open</button>
+                    </form>
+                </td>  
             </tr>
             
             {% endfor %}

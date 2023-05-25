@@ -5,7 +5,7 @@ from django.db.models.base import Model
 # from django.db.models.deletion import CASCADE
 from django.db.models.fields import EmailField
 from ckeditor.fields import RichTextField
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,AbstractUser
 import os
 from django.urls import reverse
 
@@ -172,4 +172,9 @@ class std(models.Model):
         blank=True,
     )
     file = models.FileField(upload_to="uploads/STD/")
+    updated_at = models.DateTimeField(auto_now=True)
+
+class analytics(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    page = models.CharField(max_length=30)
     updated_at = models.DateTimeField(auto_now=True)

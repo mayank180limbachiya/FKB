@@ -21,7 +21,13 @@
             <td style="white-space: nowrap;">{{manualdata.Product_name}}</td>
             <td style="white-space: nowrap;">{{manualdata.Manual_number}}</td>
             <td>{{manualdata.Manual_Name}}</td>
-            <td><a href="{% static manualdata.Manual_storage.url %}" target="_new"class="link">Open</a></td>
+            <td>
+            <form method="get" action="{% url 'pdf' %}">
+                {% csrf_token %}
+                <button type="submit"  id="link" name="link" value="{{manualdata.Manual_storage.url}}" class="btn btn-link btn-sm">Open</button>
+            </form>
+            </td>
+            <!--<td><a href="{% static manualdata.Manual_storage.url %}" target="_new"class="link">Open</a></td>-->
             <!--<td><a href="/static{{manualdata.Manual_storage.url}}" target="_new" class="link">Open</a></td>-->
         </tr>
         {% endfor %}

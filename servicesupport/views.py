@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.db import IntegrityError
-from django.db.models import Count
+from django.contrib.admin.views.decorators import staff_member_required
 # url handling
 from urllib.parse import quote
 import re
@@ -17,6 +17,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # from tab lib import Dataset #for data read
 from django.db.models import Q
 import datetime
+
 
 import servicesupport
 from .models import (
@@ -29,6 +30,7 @@ from .models import (
     requesttype,
     manual,
     Training_model,
+    analytics
 )
 
 
@@ -78,6 +80,14 @@ def Email_check(email):
     else:
         return False
 
+def add_analytics(user_name,page_name):
+    if not user_name.is_superuser:
+        data = analytics(
+                    user=user_name,
+                    page=page_name.lower(),
+                    updated_at = datetime.datetime.now(),
+                )
+        data.save()
 
 def bad_request(request, *args, **argv):
     return render(
@@ -218,6 +228,7 @@ def std(request):
 
 @login_required
 def training(request):
+    add_analytics(request.user,"training")
     page_obj = None
     User_input = {"Training": None, "Product": None, "limit": None, "line_index_adder":None}
     search_data = Training_model.objects.none()
@@ -289,6 +300,7 @@ def softwaretool(request):
 
 @login_required
 def softvrdy(request):
+    add_analytics(request.user,"softvrdy")
     return render(
         request,
         "servicesupport/vrdy.html",
@@ -300,6 +312,7 @@ def softvrdy(request):
 
 @login_required
 def softwn69(request):
+    add_analytics(request.user,"softwn69")
     return render(
         request,
         "servicesupport/wn69.html",
@@ -311,6 +324,7 @@ def softwn69(request):
 
 @login_required
 def softnmi(request):
+    add_analytics(request.user,"softnmi")
     return render(
         request,
         "servicesupport/nmi.html",
@@ -321,6 +335,7 @@ def softnmi(request):
 
 @login_required
 def belttension(request):
+    add_analytics(request.user,"belttension")
     return render(
         request,
         "servicesupport/belttension.html",
@@ -343,6 +358,7 @@ def alarm(request):
 
 @login_required
 def alarmbynumber(request):
+    add_analytics(request.user,"alarmbynumber")
     # empty Datasets
     page_obj = None
     search_data = alarm_detail.objects.none()
@@ -397,6 +413,7 @@ def alarmbynumber(request):
 
 @login_required
 def alarmbytext(request):
+    add_analytics(request.user,"alarmbytext")
     # empty Datasets
     page_obj = None
     search_data = alarm_detail.objects.none()
@@ -457,6 +474,7 @@ def alarmbytext(request):
 
 @login_required
 def alarmbyled(request):
+    add_analytics(request.user,"alarmbyled")
     Led_drive_data = led.objects.filter(
         Product_name__product_name=10
     ).all()  # 10 is id of product type
@@ -476,6 +494,7 @@ def alarmbyled(request):
 
 @login_required
 def spec(request):
+    add_analytics(request.user,"spec")
     page_obj = None
     User_input = {"specno": None, "limit": None,"value":None,"line_index_adder":None,}
 
@@ -511,6 +530,7 @@ def spec(request):
 
 @login_required
 def equivalent(request):
+    add_analytics(request.user,"equivalent")
     specno = None
     search_value = equ.objects.none()  # take Spec input & search in main spec list
     search_value1 = (
@@ -549,6 +569,7 @@ def equivalent(request):
 
 @login_required
 def Spec_details(request, part_id):
+    add_analytics(request.user,"Spec_details")
     store3 = equ.objects.none()
     store4 = equ.objects.none()
     Search_key = specification.objects.filter(id=part_id).values_list(
@@ -697,6 +718,7 @@ def manuals(request):
 
 @login_required
 def manualsview(request):
+    add_analytics(request.user,"manualsview")
     if request.method == "GET":
         system = request.GET["Selection"]
         Manual_data = (
@@ -714,24 +736,147 @@ def manualsview(request):
         },
     )
 
+@login_required
+def pdf(request):
+    if request.method == "GET":
+        link = request.GET["link"]
+        return render(
+            request,
+            "servicesupport/pdf.html",
+            {
+                "link": link,
+            },
+        )
+
 
 @login_required
 def admin_data(request):
-    dupes = (
-        equ.objects.values("spec")
-        .annotate(Count("id"))
-        .order_by()
-        .filter(id__count__gt=1)
-    )
-    data = equ.objects.filter(spec__in=[item["spec"] for item in dupes])
+    analytic = analytics.objects.all()
+    page_list = analytic.values_list("page", flat=True).distinct().all().order_by("page")
+    person_list = analytic.values("user").distinct()
+
+    User_data = {"user_selected":None,"from_date":None, "to_date":None}
+    
+    last_month = analytic.filter(updated_at__range=[(datetime.datetime.now() - datetime.timedelta(weeks=4)), datetime.datetime.now()]).all()
+    #last_month_date = last_month.values_list("updated_at").distinct()
+    last_month_Graph_data = []
+    last_month_date = []
+    start_date = (datetime.datetime.now() - datetime.timedelta(weeks=4)).date()
+    end_date = datetime.datetime.now().date()
+    delta = datetime.timedelta(days=1)
+      
+    while start_date <= end_date:
+        start_date += delta
+        count = last_month.filter(updated_at__date=start_date)
+        last_month_date.append(str(start_date.day)+"-"+str(start_date.month))
+        last_month_Graph_data.append(count.count())
+
+
+    last_Month_page_count = []
+    color = ['#F7C8E0','#DFFFD8','#B4E4FF','#95BDFF','#99A98F','#C1D0B5','#E8A0BF','#FEFF86','#F4B183','#A7727D','#FFEA20','#FCF9BE']
+    i=0
+    for pages in page_list:
+        start_date = (datetime.datetime.now() - datetime.timedelta(weeks=4)).date()
+        end_date = datetime.datetime.now().date()
+        delta = datetime.timedelta(days=1)
+        page_count = []
+        while start_date <= end_date:
+            start_date += delta
+            count = last_month.filter(updated_at__date=start_date).filter(page=pages)
+            page_count.append(count.count())   
+        last_Month_page_count.append({'page':page_count,'color':color[i],'page_name':pages})
+        i+=1        
+        
+
+    Graph_data = []
+    if request.method == "POST":
+        user_details = request.POST["user_selected"]
+        from_date = request.POST["from_date"]
+        to_date = request.POST["to_date"]
+        User_data= {"user_selected":user_details,"from_date":from_date, "to_date":to_date}
+        if user_details == "all":
+            Data = analytic.filter(updated_at__range=[from_date, to_date]).all()
+        else:
+            Data = analytic.filter(user=user_details).filter(updated_at__range=[from_date, to_date]).all()   
+        for pages in page_list:
+            count = Data.filter(page=pages).count()
+            Graph_data.append(count)
 
     return render(
         request,
         "servicesupport/test.html",
         {
             "flag": None,
-            "data": data,
-            "dupes": dupes,
+            "page_list":page_list,
+            "person_list":person_list,
+            "User_data":User_data,
+            "Graph_data":Graph_data,
+            "last_month_date":last_month_date,
+            "last_month_Graph_data":last_month_Graph_data,
+            "mixed_page_vise_last_month": last_Month_page_count,
+        },
+    )
+
+@staff_member_required
+def analytic_view(request):
+    analytic = analytics.objects.all()
+    page_list = analytic.values_list("page", flat=True).distinct().all().order_by("page")
+    
+    last_month = analytic.filter(updated_at__range=[(datetime.datetime.now() - datetime.timedelta(weeks=4)), datetime.datetime.now()]).all()
+    last_month_Graph_data = []
+    last_month_date = []
+    start_date = (datetime.datetime.now() - datetime.timedelta(weeks=4)).date()
+    end_date = datetime.datetime.now().date()
+
+    # analytics 
+    analytic_data = {
+        "today_visit":analytic.filter(updated_at__date=end_date).count(),
+        "today_visitor":analytic.filter(updated_at__date=end_date).values("user").distinct().count(),
+        "all_visit":analytic.count(),
+        "all_visitor":analytic.values("user").distinct().count(),
+                     }
+    delta = datetime.timedelta(days=1)
+      
+    while start_date <= end_date:
+        count = last_month.filter(updated_at__date=start_date)
+        last_month_date.append(str(start_date.day)+"-"+str(start_date.month))
+        last_month_Graph_data.append(count.count())
+        start_date += delta
+
+
+    last_Month_page_count = []
+    color = ["#619ED6", "#6BA547", "#F7D027", "#E48F1B", "#B77EA3", "#E64345", "#60CEED", "#9CF168", "#F7EA4A", "#FBC543", "#FFC9ED", "#E6696E"]
+    i=0
+    all_page_views = []
+    for pages in page_list:
+            count = analytic.filter(page=pages).count()
+            all_page_views.append({'page':count,'color':color[i],'page_name':pages})
+            i+=1
+    
+    i=0
+    for pages in page_list:
+        start_date = (datetime.datetime.now() - datetime.timedelta(weeks=4)).date()
+        end_date = datetime.datetime.now().date()
+        delta = datetime.timedelta(days=1)
+        page_count = []
+        while start_date <= end_date:
+            count = last_month.filter(updated_at__date=start_date).filter(page=pages)
+            page_count.append(count.count()) 
+            start_date += delta  
+        last_Month_page_count.append({'page':page_count,'color':color[i],'page_name':pages})
+        i+=1        
+        
+    return render(
+        request,
+        "servicesupport/analytic_view.html",
+        {
+            "flag": None,
+            "page_list":page_list,
+            "last_month_date":last_month_date,
+            "last_month_Graph_data":last_month_Graph_data,
+            "mixed_page_vise_last_month": last_Month_page_count,
+            "all_page_views":all_page_views,
+            "analytic_data":analytic_data,
         },
     )
 
