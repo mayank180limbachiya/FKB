@@ -1,0 +1,189 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+{% load static %}
+<br>
+{% load templatetags %}
+<button class="btn btn-dark" onclick="print_page()"> Print</button>
+<div class="container">
+<form method="post" action="{% url 'csv_output' %}"> {% csrf_token %}
+    <div class="row align-items-center text-center" >
+        <div class="col-12 col-md-1">
+            <h5> User:</h5>
+        </div>
+        <div class="col-12 col-md-2">              
+            <select class="form-select" aria-label="Default select example" name="user_selected" required >
+                {% if User_data.user_selected %}
+                <option value="{{User_data.user_selected}}" selected>{% if User_data.user_selected == "all" %}all{%else%}{% get_username_from_user_id User_data.user_selected %}{%endif%}</option>
+                {% endif %}
+                <option value="all" {% if User_data.user_selected %}{%else%}selected{% endif %}>all</option>
+                {% for person in person_list %}
+                <option value="{{person.user}}"> {% get_username_from_user_id person.user%}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-12 col-md-auto align-items-center">
+            <h6>From Date</h6>
+        </div>
+        <div class="col-8 col-md-auto mb-2">
+            <input id="startDate" class="form-control" name="from_date" {% if User_data.from_date %}value="{{User_data.from_date}}"{% endif %} type="datetime-local" required />
+        </div>    
+        <div class="col-12 col-md-auto align-items-center">
+            <h6>To Date</h6>
+        </div>
+        <div class="col-8 col-md-auto mb-2">
+            <input id="todate" class="form-control" name="to_date" {% if User_data.to_date %}value="{{User_data.to_date}}"{% endif %} type="datetime-local" required/>
+        </div> 
+        <div class="col-4 col-md-1 mb-2" >
+        <button type="submit" class="btn btn-dark" >Out_CSV</button>
+            </div>
+        </form>
+    </div>
+<script type="text/javascript">
+    function print_page() {
+     window.print()
+    }
+</script>
+<div id = "section-to-print" class="container">
+    <div class="container" style="border-bottom: rgb(158, 158, 158) solid 1px;">
+        <form method="post" action="{% url 'analytic_report' %}"> 
+        {% csrf_token %}
+        <div class="row align-items-center text-center" >
+            <div class="col-12 col-md-1">
+                <h5> User:</h5>
+            </div>
+            <div class="col-12 col-md-2">              
+                <select class="form-select" aria-label="Default select example" name="user_selected" required >
+                    {% if User_data.user_selected %}
+                    <option value="{{User_data.user_selected}}" selected>{% if User_data.user_selected == "all" %}all{%else%}{% get_username_from_user_id User_data.user_selected %}{%endif%}</option>
+                    {% endif %}
+                    <option value="all" {% if User_data.user_selected %}{%else%}selected{% endif %}>all</option>
+                    {% for person in person_list %}
+                    <option value="{{person.user}}"> {% get_username_from_user_id person.user%}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-auto align-items-center">
+                <h6>From Date</h6>
+            </div>
+            <div class="col-8 col-md-auto mb-2">
+                <input id="startDate" class="form-control" name="from_date" {% if User_data.from_date %}value="{{User_data.from_date}}"{% endif %} type="datetime-local" required />
+            </div>    
+            <div class="col-12 col-md-auto align-items-center">
+                <h6>To Date</h6>
+            </div>
+            <div class="col-8 col-md-auto mb-2">
+                <input id="todate" class="form-control" name="to_date" {% if User_data.to_date %}value="{{User_data.to_date}}"{% endif %} type="datetime-local" required/>
+            </div>  
+            <div class="col-4 col-md-1 mb-2" >
+                <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+            </div>
+        </div>
+        </form>    
+        <br>  
+    </div>
+
+    <br>
+    
+   
+    
+    
+        <div class="row mb-2 pb-1" style="border-bottom: black solid 1px;">
+            <div class="col-4">
+                <div class="row mb-1">
+                    <div class="card" style="width: 200px;background-color: #FFE01B;">
+                        <div class="card-body">
+                            <h5 class="card-title">Today Data</h5>
+                            <span> Visits & Visitor</span>
+                            <p class="h1"><img class="me-3" src="{% static 'servicesupport/visits.png' %}" alt="Visits" style="width:50px;height:50px;">{{Visits}}</p>
+                            <p class="h1"><img class="me-3" src="{% static 'servicesupport/visitors.png' %}" alt="Visits" style="width:50px;height:50px;">{{Visitors}}</p>
+                        </div>
+                    </div>
+                </div> 
+            </div>      
+            <div class="col-8">
+                <canvas id="pages_view" style="width:100%; height: 400px;"></canvas>
+            </div>
+        </div>
+        <p class="h3">Searched Data Visits</p>        
+        <canvas id="last_month" style="width:100%; height: 200px;"></canvas>
+        <p class="h3">Searched Data Visits/Page</p> 
+        <canvas id="mixedChart"style="width:100%; height: 300px;" ></canvas>
+           
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+        <script>
+            const xlineValues = [{%for data in views_result %} "{{data.date|safe}}", {%endfor%}];
+            const ylineValues = [{%for data in views_result %} "{{data.count|safe}}", {%endfor%}];
+    
+            new Chart("last_month", {
+            type: "line",
+            data: {
+                labels: xlineValues,
+                datasets: [{
+                fill: false,
+                lineTension: 0,
+                backgroundColor: "rgba(0,0,255,1.0)",
+                borderColor: "rgba(0,0,255,0.1)",
+                data: ylineValues
+                }]
+            },
+            options: {
+                legend: {display: false},
+                
+            }
+            });
+    
+            const xmixValues = [{%for data in views_result %} "{{data.date|safe}}", {%endfor%}];
+    
+            new Chart("mixedChart", {
+            type: "line",
+            data: {
+                labels: xmixValues,
+                
+                datasets: [
+                {% for data in data_result_page %}
+                {
+                data: [{%for d in data.page %}"{{d}}",{%endfor%}],
+                borderColor: "{{data.color}}",
+                label:"{{data.page_name}}",
+                fill: false
+                },
+                {%endfor%}
+                ]
+            },
+            options: {
+                legend: {display: false}
+            }
+            });
+    
+    
+    
+            const x_pageValues = [{%for date in all_page_views %} "{{date.page_name|safe}}", {%endfor%}];
+            const y_pageValues = [{%for data in all_page_views %} "{{data.page|safe}}", {%endfor%}];
+            const barColors =[{%for data in all_page_views %} "{{data.color}}", {%endfor%}];
+            new Chart("pages_view", {
+            type: "doughnut",
+            data: {
+                labels: x_pageValues,
+                datasets: [{
+                backgroundColor: barColors,
+                data: y_pageValues
+                }]
+            },
+            options: {
+                title: {
+                display: true,
+                text: "Page Vise Usage"
+                }
+            }
+            
+              
+            });
+            
+            
+        </script>
+         
+    </div>
+    
+{% endblock %} 

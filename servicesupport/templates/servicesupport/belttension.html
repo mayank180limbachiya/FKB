@@ -2,6 +2,17 @@
 
 
 {% block body %}
+<script>
+    function updateInput(){
+        var c_c= parseInt(document.getElementById("c_c").value);
+        var dm= parseInt(document.getElementById("dm").value);
+        var d= parseInt(document.getElementById("d").value);
+        let ans = Math.sqrt((Math.pow(c_c,2))-((Math.pow(dm-d,2))/4));
+        let length =  (2*c_c)+((1.57)*(dm+d))+((Math.pow((dm-d),2))/(4*c_c))
+        document.getElementById("l").value = ans;
+        document.getElementById("L").value = length;
+    }
+</script>    
 
 <div class="container">
     <br>
@@ -17,7 +28,33 @@
     </div>
     <br>
     <form>
-        <h4 class="card-title">Belt Span Calculation:</h4>
+        <h4 class="card-title">Belt Tension inputs</h4>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">C-C Distance <small class="text-muted"> (in mm)</small></th>
+                <th scope="col">D Large Pulley dia <small class="text-muted"> (in mm)</small></th>
+                <th scope="col">d Small Pulley dia <small class="text-muted"> (in mm)</small></th>
+                <th scope="col">L Length of belt <small class="text-muted"> (in mm)</small></th>
+                <th scope="col">w Weight of one belt <small class="text-muted"> (in kg)</small></th>
+                <th scope="col">Number of belt</th>
+                <th scope="col">Span - l<small class="text-muted"> (in mm)</small></th>
+                <th scope="col">Aprox. -L<small class="text-muted"> (in mm)</small></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td><input type="number" min="0"  maxlength="30" class="form-control w-50 "  id="c_c" onchange="updateInput()"></td>
+                <td><input type="number" min="0"  maxlength="30" class="form-control w-50 "  id="dm" onchange="updateInput()"></td>
+                <td><input type="number" min="0"  maxlength="30" class="form-control w-50 "  id="d" onchange="updateInput()"></td>
+                <td><input type="number" class="form-control w-50" style="background-color: lightgreen;"  id="l" disabled></td>
+                <td><input type="number" class="form-control w-100" style="background-color: orange;"  id="L" disabled></td>
+            </tr>
+
+            </tbody>
+        </table>
+        <br>
+        <h4 class="card-title">MASS / LENGTH CALCULATION:</h4>
         <table class="table">
             <thead>
             <tr>
@@ -25,18 +62,18 @@
                 <th scope="col">D Large Pulley dia <small class="text-muted"> (in mm)</small></th>
                 <th scope="col">d Small Pulley dia <small class="text-muted"> (in mm)</small></th>
                 <th scope="col">Span - l<small class="text-muted"> (in mm)</small></th>
-                <th></th>
+                <th scope="col">Aprox. -L<small class="text-muted"> (in mm)</small></th>
             </tr>
             </thead>
             <tbody>
             <tr>
-                <td><input type="number" min="0" maxlength="30" class="form-control w-50 " name="CC" placeholder="C_C" id="cc"></td>
-                <td><input type="number" min="0" maxlength="30" class="form-control w-50 " name="D" placeholder="D" id="D"></td>
-                <td><input type="number" min="0" maxlength="30" class="form-control w-50 " name="d" placeholder="d" id="d"></td>
-                <td><input type="text" class="form-control w-50" style="background-color: lightgreen;" name="d" id="d" disabled></td>
-                <td></td>
+                <td><input type="number" min="0"  maxlength="30" class="form-control w-50 "  id="c_c" onchange="updateInput()"></td>
+                <td><input type="number" min="0"  maxlength="30" class="form-control w-50 "  id="dm" onchange="updateInput()"></td>
+                <td><input type="number" min="0"  maxlength="30" class="form-control w-50 "  id="d" onchange="updateInput()"></td>
+                <td><input type="number" class="form-control w-50" style="background-color: lightgreen;"  id="l" disabled></td>
+                <td><input type="number" class="form-control w-100" style="background-color: orange;"  id="L" disabled></td>
             </tr>
-            
+
             </tbody>
         </table>
     </form>  

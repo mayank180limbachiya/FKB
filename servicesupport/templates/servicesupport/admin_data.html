@@ -1,0 +1,13 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+{% load static %}
+<br>
+<div class="container">
+<h3>Links:</h3>
+<a class="btn btn-dark" href="{% url 'analytic_view' %}"> View Dash Board </a>
+<a class="btn btn-dark" href="{% url 'analytic_report' %}"> Get Analytic Report </a>
+<a class="btn btn-dark" href="{% url 'admin:index'%}"> Admin Panel </a>
+</div>
+{% endblock %} 

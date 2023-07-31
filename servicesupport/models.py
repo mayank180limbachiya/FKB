@@ -177,4 +177,5 @@ class std(models.Model):
 class analytics(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     page = models.CharField(max_length=30)
+    ip = models.CharField(max_length= 70,null=True,blank=True)
     updated_at = models.DateTimeField(auto_now=True)

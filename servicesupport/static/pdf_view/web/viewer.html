@@ -27,12 +27,14 @@ See https://github.com/adobe-type-tools/cmap-resources
     <meta name="google" content="notranslate">
     <script src="customToolbar.js"></script>
     <title>PDF.js viewer</title>
+    
     <script>
       // Disable right-click
       document.addEventListener('contextmenu', function(e) {
           e.preventDefault();
       });
   </script>
+
 <!-- This snippet is used in production (included from viewer.html) 123-->
 <link rel="resource" type="application/l10n" href="locale/locale.properties">
 <script src="../build/pdf.js"></script>
@@ -43,6 +45,7 @@ See https://github.com/adobe-type-tools/cmap-resources
   </head>
 
   <body tabindex="1">
+    
     <style>
       .hidden {
             display: none;
@@ -59,11 +62,12 @@ See https://github.com/adobe-type-tools/cmap-resources
       if (event.ctrlKey && event.key === 's') {
         event.preventDefault();
         event.stopPropagation();
-        alert('Save Event!');
+        alert('Save Not allowed');
         return false;
       }
       });
     </script>
+  
     <div id="outerContainer">
 
       <div id="sidebarContainer">

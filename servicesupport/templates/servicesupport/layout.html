@@ -5,7 +5,7 @@
         <title>{% block title %}Service Support{% endblock %}</title> 
         <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">  
         <script src="{% static 'js/bootstrap.min.js' %}"></script>
-
+        <meta name="theme-color" content="yellow"/>
         {% if request.user.is_superuser %}
         {% else %}
         <script>
@@ -15,6 +15,40 @@
             });
         </script>
         {% endif %}
+        <script type="text/javascript"> $(document).ready(function() {
+            $(window).keyup(function(e){
+              if(e.keyCode == 44){
+                $("body").hide();
+              }
+        
+            }); });
+
+    $(window).keyup(function(e){
+    if(e.keyCode == 44){
+        copyToClipboard();
+    }
+    });
+        </script>
+        <script>
+        document.onkeyup = function(evt) {
+        evt = evt || window.event;
+        var charCode = evt.keyCode || evt.which;
+        var charStr = String.fromCharCode(charCode);
+        if (charCode == 44) {
+            alert("Print Screen Not Allowed In This Page");
+            for (let i = 0; i < 5; i++) {
+                
+                alert("Not Allowed to take Screen Shot"+i);
+                navigator.clipboard.writeText("Not Allowed to take Screen Shot."+ i);
+            }
+            navigator.clipboard.writeText("Not Allowed to take Screen Shot.");
+            navigator.clipboard.writeText("Not Allowed to take Screen Shot.");
+            window.location.href = "{% url 'index' %}"
+        }
+        
+        };
+        
+        </script>
         
         <meta name="viewport" content="width=device-width, initial-scale=1">
        
@@ -58,9 +92,25 @@
     <style  media="print">
         BODY {display:none;visibility:hidden;}
     </style>
+    <script>
+        document.addEventListener('keydown', function(event) {
+        if (event.ctrlKey && event.key === 's') {
+          event.preventDefault();
+          event.stopPropagation();
+          alert('Save Not Allowed');
+          return false;
+        }
+        });
+      </script>
     {% endif %}
     <style>
-       
+       ::-moz-selection { /* Code for Firefox */
+        background: yellow;
+        }
+
+        ::selection {
+        background: yellow;
+        }
        
         .dropdown:hover>.dropdown-menu {
             display: block;
@@ -123,6 +173,11 @@
                     <li class="nav-item ">
                         <a class="nav-link fs-5 {% if flag == 10 %}active{% endif %}" href="{% url 'manual' %}">{% if flag == 10 %}<Kbd class="card-text">{% endif %}Manual{% if flag == 10 %}</Kbd>{% endif %} </a>
                     </li>
+                    {% if request.user.is_superuser %}
+                    <li class="nav-item ">
+                        <a class="nav-link fs-5 {% if flag == 14 %}active{% endif %}" href="{% url 'admin_data' %}">{% if flag == 14 %}<Kbd class="card-text">{% endif %}Admin{% if flag == 14 %}</Kbd>{% endif %} </a>
+                    </li>
+                    {% endif %}
                 </ul>
                 {% if user.is_authenticated %}
                 <ul class="navbar-nav ml-auto">    
