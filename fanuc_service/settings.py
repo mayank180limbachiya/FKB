@@ -132,6 +132,12 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR),
 )
 
+## IN PRODUCTION Static & MEDIA ROOT
+#STATIC_URL = '/static/'
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+#MEDIA_URL = '/media/'
+#MEDIA_ROOT = BASE_DIR/'static/media'
+
 # for Decorators @loginRequired 
 LOGIN_URL = '/servicesupport/login'
 
@@ -142,3 +148,11 @@ MESSAGE_TAGS = {
     messages.WARNING: 'alert-warning',
     messages.ERROR: 'alert-danger',
 }
+
+# EMAIL
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_HOST_USER ="mayank180limbachiya@gmail.com"
+EMAIL_HOST_PASSWORD ="vedvqokpdmtyjuyu"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 

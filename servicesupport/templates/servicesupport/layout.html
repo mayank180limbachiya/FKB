@@ -224,7 +224,7 @@
                     </div>
                     <div style="float:right;">
                         {% if user.is_authenticated %}
-                            Signed in as <strong>{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</strong>
+                            Signed in as <strong>{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</strong> - <a class="link-light" href="{% url 'changepassword' %}">Change Password</a>
                         {% else %}
                             Not signed In.
                         {% endif %}

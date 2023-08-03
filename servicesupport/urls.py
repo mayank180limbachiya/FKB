@@ -30,4 +30,5 @@ urlpatterns = [
     path("specification/<str:part_id>", views.Spec_details, name="spec_details"),
     path('pdf',views.pdf, name='pdf'),
     path('csv_output',views.csv_output,name='csv_output'),
+    path('changepassword',views.changepassword,name='changepassword'),
 ]

@@ -11,6 +11,10 @@ from django.contrib.admin.views.decorators import staff_member_required
 from urllib.parse import quote
 import re ,csv
 
+#email 
+from django.core.mail import send_mail
+from django.conf import settings
+
 # for Paginator << first Pre 1,2,3,4,5 Next Last >>
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -40,7 +44,6 @@ def login_view(request):
         username = (request.POST["username"]).lower()
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-        print(user)
         if user is not None:
             messages.success(request, f"Welcome {user.first_name}")
             login(request, user)
@@ -71,6 +74,54 @@ def login_view(request):
             },
         )
 
+@login_required
+def changepassword(request):
+    if request.method == "POST":
+        # user name data
+        username = request.user
+        old_password=request.POST["old_password"]
+        new_password = request.POST["new_password"]
+        re_password = request.POST["renew_password"]
+        user_details = User.objects.get(username=username)
+        if user_details.check_password(old_password):
+            if new_password.strip() == re_password.strip():
+                user_details.set_password(new_password)
+                user_details.save()
+                messages.success(request,"Password Change Successfully")
+                logout(request)
+                return render(
+                request,
+                "servicesupport/login.html",
+                {
+                    "flag": 1,
+                },
+            )
+            else: 
+                messages.error(request,"New Password & Renew Password should be same")
+                return render(
+                request,
+                "servicesupport/changepassword.html",
+                {
+                    "flag": 12,
+                },
+            )
+        else:
+            messages.error(request,"Kindly Enter correct OLD PASSWORD")
+            return render(
+                request,
+                "servicesupport/changepassword.html",
+                {
+                    "flag": 12,
+                },
+            )
+    else:
+        return render(
+            request,
+            "servicesupport/changepassword.html",
+            {
+                "flag": 12,
+            },
+        )
 
 # to check Valid mail id
 def Email_check(email):
@@ -192,6 +243,26 @@ def register(request):
 
 
 def lostpassword(request):
+    if request.method == "POST":
+        # user name data
+        email = request.POST["email"]
+        if User.objects.filter(email= email).exists():
+            print("Email Available")
+            send_mail("Password Reset Request","You New Password is Fanuc@123",'settings.EMAIL_HOST_USER',[email])
+            messages.success(request, "New Password Send to Your mail ID, Not received contact IT support")
+            u= User.objects.get(email__exact=email)
+            u.set_password('Fanuc@123')
+            u.save()
+            return render(
+                request,
+                "servicesupport/login.html",
+                {
+                    "flag": 12,
+                },
+                )
+        else:
+            print("not available")    
+            messages.error(request, "Your mail id is not available, Enter Correct Mail or Contact IT team")
     return render(
         request,
         "servicesupport/lostpassword.html",

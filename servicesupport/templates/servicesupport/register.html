@@ -2,6 +2,16 @@
 
 {% block body %}
 {% load static %}
+<div class="text-center">
+    Only admin having authority to register User
+</div>
+<div class="text-center">
+    Go to  <b>Home Page</b> <a href="{% url 'index' %}" class="text-dark">link</a>
+</div>
+<div class="text-center">
+    Go to <b>login Page</b> <a href="{% url 'login' %}" class="text-dark">link</a>
+</div>
+<!--
 <script>
     function maxlenghth_login_user() {
       var user_name = document.getElementById("username").value;
@@ -105,5 +115,5 @@
         </div>
     </div>
 </section>   
-
+-->
 {% endblock %}

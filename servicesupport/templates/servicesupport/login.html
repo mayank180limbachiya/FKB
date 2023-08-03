@@ -15,6 +15,14 @@
         alert("Password limit is 20 Char");
       }
     }
+    function show_password(ID) {
+      let x = document.getElementById(ID);
+      if (x.type === "password") {
+        x.type = "text";
+      } else {
+        x.type = "password";
+      }
+    }
 </script>
 
 <section class="h-100">
@@ -53,10 +61,12 @@
                                         Forgot Password?
                                     </a>
                                 </div>
-                                <input id="password" type="password" id="password" class="form-control" onkeyup="maxleghth_login_pass()" name="password" required>
-                                <div class="invalid-feedback">
-                                    Password is required
-                                </div>
+                                    <div class="input-group mb-3">
+                                        <input type="password"  maxlength = "50" name="password" class="form-control" onkeyup="maxleghth_login_pass()" id="password" aria-describedby="button-addon2" required >
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="show_password('password')"><img src="{% static 'servicesupport/eye.svg' %}"></button>
+                                        </div>    
+                                    </div>
                             </div>
 
                             <div class="d-flex align-items-center">
@@ -74,7 +84,7 @@
                     </div>
                     <div class="card-footer py-3 border-0">
                         <div class="text-center">
-                            Don't have an account? <a href="{% url 'register' %}" class="text-dark">Create One</a>
+                            Don't have an account? - Contact IT support <!--<a href="{% url 'register' %}" class="text-dark">Create One</a>-->
                         </div>
                         <div class="text-center">
                             Go to Home Page <a href="{% url 'index' %}" class="text-dark">link</a>
