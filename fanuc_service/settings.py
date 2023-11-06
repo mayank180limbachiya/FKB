@@ -27,7 +27,7 @@ SECRET_KEY = '-md*w9@uywja^wno6r^$x(#240$))4r@8*fr4ee)nwgx1zml0w'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.4.105','127.0.0.1','192.168.43.76']
+ALLOWED_HOSTS = ['192.168.4.105','127.0.0.1','192.168.43.76','localhost']
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'servicesupport',
     'ckeditor',
     'import_export',
+    #'django_auth_adfs',
     
 ]
 DEFAULT_AUTO_FIELD='django.db.models.AutoField' 
@@ -54,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'django_auth_adfs.middleware.LoginRequiredMiddleware',
 ]
 
 ROOT_URLCONF = 'fanuc_service.urls'
@@ -61,7 +63,7 @@ ROOT_URLCONF = 'fanuc_service.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'servicesupport', 'templates','uploads')],
+        'DIRS': [os.path.join(BASE_DIR, 'servicesupport', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -139,7 +141,7 @@ STATICFILES_DIRS = (
 #MEDIA_ROOT = BASE_DIR/'static/media'
 
 # for Decorators @loginRequired 
-LOGIN_URL = '/servicesupport/login'
+LOGIN_URL = '/login'
 
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
@@ -156,3 +158,44 @@ EMAIL_HOST_PASSWORD ="vedvqokpdmtyjuyu"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' 
+
+#IMPORT EXPORT Restrictions
+IMPORT_EXPORT_IMPORT_PERMISSION_CODE = "import"
+
+
+
+'''
+# Client secret is not public information. Should store it as an environment variable.
+
+client_id = 'e16db199-62b0-4350-aa15-076cf3719d4e'
+client_secret = 'oXO8Q~xuGAyZAYUYSfhQ1AjNXGkB4bwdY~jvgaBt'
+
+#Gl~8Q~DDIe7uXefKIJw_lgfPQuQmgjsvXLGSrdlD
+
+
+
+tenant_id = '5f4b290f-39e7-4135-9b77-b5eac2f11f94'
+
+AUTH_ADFS = {
+    'AUDIENCE': client_id,
+    'CLIENT_ID': client_id,
+    'CLIENT_SECRET': client_secret,
+    'CLAIM_MAPPING': {'first_name': 'given_name',
+                      'last_name': 'family_name',
+                      'email': 'upn'},
+    'GROUPS_CLAIM': 'roles',
+    'MIRROR_GROUPS': True,
+    'USERNAME_CLAIM': 'upn',
+    'TENANT_ID': tenant_id,
+    'RELYING_PARTY_ID': client_id,
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django_auth_adfs.backend.AdfsAccessTokenBackend',
+]
+
+
+# Configure django to redirect users to the right URL for login
+LOGIN_URL = "django_auth_adfs:login"
+LOGIN_REDIRECT_URL = "/"
+'''

@@ -3,7 +3,10 @@ from . import views
 
 
 urlpatterns = [
-    path("", views.index, name="index"),  # flag 1
+    path('', views.home, name='index'),  
+    
+
+    #path("", views.index, name="index"),  # flag 1
     path("login", views.login_view, name="login"),  # flag 12
     path("logout", views.logout_view, name="logout"),  # flag 13
     path("register", views.register, name="register"),  # flag 2
@@ -31,4 +34,7 @@ urlpatterns = [
     path('pdf',views.pdf, name='pdf'),
     path('csv_output',views.csv_output,name='csv_output'),
     path('changepassword',views.changepassword,name='changepassword'),
+    path('repair_list',views.repair_list,name='repair_list'),
+    path('repair_list/<str:list_id>',views.checklist,name='checklist'),
+    path('images/<str:spec>',views.photo,name='images'),
 ]

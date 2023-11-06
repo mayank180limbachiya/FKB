@@ -179,3 +179,16 @@ class analytics(models.Model):
     page = models.CharField(max_length=30)
     ip = models.CharField(max_length= 70,null=True,blank=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class spec_details(models.Model):
+    spec_no = models.CharField(max_length=50)
+    photo= models.ImageField(upload_to='uploads/images/')
+    weight = models.IntegerField(max_length=15,null=True,blank=True)
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "spec_no": self.spec_no,
+            "weight": self.weight,
+            "photo": self.photo.url,
+        }

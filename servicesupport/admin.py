@@ -10,7 +10,8 @@ from .models import (
     system_types,
     manual,
     Training_model,
-    analytics
+    analytics,
+    spec_details,
 )
 
 from import_export.admin import ImportExportModelAdmin
@@ -97,4 +98,9 @@ class led(admin.ModelAdmin):
 @admin.register(analytics)
 class analytics(admin.ModelAdmin):
     list_display = ("user", "page","updated_at")
+    pass
+
+@admin.register(spec_details)
+class spec_details(admin.ModelAdmin):
+    list_display = ("spec_no","weight")
     pass

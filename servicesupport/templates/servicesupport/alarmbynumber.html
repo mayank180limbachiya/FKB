@@ -90,8 +90,8 @@
         <div class="card-body">
             <!--<h5 class="card-title">Special title treatment</h5> -->
 
-            <p class="card-text" id="Alarm_details{{ forloop.counter0 }}">{{result.alarm_data}}</p>
-            <p class="card-text" id="Alarm_tips{{ forloop.counter0 }}">Tips : {{result.special_tips}}</p>
+            <div class="card-text" id="Alarm_details{{ forloop.counter0 }}">{{result.alarm_data|safe}}</div>
+            <div class="card-text" id="Alarm_tips{{ forloop.counter0 }}">Tips : {{result.special_tips|safe}}</div>
             <div class="card-header">
             <p class="card-text"><small>Manual : {{result.manual_name_number}}</small></p>
             </div>

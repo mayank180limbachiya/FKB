@@ -5,17 +5,43 @@
 <br>
 
 <script>
+    
     function maxlenghth_specification_spec() {
         var user_name = document.getElementById("spec").value;
         if (user_name.length == 40) {
           alert("Spec enter limit is 40 Char");
         }
       }
+    
+      function image_view(spec) {
+       
+        // Show the mailbox and hide other views
+        document.querySelector('#modal-body').style.display = 'block';
+        document.querySelector('#modal-body').innerHTML = "";
+        document.querySelector('#exampleModalLabel').innerHTML = spec + "- Photo"
+        // Show the mailbox name
+        const view = document.querySelector('#modal-body');
+        
+        fetch('/images/'+spec)
+        .then(response => response.json())
+        .then(specs => {
+            specs.forEach(photo => {
+            let div = document.createElement('div');
+                div.className = "mail-border";
+                div.innerHTML = `
+                    <span class="col-3"> <img src="static${photo['photo']}" alt="${photo['photo']}" width="200" height="auto"></span>
+
+                `;
+            view.appendChild(div);
+            });
+        
+        })
+}
 </script>
 
 <div class="container"  style="border-bottom: rgb(158, 158, 158) solid 1px;">
     <form method="get" action="{% url 'specification' %}"> 
-    {% csrf_token %}
+    
     <div class="row align-items-center">
         <div class="col-12 col-md-2">
             <h5> Parent Spec:</h5>
@@ -68,23 +94,46 @@
                     <th scscope="col" style=" white-space: nowrap;"> Child Spec</th>
                     <th scscope="col" style=" white-space: nowrap;"> Child Name</th>
                     <th scscope="col" style=" white-space: nowrap;"> QTY</th>
+                    <th scscope="col" style=" white-space: nowrap;"> Photo</th>
                 </tr>
             </thead>
             <tbody>
-                {% for write in page_obj %} 
+                {% for write in page_obj %} {% for b in photo %}
+                {% if forloop.counter == forloop.parentloop.counter %}
                         <tr>
                             <td class="text-end">{{forloop.counter|add:user_data.line_index_adder}}</td>
                             <td style=" white-space: nowrap;"><a href="{% url 'spec_details' write.id %}">{{ write.parentspec }}</a></td>
                             <td class="text-start" style=" white-space: nowrap;">{{ write.parentname }}</td>
-                            <td class="text-start" style=" white-space: nowrap;">{{ write.childspec }}</td>
+                            <td class="text-start" style=" white-space: nowrap;" id="{{forloop.counter}}">{{ write.childspec }}</td>
                             <td class="text-start" style=" white-space: nowrap;">{{ write.childname }}</td>
                             <td class="text-end" style=" white-space: nowrap;">{{ write.qty }}</td>
+                            <td class="text-end" style=" white-space: nowrap;"> {% if b == 1 %}<button type="button"  class="btn btn-primary btn-sm" onclick="image_view('{{write.childspec}}')" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                click
+                            </button>{% endif %} </td>
                         </tr>
-                {% endfor %}
+                {% endif %}        
+                {% endfor %}{% endfor %}
             </tbody>
         </table>
     </div>       
 </div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modal-body">
+            
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 <br>
 {% if page_obj.has_other_pages %}
     <nav>

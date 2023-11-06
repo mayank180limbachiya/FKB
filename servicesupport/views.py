@@ -22,6 +22,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 import datetime
 
+#for Photo API
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 
 import servicesupport
 from .models import (
@@ -34,8 +38,57 @@ from .models import (
     requesttype,
     manual,
     Training_model,
-    analytics
+    analytics,
+    spec_details,
 )
+
+
+from servicesupport.auth_helper import get_sign_in_flow, get_token_from_code, store_user, remove_user_and_token, get_token
+from servicesupport.graph_helper import *
+def home(request):
+    context = initialize_context(request)
+    return render(request, 'servicesupport/index.html', context)
+
+def initialize_context(request):
+    context = {'errors':[]}
+    error = request.session.pop('flash_error', None)
+    if error != None:
+      context['errors'] = []
+    context['errors'].append(error)
+    # Check for user in the session
+    context['user'] = request.session.get('user',{'is_authenticated': False})
+    return context
+def sign_in(request):
+    # Get the sign-in flow
+    flow = get_sign_in_flow()
+    # Save the expected flow so we can use it in the callback
+    try:
+        request.session['auth_flow'] = flow
+    except Exception as e:
+        print(e)
+    # Redirect to the Azure sign-in page
+    return HttpResponseRedirect(flow['auth_uri'])
+def sign_out(request):
+    # Clear out the user and token
+    remove_user_and_token(request)
+    return HttpResponseRedirect(reverse('home'))
+def callback(request):
+    # Make the token request
+    result = get_token_from_code(request)
+    #Get the user's profile from graph_helper.py script
+    user = get_user(result['access_token']) 
+    # Store user from auth_helper.py script
+    store_user(request, user)
+    return HttpResponseRedirect(reverse('home'))
+
+
+
+def index(request):
+    return render(
+        request,
+        "servicesupport/Index.html",
+        {"flag":1},
+    )
 
 
 def login_view(request):
@@ -49,7 +102,7 @@ def login_view(request):
             login(request, user)
             return render(
                 request,
-                "servicesupport/Index.html",
+                "servicesupport/index.html",
                 {
                     "flag": 1,
                 },
@@ -247,7 +300,6 @@ def lostpassword(request):
         # user name data
         email = request.POST["email"]
         if User.objects.filter(email= email).exists():
-            print("Email Available")
             send_mail("Password Reset Request","You New Password is Fanuc@123",'settings.EMAIL_HOST_USER',[email])
             messages.success(request, "New Password Send to Your mail ID, Not received contact IT support")
             u= User.objects.get(email__exact=email)
@@ -260,8 +312,7 @@ def lostpassword(request):
                     "flag": 12,
                 },
                 )
-        else:
-            print("not available")    
+        else:    
             messages.error(request, "Your mail id is not available, Enter Correct Mail or Contact IT team")
     return render(
         request,
@@ -278,21 +329,15 @@ def logout_view(request):
     messages.success(request, "logout Success")
     return render(
         request,
-        "servicesupport/Index.html",
+        "servicesupport/index.html",
         {
             "flag": 13,
         },
     )
 
 
-def index(request):
-    return render(
-        request,
-        "servicesupport/Index.html",
-        {
-            "flag": 1,
-        },
-    )
+
+
 
 
 @login_required
@@ -358,7 +403,6 @@ def training(request):
             # if page is empty then return last page
             page_obj = paginator.page(paginator.num_pages)
             page_number = str(paginator.num_pages)
-        print(page_number)
         User_input = {
             "Training": quote(Training_Data_ser),
             "Product": Product_Ser,
@@ -584,12 +628,13 @@ def alarmbyled(request):
     )
 
 
+@csrf_exempt
 @login_required
 def spec(request):
     add_analytics(request.user,"spec",request)
     page_obj = None
     User_input = {"specno": None, "limit": None,"value":None,"line_index_adder":None,}
-
+    photo = None
     if "specno" in request.GET and request.GET["specno"]:
         specno = request.GET["specno"]
         limit = request.GET["limit"]
@@ -608,6 +653,13 @@ def spec(request):
         except EmptyPage:
             # if page is empty then return last page
             page_obj = paginator.page(paginator.num_pages)
+        photo = []
+        for page in page_obj:
+            if spec_details.objects.filter(spec_no=page.childspec).exists():
+                photo.append(1)
+            else:
+                photo.append("")        
+       
         User_input = {"specno": quote(specno), "limit": limit, "value":specno,"line_index_adder":((int(page_number)-1)*(int(limit))),}
     return render(
         request,
@@ -616,6 +668,7 @@ def spec(request):
             "flag": 7,  # active tag
             "page_obj": page_obj,
             "user_data": User_input,
+            "photo":photo,
         },
     )
 
@@ -669,7 +722,6 @@ def Spec_details(request, part_id):
     )
     Main_data = specification.objects.filter(parentspec__exact=Search_key[0]).all()
     First_data = Main_data[0]
-    print(First_data.parentspec, First_data.parentname)
 
     # Search CHild spec have any future or past equivalent=nt no.
     ChildSpec = Main_data.values_list("childspec", flat=True)
@@ -1005,5 +1057,28 @@ def csv_output(request):
             writer.writerow([value.user,value.page,value.updated_at,value.ip])  
         return response       
 
+def repair_list(request):
+    pass
+
+def checklist(request,list_id):
+    pass
+    
+@csrf_exempt
+@login_required
+def photo(request, spec):
+
+    # Query for requested email
+    try:
+        data = spec_details.objects.filter(spec_no=spec).all()
+    except spec_details.DoesNotExist:
+        return JsonResponse({"error": "Photo not found."}, status=404)
+
+    # Return email contents
+    #if request.method == "GET":
+    return JsonResponse([email.serialize() for email in data], safe=False) 
+    #else:
+    #    return JsonResponse({
+    #        "error": "GET request required."
+    #   }, status=400)   
 
 # Create your views here.
