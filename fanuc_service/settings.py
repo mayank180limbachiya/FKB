@@ -27,7 +27,7 @@ SECRET_KEY = '-md*w9@uywja^wno6r^$x(#240$))4r@8*fr4ee)nwgx1zml0w'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.4.105','127.0.0.1','192.168.43.76','localhost']
+ALLOWED_HOSTS = ['192.168.4.105','127.0.0.1','192.168.43.76','localhost',]
 
 
 # Application definition
@@ -41,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'servicesupport',
     'ckeditor',
+     'ckeditor_uploader',
     'import_export',
+    'rest_framework',
     #'django_auth_adfs',
     
 ]
@@ -134,11 +136,111 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR),
 )
 
+SESSION_COOKIE_AGE = 3600 
+
+# Allow larger POST body for .docx upload (default is 2.5MB — too small)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024   # 50 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE  = 50 * 1024 * 1024   # 50 MB
+
+CKEDITOR_UPLOAD_PATH = "uploads/ckeditor/"
+CKEDITOR_IMAGE_BACKEND = "pillow"   # pip install Pillow if not installed
+CKEDITOR_CONFIGS = {
+    'default': {
+        # Use the full toolbar (all buttons)
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Styles', 'Format', 'Bold', 'Italic', 'Underline', 'Strike',
+             'SpellChecker', 'Undo', 'Redo'],
+            ['Link', 'Unlink', 'Anchor'],
+            ['Image', 'Flash', 'Table', 'HorizontalRule'],
+            ['TextColor', 'BGColor'],
+            ['Smiley', 'SpecialChar'],
+            ['Source'],
+            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'],
+            ['NumberedList', 'BulletedList'],
+            ['Indent', 'Outdent'],
+            ['Maximize'],
+        ],
+ 
+        # Editor dimensions
+        'width':  '100%',
+        'height': 350,
+ 
+        # Enable all extra plugins
+        'extraPlugins': ','.join([
+            'uploadimage',    # drag-drop + paste image upload
+            'image2',         # better image widget with resize handles
+            'autoembed',
+            'embedsemantic',
+            'autogrow',       # editor grows with content
+            'tableresize',    # drag to resize table columns
+            'tabletools',     # merge/split cells
+            'pastefromword',  # paste from Word with cleanup
+            'pastetools',
+            'colorbutton',
+            'font',
+            'justify',
+            'showblocks',
+            'div',
+        ]),
+ 
+        # Image 2 plugin — allows resize by dragging handle
+        'image2_alignClasses': ['image-align-left', 'image-align-center', 'image-align-right'],
+        'image2_captionedClass': 'image-captioned',
+ 
+        # Auto-grow: editor expands as user types
+        'autoGrow_minHeight':  200,
+        'autoGrow_maxHeight':  800,
+        'autoGrow_bottomSpace': 50,
+ 
+        # Allow all content (don't strip any HTML)
+        'allowedContent': True,
+ 
+        # Paste cleanup
+        'forcePasteAsPlainText': False,
+        'pasteFilter': None,
+ 
+        # Table defaults
+        'tabletools_scopedHeaders': True,
+ 
+        # Remove the "Powered by CKEditor" footer
+        'removePlugins': 'elementspath',
+ 
+        # Use Django's CSRF token for uploads
+        'filebrowserUploadUrl':      '/ckeditor/upload/',
+        'filebrowserImageUploadUrl': '/ckeditor/upload/',
+        'filebrowserBrowseUrl':      '/ckeditor/browse/',
+ 
+        # Content CSS (styles inside the editor iframe)
+        'contentsCss': [
+            'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&display=swap',
+            # Inline style block below handles the rest
+        ],
+ 
+        # Skin
+        'skin': 'moono-lisa',
+    },
+ 
+    # Minimal config for simple fields (alarm_data, special_tips)
+    'minimal': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink'],
+            ['Source'],
+        ],
+        'width':  '100%',
+        'height': 150,
+        'allowedContent': True,
+        'removePlugins': 'elementspath',
+    },
+}
 ## IN PRODUCTION Static & MEDIA ROOT
 #STATIC_URL = '/static/'
 #STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-#MEDIA_URL = '/media/'
-#MEDIA_ROOT = BASE_DIR/'static/media'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR
 
 # for Decorators @loginRequired 
 LOGIN_URL = '/login'
@@ -162,8 +264,15 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 #IMPORT EXPORT Restrictions
 IMPORT_EXPORT_IMPORT_PERMISSION_CODE = "import"
 
-
-
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES':['rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,  # Adjust page size as needed
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+    ],
+}
 '''
 # Client secret is not public information. Should store it as an environment variable.
 

@@ -1,146 +1,76 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}Manual — Service Support{% endblock %}
 {% block body %}
 {% load static %}
-<script>
+<div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-6 sm:py-10" x-data="{ activeTab: 'cnc' }">
+  <div class="mb-5 sm:mb-6">
+    <p class="font-mono text-xs text-brand-yellow tracking-widest uppercase mb-1">Documentation</p>
+    <h1 class="text-xl sm:text-2xl font-semibold text-brand-dark">Manual Library</h1>
+    <p class="text-sm text-slate-500 mt-1">Select a product category, then choose a product to view its manuals.</p>
+  </div>
 
-</script>
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="cnc-tab" data-bs-toggle="tab" data-bs-target="#cnc" type="button" role="tab" aria-controls="home" aria-selected="true">CNC</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="drive-tab" data-bs-toggle="tab" data-bs-target="#drive" type="button" role="tab" aria-controls="profile" aria-selected="false">DRIVE/MOTOR</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="robot-tab" data-bs-toggle="tab" data-bs-target="#robot" type="button" role="tab" aria-controls="profile" aria-selected="false">ROBOT</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="cut-tab" data-bs-toggle="tab" data-bs-target="#cut" type="button" role="tab" aria-controls="profile" aria-selected="false">ROBOCUT</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="drill-tab" data-bs-toggle="tab" data-bs-target="#drill" type="button" role="tab" aria-controls="profile" aria-selected="false">ROBODRILL</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="shot-tab" data-bs-toggle="tab" data-bs-target="#shot" type="button" role="tab" aria-controls="profile" aria-selected="false">ROBOSHOT</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="laser-tab" data-bs-toggle="tab" data-bs-target="#laser" type="button" role="tab" aria-controls="profile" aria-selected="false">LASER</button>
-    </li>
-</ul>
+  <!-- Tab Pills — scrollable horizontally on mobile -->
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-5 sm:mb-6 -mx-3 px-3 sm:mx-0 sm:px-0 sm:flex-wrap">
+    <button @click="activeTab='cnc'" :class="activeTab==='cnc'?'bg-brand-dark text-brand-yellow border-brand-yellow':'bg-white text-slate-600 border-slate-200 hover:border-slate-400'" class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">CNC</button>
+    <button @click="activeTab='drive'" :class="activeTab==='drive'?'bg-brand-dark text-brand-yellow border-brand-yellow':'bg-white text-slate-600 border-slate-200 hover:border-slate-400'" class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">Drive / Motor</button>
+    <button @click="activeTab='robot'" :class="activeTab==='robot'?'bg-brand-dark text-brand-yellow border-brand-yellow':'bg-white text-slate-600 border-slate-200 hover:border-slate-400'" class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">Robot</button>
+    <button @click="activeTab='cut'" :class="activeTab==='cut'?'bg-brand-dark text-brand-yellow border-brand-yellow':'bg-white text-slate-600 border-slate-200 hover:border-slate-400'" class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">RoboCut</button>
+    <button @click="activeTab='drill'" :class="activeTab==='drill'?'bg-brand-dark text-brand-yellow border-brand-yellow':'bg-white text-slate-600 border-slate-200 hover:border-slate-400'" class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">RoboDrill</button>
+    <button @click="activeTab='shot'" :class="activeTab==='shot'?'bg-brand-dark text-brand-yellow border-brand-yellow':'bg-white text-slate-600 border-slate-200 hover:border-slate-400'" class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">RoboShot</button>
+    <button @click="activeTab='laser'" :class="activeTab==='laser'?'bg-brand-dark text-brand-yellow border-brand-yellow':'bg-white text-slate-600 border-slate-200 hover:border-slate-400'" class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">Laser</button>
+  </div>
 
-<div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="cnc" role="tabpanel" aria-labelledby="cnc-tab">
-        <div class="container">
-        <form method="get" action="{% url 'manualview' %}">
-            <br>
-            {% csrf_token %}
-            <div class="row">
-            {% for productdata in cnc_product %}
-                <div class="col-auto" >
-                <button type="submit" style="background-color: black;" id="Selection" name="Selection" value="{{productdata.system_names}}" class="btn btn-secondary">{{productdata.system_names}} | {{productdata.product_name}}</button>
-                </div>
-            {% endfor %}
-            </div>
-        </form>
-        </div>
-    </div>
-    <div class="tab-pane fade" id="drive" role="tabpanel" aria-labelledby="drive-tab">
-        <div class="container">
-            <form method="get" action="{% url 'manualview' %}">
-                <br>
-                {% csrf_token %}
-                <div class="row">
-                    {% for productdata in drive_product %}
-                        <div class="col-auto">
-                            <button type="submit" style="background-color: black;" id="Selection" name="Selection" value="{{productdata.system_names}}" class="btn btn-secondary">{{productdata.system_names}} | {{productdata.product_name}}</button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="tab-pane fade" id="robot" role="tabpanel" aria-labelledby="robot-tab">
-        <div class="container">
-            <form method="get" action="{% url 'manualview' %}">
-                <br>
-                {% csrf_token %}
-                <div class="row">
-                    {% for productdata in robot_product %}
-                        <div class="col-auto">
-                            <button type="submit" style="background-color: black;" id="Selection" name="Selection" value="{{productdata.system_names}}" class="btn btn-secondary">{{productdata.system_names}} | {{productdata.product_name}}</button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="tab-pane fade" id="cut" role="tabpanel" aria-labelledby="cut-tab">
-        <div class="container">
-            <form method="get" action="{% url 'manualview' %}">
-                <br>
-                {% csrf_token %}
-                <div class="row">
-                    {% for productdata in cut_product %}
-                        <div class="col-auto">
-                            <button type="submit" style="background-color: black;" id="Selection" name="Selection" value="{{productdata.system_names}}" class="btn btn-secondary">{{productdata.system_names}} | {{productdata.product_name}}</button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </form>
-        </div>    
-    </div>
-    <div class="tab-pane fade" id="drill" role="tabpanel" aria-labelledby="drill-tab">
-        <div class="container">
-            <form method="get" action="{% url 'manualview' %}">
-                <br>
-                {% csrf_token %}
-                <div class="row">
-                    {% for productdata in drill_product %}
-                    <div class="col-auto">
-                        <button type="submit" style="background-color: black;" id="Selection" name="Selection" value="{{productdata.system_names}}" class="btn btn-secondary">{{productdata.system_names}} | {{productdata.product_name}}</button>
-                    </div>
-                    {% endfor %}
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="tab-pane fade" id="shot" role="tabpanel" aria-labelledby="shot-tab">
-        <div class="container">
-            <form method="get" action="{% url 'manualview' %}">
-                <br>
-                {% csrf_token %}
-                <div class="row">
-                    {% for productdata in shot_product %}
-                        <div class="col-auto">
-                            <button type="submit" style="background-color: black;" id="Selection" name="Selection" value="{{productdata.system_names}}" class="btn btn-secondary">{{productdata.system_names}} | {{productdata.product_name}}</button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </form>
-        </div>
-    </div>
-    <div class="tab-pane fade" id="laser" role="tabpanel" aria-labelledby="laser-tab">
-        <div class="container">
-            <form method="get" action="{% url 'manualview' %}">
-                <br>
-                {% csrf_token %}
-                <div class="row">
-                    {% for productdata in laser_product %}
-                        <div class="col-auto">
-                            <button type="submit" style="background-color: black;" id="Selection" name="Selection" value="{{productdata.system_names}}" class="btn btn-secondary">{{productdata.system_names}} | {{productdata.product_name}}</button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </form>
-        </div>
-    </div>
-</div>        
-
-<br>
-<div class="fixed-bottom">
-    <div class="text-center" style="padding: 5px; border-top: #737373 solid 0.2px; background-color: white">
-        <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
-    </div>    
-</div> 
+  <!-- Product buttons -->
+  <div x-show="activeTab==='cnc'" x-transition>
+    <form method="get" action="{% url 'manualview' %}">{% csrf_token %}
+      <div class="flex flex-wrap gap-2">
+        {% for p in cnc_product %}
+        <button type="submit" name="Selection" value="{{ p.system_names }}" class="font-mono text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-brand-dark hover:text-brand-yellow hover:border-brand-yellow transition min-h-[40px]">{{ p.system_names }} — {{ p.product_name }}</button>
+        {% endfor %}
+      </div>
+    </form>
+  </div>
+  <div x-show="activeTab==='drive'" x-transition>
+    <form method="get" action="{% url 'manualview' %}">{% csrf_token %}
+      <div class="flex flex-wrap gap-2">
+        {% for p in drive_product %}<button type="submit" name="Selection" value="{{ p.system_names }}" class="font-mono text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-brand-dark hover:text-brand-yellow hover:border-brand-yellow transition min-h-[40px]">{{ p.system_names }} — {{ p.product_name }}</button>{% endfor %}
+      </div>
+    </form>
+  </div>
+  <div x-show="activeTab==='robot'" x-transition>
+    <form method="get" action="{% url 'manualview' %}">{% csrf_token %}
+      <div class="flex flex-wrap gap-2">
+        {% for p in robot_product %}<button type="submit" name="Selection" value="{{ p.system_names }}" class="font-mono text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-brand-dark hover:text-brand-yellow hover:border-brand-yellow transition min-h-[40px]">{{ p.system_names }} — {{ p.product_name }}</button>{% endfor %}
+      </div>
+    </form>
+  </div>
+  <div x-show="activeTab==='cut'" x-transition>
+    <form method="get" action="{% url 'manualview' %}">{% csrf_token %}
+      <div class="flex flex-wrap gap-2">
+        {% for p in cut_product %}<button type="submit" name="Selection" value="{{ p.system_names }}" class="font-mono text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-brand-dark hover:text-brand-yellow hover:border-brand-yellow transition min-h-[40px]">{{ p.system_names }} — {{ p.product_name }}</button>{% endfor %}
+      </div>
+    </form>
+  </div>
+  <div x-show="activeTab==='drill'" x-transition>
+    <form method="get" action="{% url 'manualview' %}">{% csrf_token %}
+      <div class="flex flex-wrap gap-2">
+        {% for p in drill_product %}<button type="submit" name="Selection" value="{{ p.system_names }}" class="font-mono text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-brand-dark hover:text-brand-yellow hover:border-brand-yellow transition min-h-[40px]">{{ p.system_names }} — {{ p.product_name }}</button>{% endfor %}
+      </div>
+    </form>
+  </div>
+  <div x-show="activeTab==='shot'" x-transition>
+    <form method="get" action="{% url 'manualview' %}">{% csrf_token %}
+      <div class="flex flex-wrap gap-2">
+        {% for p in shot_product %}<button type="submit" name="Selection" value="{{ p.system_names }}" class="font-mono text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-brand-dark hover:text-brand-yellow hover:border-brand-yellow transition min-h-[40px]">{{ p.system_names }} — {{ p.product_name }}</button>{% endfor %}
+      </div>
+    </form>
+  </div>
+  <div x-show="activeTab==='laser'" x-transition>
+    <form method="get" action="{% url 'manualview' %}">{% csrf_token %}
+      <div class="flex flex-wrap gap-2">
+        {% for p in laser_product %}<button type="submit" name="Selection" value="{{ p.system_names }}" class="font-mono text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-brand-dark hover:text-brand-yellow hover:border-brand-yellow transition min-h-[40px]">{{ p.system_names }} — {{ p.product_name }}</button>{% endfor %}
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

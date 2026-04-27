@@ -1,84 +1,119 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}Alarm by LED — Service Support{% endblock %}
 {% block body %}
 {% load static %}
 
-<ul class="nav nav-tabs m-2" id="myTab" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Drive LED</button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">System LED</button>
-    </li>
-</ul>
-<div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-        <br>
-        <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover  ">
-            <thead>
-                <tr>
-                    <th >#</th>
-                    <!--<th scope="col">Product</th>-->
-                    <th >PDF Name</th>
-                    <th >PDF Location</th>
-                    <th >Link</th>
-                  </tr>
-            </thead>      
-            <tbody>
-            {% for led in Led_drive_data %}
-            <tr>
-                <th>{{forloop.counter}}</th>
-                <!--<td>{{led.Product_name.system_names}}</td>-->
-                <td  style=" white-space: nowrap;">{{led.pdf_name}}</td>
-                <td  style=" white-space: nowrap;">{{led.pdf_storage}} </a></td>
-                <td>
-                    <form method="get" action="{% url 'pdf' %}">
-                        {% csrf_token %}
-                        <button type="submit"  id="link" name="link" value="{{led.pdf_storage.url}}" class="btn btn-link btn-sm">Open</button>
-                    </form>
-                </td>    
-                <!-- <td><a href="{% static led.pdf_storage.url %}" target="_new">Open</a></td>-->
-            </tr>
-            
-            {% endfor %}
-            </tbody>
-        </table> 
-        </div>
-    </div>
-    <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-        <br>
-        <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th >#</th>
-                    <!--<th scope="col">Product</th>-->
-                    <th>PDF Name</th>
-                    <th>PDF Location</th>
-                    <th scope="col">Link</th>
-                  </tr>
-            </thead>      
-            <tbody>
-            {% for led in Led_system_data %}
-            <tr>
-                <th >{{forloop.counter}}</th>
-                <!--<td>{{led.Product_name.system_names}}</td>-->
-                <td  style=" white-space: nowrap;">{{led.pdf_name}}</td>
-                <td  style=" white-space: nowrap;">{{led.pdf_storage}}</td>
-                <td>
-                    <form method="get" action="{% url 'pdf' %}">
-                        {% csrf_token %}
-                        <button type="submit"  id="link" name="link" value="{{led.pdf_storage.url}}" class="btn btn-link btn-sm">Open</button>
-                    </form>
-                </td>  
-            </tr>
-            
-            {% endfor %}
-            </tbody>
-        </table>     
-    </div>
-    </div>
-</div>
+<div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-8" x-data="{ activeTab: 'drive' }">
 
+  <div class="mb-5 sm:mb-6">
+    <p class="font-mono text-xs text-brand-yellow tracking-widest uppercase mb-1">Alarm Search</p>
+    <h1 class="text-xl sm:text-2xl font-semibold text-brand-dark">Alarm by LED</h1>
+    <p class="text-sm text-slate-500 mt-1">Select a category to view LED diagnostic references.</p>
+  </div>
+
+  <!-- Tab pills -->
+  <div class="flex gap-2 overflow-x-auto pb-2 mb-5 sm:mb-6 -mx-3 px-3 sm:mx-0 sm:px-0">
+    <button @click="activeTab='drive'"
+      :class="activeTab==='drive' ? 'bg-brand-dark text-brand-yellow border-brand-yellow' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'"
+      class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">
+      Drive LED
+    </button>
+    <button @click="activeTab='system'"
+      :class="activeTab==='system' ? 'bg-brand-dark text-brand-yellow border-brand-yellow' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'"
+      class="font-mono text-xs px-4 py-2 rounded-full border transition whitespace-nowrap shrink-0 min-h-[36px]">
+      System LED
+    </button>
+  </div>
+
+  <!-- Drive LED tab -->
+  <div x-show="activeTab==='drive'" x-transition>
+    {% if Led_drive_data %}
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div class="px-4 sm:px-5 py-3 bg-brand-dark border-b border-slate-700">
+        <h2 class="font-mono text-sm text-brand-yellow font-semibold">Drive LED References</h2>
+      </div>
+      <div class="table-scroll">
+        <table class="w-full text-sm" style="min-width:480px">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase w-10">#</th>
+              <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase">PDF Name</th>
+              <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase">Location</th>
+              <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase w-20">Open</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for led in Led_drive_data %}
+            <tr class="hover:bg-amber-50 transition">
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">{{ forloop.counter }}</td>
+              <td class="px-3 sm:px-4 py-3 text-sm text-slate-700 whitespace-nowrap">{{ led.pdf_name }}</td>
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 whitespace-nowrap">{{ led.pdf_storage }}</td>
+              <td class="px-3 sm:px-4 py-3">
+                <form method="get" action="{% url 'pdf' %}">
+                  {% csrf_token %}
+                  <button type="submit" name="link" value="{{ led.pdf_storage.url }}"
+                    class="min-h-[32px] font-mono text-xs px-3 py-1.5 rounded-lg bg-brand-dark text-brand-yellow border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">
+                    Open
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
+      <p class="font-mono text-slate-400 text-sm">No Drive LED data available.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- System LED tab -->
+  <div x-show="activeTab==='system'" x-transition>
+    {% if Led_system_data %}
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div class="px-4 sm:px-5 py-3 bg-brand-dark border-b border-slate-700">
+        <h2 class="font-mono text-sm text-brand-yellow font-semibold">System LED References</h2>
+      </div>
+      <div class="table-scroll">
+        <table class="w-full text-sm" style="min-width:480px">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase w-10">#</th>
+              <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase">PDF Name</th>
+              <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase">Location</th>
+              <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase w-20">Open</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for led in Led_system_data %}
+            <tr class="hover:bg-amber-50 transition">
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">{{ forloop.counter }}</td>
+              <td class="px-3 sm:px-4 py-3 text-sm text-slate-700 whitespace-nowrap">{{ led.pdf_name }}</td>
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 whitespace-nowrap">{{ led.pdf_storage }}</td>
+              <td class="px-3 sm:px-4 py-3">
+                <form method="get" action="{% url 'pdf' %}">
+                  {% csrf_token %}
+                  <button type="submit" name="link" value="{{ led.pdf_storage.url }}"
+                    class="min-h-[32px] font-mono text-xs px-3 py-1.5 rounded-lg bg-brand-dark text-brand-yellow border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">
+                    Open
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
+      <p class="font-mono text-slate-400 text-sm">No System LED data available.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
 {% endblock %}

@@ -1,166 +1,133 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}Equivalent Search — Service Support{% endblock %}
 {% block body %}
+<div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-8">
 
-<br>
-<script>
-function maxlenghth_equ_spec() {
-    var user_name = document.getElementById("spec").value;
-    if (user_name.length == 40) {
-      alert("Spec enter limit is 40 Char");
-    }
-  }
-</script>
-<div class="container" style="border-bottom: rgb(158, 158, 158) solid 1px;">
+  <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-5 mb-5 sm:mb-6 shadow-sm">
     <form method="post" action="{% url 'equ' %}">
-    {% csrf_token %}
-    <div class="row ">
-        <div class="col-12 col-md-auto">
-            <div ><h5>Specification:</h5></div>
+      {% csrf_token %}
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
+        <div class="flex-1 min-w-0">
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Specification No.</label>
+          <input type="text" name="specno" id="spec" maxlength="40" required value="{% if user_data %}{{ user_data }}{% endif %}" placeholder="Enter child or parent spec..."
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
         </div>
-        <div class="col-8 col-md-5">            
-            <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_equ_spec()" class="form-control" value="{%if user_data %}{{user_data}}{%endif%}" name="specno" placeholder="Type Child or parent Spec" required>
-        </div>
-        <div class="col-4 col-md-auto" >
-            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
-        </div>
-    </div>
-    </form>    
-    <br>
-</div>    
-<br>
-<h4 class="container">Equvivalant Search</h4>
-{% if serchvalue.count != 0 %}
-<div class="container text-center">
-    <div class="table-responsive">
-        <table class="table table-fit table-bordered table-hover table-striped">
-            <thead>
-                <tr> 
-                    <th scscope="col"> Spec</th>
-                    <th scscope="col"> Discription</th>
-                    <th scscope="col"> Reuse</th>
-                    <th scscope="col"> Info </th>
-                    <th scscope="col"> Equ spec</th>
-                    <th scscope="col"> SR No</th>
-                    <th scscope="col"> TR No</th>
-                    <th scscope="col"> Remark</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in serchvalue %}  
-                    <tr>
-                    <td class="table-primary" style=" white-space: nowrap;">{{data.spec}}</td>
-                    <td>{{data.discription}}</td>
-                    <td>{{data.reuse}}</td>
-                    <td>{{ data.info }}</td>
-                    <td style="white-space: nowrap;">{{ data.equspec }}</td>
-                    <td>{{ data.srno }}</td>
-                    <td>{{ data.trno }}</td>
-                    <td>{{ data.remark }}</td>
-                    </tr>    
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>       
-</div>
-{%else%}
-<div class="container">
-<div class="card">
-    <div class="card-body">
-        No Old Equ Data Available - Kindly Search with Spec No.
-    </div>
-</div>
-</div>
-{% endif %}
-<br>
-<h4 class="container">Old Equvivalant Search</h4>
-{% if serchvalue1.count != 0 %}
-<div class="container text-center">
-    <div class="table-responsive">
-        <table class="table table-fit table-bordered table-hover table-striped">
-            <thead>
-                <tr> 
-                    <th scscope="col"> Spec</th>
-                    <th scscope="col"> Discription</th>
-                    <th scscope="col"> Reuse</th>
-                    <th scscope="col"> Info </th>
-                    <th scscope="col"> Equ spec</th>
-                    <th scscope="col"> SR NO</th>
-                    <th scscope="col"> TR NO</th>
-                    <th scscope="col"> Remark</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in serchvalue1 %}  
-                    <tr >
-                    <td style=" white-space: nowrap;">{{ data.spec }}</td>
-                    <td> {{ data.discription }}</td>
-                    <td>{{data.reuse}}</td>
-                    <td>{{ data.info }}</td>
-                    <td style="white-space: nowrap;" class="table-primary">{{ data.equspec }}</td>
-                    <td>{{ data.srno }}</td>
-                    <td>{{ data.trno }}</td>
-                    <td>{{ data.remark }}</td>
-                    </tr>    
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>       
-</div>
-{%else%}
-<div class="container">
-<div class="card">
-    <div class="card-body">
-        No Old Equ Data Available - Kindly Search with Spec No.
-    </div>
-</div>
-</div>
-{% endif %}
-<br>
-{% if availparent %}
-<div class="container">
-    <div class="accordion" id="accordionExample">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                Part In Parent Spec: 
-                </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                <div class="accordion-body"> 
-                    <div class="container text-center">
-                        <div class="table-responsive"> 
-                            <table class="table table-fit table-bordered">
-                                <thead>
-                                    <tr> 
-                                        <th scscope="col"> Parent Spec</th>
-                                        <th scscope="col"> Parent Name</th>
-                                        <th scscope="col"> Child Spec</th>
-                                        <th scscope="col"> Child Spec Name</th>
-                                        <th scscope="col"> QTY</th>
-                                    </tr>   
-                                </thead>     
-                                <tbody>   
-                                    {% for write in availparent %}
-                                    {% if write.parentspec != write.childspec %}
-                                    <tr>
-                                        <td><a href="{% url 'spec_details' write.id %}">{{ write.parentspec }}</a></td>
-                                        <td> {{ write.parentname }}</td>
-                                        <td class="table-primary">{{ write.childspec }}</td>
-                                        <td class="table-primary">{{ write.childname }}</td>
-                                        <td>{{ write.qty}}</td>
-                                    </tr>
-                                    {% endif %}
-                                    {% endfor %}
-                                </tbody>    
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>       
-    </div>
-</div>
-{% endif %}
+        <button type="submit" class="w-full sm:w-auto min-h-[44px] rounded-lg bg-brand-dark text-brand-yellow font-mono font-semibold text-sm px-6 py-2.5 hover:bg-brand-yellow hover:text-brand-dark transition border border-brand-yellow">EXEC →</button>
+      </div>
+    </form>
+  </div>
 
+  <!-- Equivalent Search -->
+  <div class="mb-5 sm:mb-6">
+    <h2 class="font-mono text-sm font-semibold text-brand-dark mb-3 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-brand-yellow inline-block"></span>Equivalent Search
+    </h2>
+    {% if serchvalue.count != 0 %}
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div class="table-scroll">
+        <table class="w-full text-sm" style="min-width:600px">
+          <thead><tr class="bg-brand-dark border-b border-slate-700">
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-brand-yellow">Spec</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Description</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Reuse</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Info</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Equ Spec</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">SR No.</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">TR No.</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Remark</th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for d in serchvalue %}<tr class="hover:bg-amber-50 transition">
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-brand-yellow font-semibold whitespace-nowrap bg-brand-dark/5">{{ d.spec }}</td>
+              <td class="px-3 sm:px-4 py-3 text-sm text-slate-700">{{ d.discription }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.reuse }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.info }}</td>
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-700 whitespace-nowrap">{{ d.equspec }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.srno }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.trno }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.remark }}</td>
+            </tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl border border-dashed border-slate-300 px-6 py-8 text-center"><p class="font-mono text-slate-400 text-sm">No equivalent data found.</p></div>
+    {% endif %}
+  </div>
+
+  <!-- Old Equivalent Search -->
+  <div class="mb-5 sm:mb-6">
+    <h2 class="font-mono text-sm font-semibold text-brand-dark mb-3 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-slate-400 inline-block"></span>Old Equivalent Search
+    </h2>
+    {% if serchvalue1.count != 0 %}
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div class="table-scroll">
+        <table class="w-full text-sm" style="min-width:600px">
+          <thead><tr class="bg-slate-700 border-b border-slate-600">
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-300">Spec</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Description</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Reuse</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Info</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-brand-yellow">Equ Spec</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">SR No.</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">TR No.</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">Remark</th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for d in serchvalue1 %}<tr class="hover:bg-amber-50 transition">
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-700 whitespace-nowrap">{{ d.spec }}</td>
+              <td class="px-3 sm:px-4 py-3 text-sm text-slate-700">{{ d.discription }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.reuse }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.info }}</td>
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-brand-yellow font-semibold whitespace-nowrap">{{ d.equspec }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.srno }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.trno }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ d.remark }}</td>
+            </tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl border border-dashed border-slate-300 px-6 py-8 text-center"><p class="font-mono text-slate-400 text-sm">No old equivalent data found.</p></div>
+    {% endif %}
+  </div>
+
+  <!-- Parent Spec accordion -->
+  {% if availparent %}
+  <div x-data="{open:false}" class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+    <button @click="open=!open" class="w-full flex items-center justify-between px-4 sm:px-5 py-4 text-left hover:bg-slate-50 transition">
+      <span class="font-mono text-sm font-semibold text-brand-dark">Part in Parent Spec</span>
+      <svg :class="open?'rotate-180':''" class="w-4 h-4 text-slate-400 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </button>
+    <div x-show="open" x-transition class="border-t border-slate-100">
+      <div class="table-scroll">
+        <table class="w-full text-sm" style="min-width:480px">
+          <thead><tr class="bg-slate-50 border-b border-slate-100">
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500">Parent Spec</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500">Parent Name</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500">Child Spec</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500">Child Name</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500">QTY</th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for w in availparent %}{% if w.parentspec != w.childspec %}
+            <tr class="hover:bg-amber-50 transition">
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-blue-600 hover:underline whitespace-nowrap"><a href="{% url 'spec_details' w.id %}">{{ w.parentspec }}</a></td>
+              <td class="px-3 sm:px-4 py-3 text-sm text-slate-700">{{ w.parentname }}</td>
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-brand-yellow font-semibold whitespace-nowrap">{{ w.childspec }}</td>
+              <td class="px-3 sm:px-4 py-3 text-sm text-slate-700">{{ w.childname }}</td>
+              <td class="px-3 sm:px-4 py-3 text-xs text-slate-600">{{ w.qty }}</td>
+            </tr>
+            {% endif %}{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
 {% endblock %}

@@ -1,164 +1,116 @@
 {% extends "servicesupport/layout.html" %}
-
 {% block body %}
 {% load static %}
 
 <script>
-    function myFunction(data) {
-        // Get the text field
-        var Alarm_number = "Alarm"+data
-        var Alarm_details = "Alarm_details"+data
-        var Alarm_tips = "Alarm_tips"+data      
-        console.log(Alarm_number);
-        var copyText = document.getElementById(Alarm_number).innerText;
-        var copyText1 = document.getElementById(Alarm_details).innerText;
-        var copyText2 = document.getElementById(Alarm_tips).innerText;
-        
-        var all_data = copyText  +"\n"+ copyText1 + "\n"+ copyText2;
-        console.log(copyText.bold());
-        console.log(all_data);
-        navigator.clipboard.writeText(all_data);   
-    }
-
-    function maxlenghth_alarmbytext_number() {
-        var user_name = document.getElementById("alarm_text").value;
-        if (user_name.length == 60) {
-          alert("Alarm Text enter limit is 60 Char");
-        }
-    }
+function copyAlarm(i) {
+    var num     = document.getElementById("Alarm"+i).innerText;
+    var details = document.getElementById("Alarm_details"+i).innerText;
+    var tips    = document.getElementById("Alarm_tips"+i).innerText;
+    navigator.clipboard.writeText(num+"\n"+details+"\n"+tips).then(()=>{
+        var btn=document.getElementById("copybtn"+i);
+        btn.classList.add("bg-brand-yellow","!text-brand-dark");
+        setTimeout(()=>btn.classList.remove("bg-brand-yellow","!text-brand-dark"),900);
+    });
+}
+function checkAlarmLength(){
+    var warn=document.getElementById("char-warn");
+    if(document.getElementById("alarm_text").value.length>=60) warn.classList.remove("hidden");
+    else warn.classList.add("hidden");
+}
 </script>
 
-<br>
+<div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-8">
 
-<div class="container" style="border-bottom: rgb(158, 158, 158) solid 1px;">
-    <form method="get" action="{% url 'alarmbytext' %}"> 
-    {% csrf_token %}
-    <div class="row align-items-center text-center" >
-        <div class="col-12 col-md-2">
-            <h5> Alarm by Text:</h5>
-        </div>
-        <div class="col-12 col-md-3">              
-            <input type="text" id="alarm_text" maxlength="60" onkeyup="maxlenghth_alarmbytext_number()" class="form-control" name="Alarm_number" onkeyup="maxlenghth_alarmbytext_number()" value="{%if User_input.alarm %}{{User_input.value}}{%endif%}"  placeholder="Alarm Text" id="Alarm_number" required>
-        </div>
-        <div class="col-12 col-md-1 align-items-center">
-            <h5>Product</h5>
-        </div>
-        <div class="col-8 col-md-2 mb-2">
-            <select class="form-select" aria-label="Default select example" name="system" required>
-                {% if User_input.system %}
-                <option value="{{User_input.system}}" selected>{{User_input.system}}</option>
-                {% endif %}
-                <option value="all" {% if User_input.system %}{%else%}selected{% endif %}>all</option>
-                {% for product in product_type %}
-                <option value="{{product.system_names}}">{{product.nick_names}}</option>
-                {% endfor %}
-            </select>
-        </div>    
-        <div class="col-4 col-md-1 mb-2" >
-            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
-        </div>
-        <div class="col-6 col-md-2 mt-2">
-            <div class="float-end">
-                <div class="input-group input-group-sm mb-0"> 
-                <h6> No. of Row:</h6></div>
-            </div>
-        </div>
-        <div class="col-3 col-md-1 mt-2" > 
-            <div class="input-group input-group-sm mb-0">           
-                <input size="2"  min="1" max="200" type="number" class="form-control" name="limit" value="{%if User_input.limit %}{{User_input.limit}}{%else%}5{%endif%}" id="limit">
-            </div>
-        </div>
-    </div>
-    </form>    
-    <br>  
-</div>    
+    <!-- Search form — stacks on mobile, row on md+ -->
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-5 mb-5 sm:mb-6 shadow-sm">
+        <form method="get" action="{% url 'alarmbytext' %}">
+            {% csrf_token %}
+            <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3">
 
-<div class="container" >
-{% if page_obj %}  
-<br> 
-    {% for result in page_obj %}
-    <div class="card mb-3">
-        <div class="card-header">
-            <div class="row">
-                <div class="col" id ="Alarm{{ forloop.counter0 }}">
-                {{result.alarm_number}}  | {{result.alarm_description}} 
+                <div class="flex-1 min-w-0 sm:min-w-48">
+                    <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Alarm Text</label>
+                    <input type="text" id="alarm_text" name="Alarm_number" maxlength="60" onkeyup="checkAlarmLength()"
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"
+                        placeholder="Enter alarm text..." value="{% if User_input.alarm %}{{ User_input.value }}{% endif %}" required>
+                    <p id="char-warn" class="hidden text-xs text-red-500 mt-1 font-mono">60 character limit reached.</p>
                 </div>
-                <div style="text-align: right" class="col">
-                    {{result.system_type}}
-                    <button onclick="myFunction('{{forloop.counter0}}');" class="button"><img src="{% static 'servicesupport/copy.png' %}" alt="copy" style="border: 0;"> </button>
+
+                <div class="sm:w-44">
+                    <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Product</label>
+                    <select name="system" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow" required>
+                        {% if User_input.system %}<option value="{{ User_input.system }}" selected>{{ User_input.system }}</option>{% endif %}
+                        <option value="all" {% if not User_input.system %}selected{% endif %}>All Products</option>
+                        {% for p in product_type %}<option value="{{ p.system_names }}">{{ p.nick_names }}</option>{% endfor %}
+                    </select>
+                </div>
+
+                <div class="w-full sm:w-24">
+                    <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Rows</label>
+                    <input type="number" name="limit" min="1" max="200"
+                        value="{% if User_input.limit %}{{ User_input.limit }}{% else %}5{% endif %}"
+                        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+                </div>
+
+                <button type="submit" class="w-full sm:w-auto min-h-[44px] rounded-lg bg-brand-dark text-brand-yellow font-mono font-semibold text-sm px-6 py-2.5 hover:bg-brand-yellow hover:text-brand-dark transition border border-brand-yellow">
+                    EXEC →
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if page_obj %}
+    <div class="space-y-3 sm:space-y-4">
+        {% for result in page_obj %}
+        <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:border-slate-300 transition">
+            <div class="flex items-start justify-between gap-3 px-4 sm:px-5 py-3 bg-brand-dark">
+                <div id="Alarm{{ forloop.counter0 }}" class="font-mono text-xs sm:text-sm text-brand-yellow font-semibold leading-snug">
+                    {{ result.alarm_number }} | {{ result.alarm_description }}
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <span class="hidden sm:inline text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">{{ result.system_type }}</span>
+                    <button id="copybtn{{ forloop.counter0 }}" onclick="copyAlarm('{{ forloop.counter0 }}')"
+                        class="min-h-[32px] px-2 py-1 rounded text-xs font-mono text-slate-300 border border-slate-600 hover:border-brand-yellow hover:text-brand-yellow transition">
+                        Copy
+                    </button>
                 </div>
             </div>
-        </div>
-        <div class="card-body">
-            <!--<h5 class="card-title">Special title treatment</h5> -->
-
-            <div class="card-text" id="Alarm_details{{ forloop.counter0 }}">{{result.alarm_data|safe}}</div>
-            <div class="card-text" id="Alarm_tips{{ forloop.counter0 }}">Tips :<span>{{result.special_tips|safe}}</span></div>
-            <div class="card-header">
-            <p class="card-text"><small>Manual : {{result.manual_name_number}}</small></p>
+            <div class="px-4 sm:px-5 py-3 sm:py-4 space-y-2 sm:space-y-3">
+                <div id="Alarm_details{{ forloop.counter0 }}" class="text-sm text-slate-700 leading-relaxed">{{ result.alarm_data|safe }}</div>
+                <div id="Alarm_tips{{ forloop.counter0 }}" class="text-sm text-slate-600 bg-amber-50 border border-amber-100 rounded-lg px-3 sm:px-4 py-2">
+                    <span class="font-semibold text-amber-700 text-xs uppercase tracking-wide">Tips: </span>{{ result.special_tips|safe }}
+                </div>
+                <div class="text-xs font-mono text-slate-400 pt-1 border-t border-slate-100">Manual: {{ result.manual_name_number }}</div>
             </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}        
-</div> 
 
-{% if page_obj.has_other_pages %}
-    <nav>
-        <ul class="pagination justify-content-center">
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-6 sm:mt-8">
+        <ul class="flex items-center justify-center gap-1 flex-wrap">
             {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1&Alarm_number={{User_input.alarm}}&limit={{User_input.limit}}&system={{User_input.system}}">
-                        First
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&Alarm_number={{User_input.alarm}}&limit={{User_input.limit}}&system={{User_input.system}}">
-                        Previous
-                    </a>
-                </li>
+            <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page=1&Alarm_number={{ User_input.alarm }}&limit={{ User_input.limit }}&system={{ User_input.system }}">First</a></li>
+            <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.previous_page_number }}&Alarm_number={{ User_input.alarm }}&limit={{ User_input.limit }}&system={{ User_input.system }}">← Prev</a></li>
             {% endif %}
-
-            {% for page_number in page_obj.paginator.page_range %}
-                {% if page_number <= page_obj.number|add:3 and page_number >= page_obj.number|add:-3 %}
-                    {% if page_obj.number == page_number %}
-                        <li class="page-item active">
-                            <a class="page-link" href="?page={{ page_number }}&Alarm_number={{User_input.alarm}}&limit={{User_input.limit}}&system={{User_input.system}}">
-                                {{ page_number }}
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_number }}&Alarm_number={{User_input.alarm}}&limit={{User_input.limit}}&system={{User_input.system}}">
-                                {{ page_number }}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endif %}
+            {% for p in page_obj.paginator.page_range %}
+              {% if p <= page_obj.number|add:3 and p >= page_obj.number|add:-3 %}
+              <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border transition {% if page_obj.number == p %}bg-brand-dark text-brand-yellow border-brand-yellow{% else %}bg-white text-slate-600 border-slate-200 hover:border-brand-yellow{% endif %}" href="?page={{ p }}&Alarm_number={{ User_input.alarm }}&limit={{ User_input.limit }}&system={{ User_input.system }}">{{ p }}</a></li>
+              {% endif %}
             {% endfor %}
-
             {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&Alarm_number={{User_input.alarm}}&limit={{User_input.limit}}&system={{User_input.system}}">
-                        Next
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&Alarm_number={{User_input.alarm}}&limit={{User_input.limit}}&system={{User_input.system}}">
-                        Last
-                    </a>
-                </li>
+            <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.next_page_number }}&Alarm_number={{ User_input.alarm }}&limit={{ User_input.limit }}&system={{ User_input.system }}">Next →</a></li>
+            <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.paginator.num_pages }}&Alarm_number={{ User_input.alarm }}&limit={{ User_input.limit }}&system={{ User_input.system }}">Last</a></li>
             {% endif %}
         </ul>
     </nav>
-{% endif %}
-{% else %}
-<br>
-<div class="container">
-    <div class="card">
-        <div class="card-body">
-            No Data Available - Kindly Search with No.
-        </div>
+    {% endif %}
+
+    {% else %}
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-dashed border-slate-300 px-6 py-12 text-center">
+        <p class="font-mono text-slate-400 text-sm">No data — try searching with a different alarm text.</p>
     </div>
+    {% endif %}
+
 </div>
-{% endif %}
 {% endblock %}

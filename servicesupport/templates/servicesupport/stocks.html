@@ -1,0 +1,177 @@
+{% extends "servicesupport/layout.html" %}
+{% block extra_head %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+<!-- jQuery -->
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<!-- DataTables JS -->
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+{% endblock %}
+
+{% block body %}
+{% load static %}
+<br>
+<script>
+    function maxlenghth_specification_spec() {
+        var user_name = document.getElementById("spec").value;
+        if (user_name.length == 40) {
+          alert("Spec enter limit is 40 Char");
+        }
+      }
+    
+      function image_view(spec) {
+       
+        // Show the mailbox and hide other views
+        document.querySelector('#modal-body').style.display = 'block';
+        document.querySelector('#modal-body').innerHTML = "";
+        document.querySelector('#exampleModalLabel').innerHTML = spec + "- Photo"
+        // Show the mailbox name
+        const view = document.querySelector('#modal-body');
+        
+        fetch('/images/'+spec)
+        .then(response => response.json())
+        .then(specs => {
+            specs.forEach(photo => {
+            let div = document.createElement('div');
+                div.className = "mail-border";
+                div.innerHTML = `
+                    <span class="col-3"> <img src="static${photo['photo']}" alt="${photo['photo']}" width="200" height="auto"></span>
+
+                `;
+            view.appendChild(div);
+            });
+        
+        })
+}
+    function myFunction(data) {
+        // Get the text field
+            
+        console.log(data);
+                
+        var all_data = "\t"+"\t"+ data +"\t"+ "\t"+ "SRP3";
+       
+        console.log(all_data)
+        unsecuredCopyToClipboard(all_data)
+        navigator.clipboard.writeText(all_data);
+        alert("Copied the text");
+    }
+    function unsecuredCopyToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        
+        textArea.focus({preventScroll:true});
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Unable to copy to clipboard', err);
+        }
+        document.body.removeChild(textArea);
+    }
+</script>
+<script type="text/javascript">
+        $(document).ready(function() {
+            // DataTables initialization
+            var table = $('#example').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "/api/stocks/",
+                    "type": "GET",
+                    "data": function (d) {
+                        d.page = (d.start / d.length) + 1;  // DataTables uses 'start' and 'length', convert to page number
+                    },
+                    "dataSrc": function (json) {
+                        // Map JSON data to DataTables format
+                        json.recordsTotal = json.count;
+                        json.recordsFiltered = json.count;
+                        return json.results;
+                    }
+
+                },
+                "columns": [
+                    { "data": "material" },
+                    { "data": "material_name"},
+                    { "data": "plant" },
+                    { "data": "storage" },
+                    { "data": "special_stock" },
+                    { "data": "special_stock_number" },
+                    { "data": "available" },
+                    { "data": "transit" },
+                    { "data": "returns" },
+                ],
+                "columnDefs": [
+                { "orderable": false, "targets": 1 }
+                ],
+                "searchDelay": 1000
+                
+            });
+
+            // Apply the search for each column
+            $('#example thead tr:eq(1) th').each(function (i) {
+                var title = $(this).text();
+                $('input', this).on('keyup change', function () {
+                    if (table.column(i).search() !== this.value) {
+                        table
+                            .column(i)
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+        });
+</script>
+
+<div class="container" style="border-bottom: rgb(158, 158, 158) solid 1px;">
+    <form method="get" action="{% url 'alarmbytext' %}"> 
+    {% csrf_token %}
+    <div class="row align-items-center text-center" >
+        <div class="col-12 col-md-2">
+            <h5> Spec:</h5>
+        </div>
+        <div class="col-12 col-md-3">              
+            <input type="text" id="alarm_text" maxlength="60"  class="form-control" name="Alarm_number" onkeyup="maxlenghth_alarmbytext_number()"  placeholder="spec" id="spec" required>
+        </div>
+        <div class="col-12 col-md-1 align-items-center">
+            <h5>Plant</h5>
+        </div>
+        <div class="col-8 col-md-2 mb-2">
+            <input type="text" id="alarm_text" maxlength="60"  class="form-control" name="plant" onkeyup="maxlenghth_alarmbytext_number()"   placeholder="plant" id="plant" required>
+        </div>    
+        <div class="col-4 col-md-1 mb-2" >
+            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+        </div>
+    </div>
+    </form>    
+    <br>  
+</div>
+
+<table id="example" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Spec</th>
+            <th>Name</th>
+            <th>Plant</th>
+            <th>Storage</th>
+            <th>SP</th>
+            <th>special_stock_number</th>
+            <th>AVBL</th>
+            <th>TRANS</th>
+            <th>RET</th>
+        </tr>
+        <tr>
+            <th><input type="text" placeholder="Search Spec" /></th>
+            <th><input type="text" placeholder="Search Name" /></th>
+            <th><input type="text" placeholder="Search Plant" /></th>
+            <th><input type="text" placeholder="Search Storage" /></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+</table>
+
+{% endblock %}

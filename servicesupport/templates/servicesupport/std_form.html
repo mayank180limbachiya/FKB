@@ -1,0 +1,237 @@
+{% extends "servicesupport/layout.html" %}
+{% block title %}{% if report %}Edit STD{% else %}New STD Report{% endif %} — Service Support{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<!--<script src="https://cdn.ckeditor.com/4.25.0/full/ckeditor.js"></script>-->
+<style>
+.fl { display:block; font-family:'IBM Plex Mono',monospace; font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:#64748b; margin-bottom:.2rem; }
+.action-bar { position:sticky; bottom:0; background:#f8fafc; border-top:1px solid #e2e8f0; padding:8px 0; z-index:20; margin-top:12px; }
+.cke_chrome { border:1px solid #e2e8f0 !important; }
+.cke_top    { background:#f8fafc !important; border-bottom:1px solid #e2e8f0 !important; }
+.cke_bottom { background:#f8fafc !important; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="max-w-5xl mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-5">
+
+  <div class="flex items-center gap-2 mb-3 text-xs font-mono text-slate-400">
+    <a href="{% url 'std' %}" class="hover:text-brand-yellow transition">STD List</a>
+    <span>›</span>
+    <span class="text-slate-600">{% if report %}Edit — {{ report.subject|truncatechars:40 }}{% else %}New Report{% endif %}</span>
+  </div>
+
+  <form method="POST" id="std-form">
+    {% csrf_token %}
+
+    <!-- ════════ 01 IDENTIFICATION ════════ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="px-3 py-2 bg-brand-dark rounded-t-xl border-b border-slate-700 flex items-center gap-2">
+        <span class="font-mono text-xs text-brand-yellow font-bold">01</span>
+        <h2 class="font-mono text-xs text-brand-yellow font-semibold uppercase tracking-widest">Report Identification</h2>
+      </div>
+      <div class="p-3">
+
+        <div class="mb-2">
+          <label class="fl">Subject *</label>
+          <input type="text" name="subject" required maxlength="200" value="{{ report.subject|default:'' }}"
+            placeholder="e.g. EX1180 Tank Alarm & E09 on Chiller"
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div class="col-span-2">
+            <label class="fl">Product *</label>
+            <select name="product" required class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+              <option value="">Select</option>
+              {% for val,label in product_choices %}<option value="{{ val }}" {% if report.product == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="col-span-2">
+            <label class="fl">Content Type</label>
+            <select name="content_type" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+              {% for val,label in content_choices %}<option value="{{ val }}" {% if report.content_type == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div><label class="fl">Controller Model</label><input type="text" name="controller_model" value="{{ report.controller_model|default:'' }}" placeholder="FS31iB" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Controller S/N</label><input type="text" name="controller_sl_no" value="{{ report.controller_sl_no|default:'' }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Laser/RO/RM Model</label><input type="text" name="rm_model" value="{{ report.rm_model|default:'' }}" placeholder="FCRA-C4000iC or NA" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Laser/RO/RM S/N</label><input type="text" name="rm_sl_no" value="{{ report.rm_sl_no|default:'' }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div><label class="fl">Machine Model</label><input type="text" name="machine_model" value="{{ report.machine_model|default:'' }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Machine S/N</label><input type="text" name="machine_sl_no" value="{{ report.machine_sl_no|default:'' }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Machine Tool Builder</label><input type="text" name="machine_tool_builder" value="{{ report.machine_tool_builder|default:'' }}" placeholder="FANUC, HMT..." class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Configuration</label><input type="text" name="configuration" value="{{ report.configuration|default:'' }}" placeholder="FRC, 2 axes..." class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div class="col-span-2"><label class="fl">End User</label><input type="text" name="end_user" value="{{ report.end_user|default:'' }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Application</label><input type="text" name="application" value="{{ report.application|default:'' }}" placeholder="Turning, FRC..." class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">MR No.</label><input type="text" name="mr_no" value="{{ report.mr_no|default:'' }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+        </div>
+
+        <div class="grid grid-cols-6 gap-2">
+          <div class="col-span-1"><label class="fl">Visits</label><input type="number" name="visits_count" min="1" value="{{ report.visits_count|default:1 }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-mono text-center text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div class="col-span-1"><label class="fl">Hours</label><input type="number" name="hours_count" min="0" value="{{ report.hours_count|default:0 }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-mono text-center text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div class="col-span-4"><label class="fl">Reason for Repeat Visits</label><input type="text" name="repeat_visit_reason" value="{{ report.repeat_visit_reason|default:'' }}" placeholder="NA if single visit" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ════════ 02 PROBLEM DESCRIPTION ════════ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="px-3 py-2 bg-brand-dark rounded-t-xl border-b border-slate-700 flex items-center gap-2">
+        <span class="font-mono text-xs text-brand-yellow font-bold">02</span>
+        <h2 class="font-mono text-xs text-brand-yellow font-semibold uppercase tracking-widest">Problem Description</h2>
+      </div>
+      <div class="p-3 space-y-2">
+        <div><label class="fl">Reason for presenting this subject *</label><textarea name="reason_for_subject" rows="2" required class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ report.reason_for_subject|default:'' }}</textarea></div>
+        <div><label class="fl">Problem as reported by End-user *</label><textarea name="problem_reported" rows="2" required class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ report.problem_reported|default:'' }}</textarea></div>
+        <div><label class="fl">Observation of the problem *</label><textarea name="problem_observation" rows="2" required class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ report.problem_observation|default:'' }}</textarea></div>
+        <div><label class="fl">Problem suspected by FSE/SRC</label><textarea name="problem_suspected" rows="2" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ report.problem_suspected|default:'' }}</textarea></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div><label class="fl">History of the problem</label><textarea name="problem_history" rows="2" placeholder="NIL if none" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ report.problem_history|default:'' }}</textarea></div>
+          <div><label class="fl">External disturbance?</label><textarea name="external_disturbance" rows="2" placeholder="No / describe" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ report.external_disturbance|default:'' }}</textarea></div>
+          <div><label class="fl">How many times occurred?</label><input type="text" name="occurrence_count" value="{{ report.occurrence_count|default:'' }}" placeholder="Intermittent after 2hrs" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Diagnosis info as per manual</label><textarea name="diagnosis_info" rows="2" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ report.diagnosis_info|default:'' }}</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ 03 ANALYSIS — CKEditor ════════ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="px-3 py-2 bg-brand-dark rounded-t-xl border-b border-slate-700 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs text-brand-yellow font-bold">03</span>
+          <h2 class="font-mono text-xs text-brand-yellow font-semibold uppercase tracking-widest">How was the Problem Analyzed?</h2>
+        </div>
+        <span class="hidden sm:block font-mono text-xs text-slate-400">Paste images · tables · formatting</span>
+      </div>
+      <textarea name="analysis" id="id_analysis">{{ report.analysis|default:''|safe }}</textarea>
+    </div>
+
+    <!-- ════════ 04 SOLUTION — CKEditor ════════ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="px-3 py-2 bg-brand-dark rounded-t-xl border-b border-slate-700 flex items-center gap-2">
+        <span class="font-mono text-xs text-brand-yellow font-bold">04</span>
+        <h2 class="font-mono text-xs text-brand-yellow font-semibold uppercase tracking-widest">How was the Problem Solved?</h2>
+      </div>
+      <textarea name="solution" id="id_solution">{{ report.solution|default:''|safe }}</textarea>
+    </div>
+
+    <!-- ════════ 05 PARTS REPLACED ════════ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3" x-data="partsTable()">
+      <div class="px-3 py-2 bg-brand-dark rounded-t-xl border-b border-slate-700 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="font-mono text-xs text-brand-yellow font-bold">05</span>
+          <h2 class="font-mono text-xs text-brand-yellow font-semibold uppercase tracking-widest">Parts Replaced</h2>
+        </div>
+        <button type="button" @click="addRow()" class="font-mono text-xs px-2.5 py-1 rounded-lg border border-brand-yellow text-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">+ Row</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" style="min-width:420px">
+          <thead><tr class="bg-slate-50 border-b border-slate-100">
+            <th class="text-left px-3 py-2 font-mono text-xs text-slate-500">Specification</th>
+            <th class="text-left px-3 py-2 font-mono text-xs text-slate-500 w-16">Qty</th>
+            <th class="text-left px-3 py-2 font-mono text-xs text-slate-500">Reason</th>
+            <th class="w-8"></th>
+          </tr></thead>
+          <tbody>
+            <template x-for="(row, idx) in rows" :key="idx">
+              <tr class="border-b border-slate-100">
+                <td class="px-2 py-1"><input type="text" name="part_spec[]" x-model="row.spec" placeholder="A20B-1111-0900" class="w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-xs text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-yellow"></td>
+                <td class="px-2 py-1"><input type="text" name="part_qty[]" x-model="row.qty" placeholder="1" class="w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 font-mono text-xs text-center text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-yellow"></td>
+                <td class="px-2 py-1"><input type="text" name="part_reason[]" x-model="row.reason" placeholder="Reason" class="w-full rounded border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-yellow"></td>
+                <td class="px-1 py-1 text-center"><button type="button" @click="removeRow(idx)" class="text-slate-300 hover:text-red-500 transition font-bold">✕</button></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ════════ 06 ADDITIONAL INFO — CKEditor ════════ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="px-3 py-2 bg-brand-dark rounded-t-xl border-b border-slate-700 flex items-center gap-2">
+        <span class="font-mono text-xs text-brand-yellow font-bold">06</span>
+        <h2 class="font-mono text-xs text-brand-yellow font-semibold uppercase tracking-widest">Additional Information</h2>
+      </div>
+      <textarea name="additional_info" id="id_additional_info">{{ report.additional_info|default:''|safe }}</textarea>
+    </div>
+
+    <!-- ════════ ACTIONS ════════ -->
+    <div class="action-bar flex flex-col sm:flex-row gap-2 justify-end">
+      <a href="{% url 'std' %}" class="w-full sm:w-auto min-h-[40px] flex items-center justify-center rounded-lg border border-slate-300 text-slate-600 font-mono text-xs px-5 hover:border-slate-400 transition">Cancel</a>
+      <button type="submit" name="action" value="save_draft" class="w-full sm:w-auto min-h-[40px] rounded-lg border border-slate-300 bg-white text-slate-700 font-mono text-xs px-5 hover:border-brand-yellow transition">Save Draft</button>
+      <button type="submit" name="action" value="submit" class="w-full sm:w-auto min-h-[40px] rounded-lg bg-brand-dark text-brand-yellow font-mono font-semibold text-xs px-6 border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">Submit for Review →</button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+// CKEditor config — defined at script parse time (no event wrapper needed
+// because this script is at the bottom of body, textareas already exist)
+var CK_CONFIG = {
+  toolbar: [
+    { name: 'clipboard',   items: ['Undo', 'Redo', '-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord'] },
+    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat'] },
+    { name: 'paragraph',   items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight'] },
+    { name: 'links',       items: ['Link', 'Unlink'] },
+    { name: 'insert',      items: ['Image', 'Table', 'HorizontalRule'] },
+    { name: 'styles',      items: ['Format', 'FontSize'] },
+    { name: 'colors',      items: ['TextColor', 'BGColor'] },
+    { name: 'tools',       items: ['Maximize', 'Source'] }
+  ],
+  height: 300,
+  width: '100%',
+  allowedContent: true,
+  filebrowserUploadUrl:      '/ckeditor/upload/?csrfmiddlewaretoken={{ csrf_token }}',
+  filebrowserImageUploadUrl: '/ckeditor/upload/?csrfmiddlewaretoken={{ csrf_token }}',
+  filebrowserBrowseUrl:      '/ckeditor/browse/',
+  skin: 'moono-lisa',
+  removePlugins: 'elementspath',
+  contentsCss: 'data:text/css,' + encodeURIComponent([
+    'body{font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#0f172a;padding:8px 12px;margin:0;}',
+    'p{margin:0.4em 0;}',
+    'h2{font-size:1.1em;font-weight:600;margin:0.7em 0 0.3em;}',
+    'ul,ol{padding-left:1.4em;margin:0.4em 0;}',
+    'table{border-collapse:collapse;width:100%;margin:0.6em 0;}',
+    'table td,table th{border:1px solid #d1d5db;padding:5px 8px;min-width:50px;}',
+    'table th{background:#f1f5f9;font-weight:600;}',
+    'img{max-width:100%;height:auto;}',
+  ].join(''))
+};
+
+// Direct replace — script is at bottom of body so textareas exist.
+// No event listener needed.
+CKEDITOR.replace('id_analysis',        CK_CONFIG);
+CKEDITOR.replace('id_solution',        CK_CONFIG);
+CKEDITOR.replace('id_additional_info', CK_CONFIG);
+
+// Sync all editors to their textareas on form submit
+document.getElementById('std-form').addEventListener('submit', function() {
+  for (var name in CKEDITOR.instances) {
+    CKEDITOR.instances[name].updateElement();
+  }
+});
+
+// Alpine parts table
+function partsTable() {
+  var initial = {{ report.parts_list|default:'[]'|safe }};
+  return {
+    rows: initial.length ? initial : [{ spec: '', qty: '', reason: '' }],
+    addRow:    function()  { this.rows.push({ spec: '', qty: '', reason: '' }); },
+    removeRow: function(i) { if (this.rows.length > 1) this.rows.splice(i, 1); }
+  };
+}
+</script>
+
+{% endblock %}

@@ -27,13 +27,13 @@ See https://github.com/adobe-type-tools/cmap-resources
     <meta name="google" content="notranslate">
     <script src="customToolbar.js"></script>
     <title>PDF.js viewer</title>
-    
+    <!--
     <script>
       // Disable right-click
       document.addEventListener('contextmenu', function(e) {
           e.preventDefault();
       });
-  </script>
+  </script>-->
 
 <!-- This snippet is used in production (included from viewer.html) 123-->
 <link rel="resource" type="application/l10n" href="locale/locale.properties">
@@ -45,7 +45,7 @@ See https://github.com/adobe-type-tools/cmap-resources
   </head>
 
   <body tabindex="1">
-    
+    <!--
     <style>
       .hidden {
             display: none;
@@ -53,7 +53,7 @@ See https://github.com/adobe-type-tools/cmap-resources
         body {
             user-select: none;
         }
-    </style>
+    </style> 
     <style type="text/css" media="print">
       * { display: none; }
     </style>
@@ -66,7 +66,7 @@ See https://github.com/adobe-type-tools/cmap-resources
         return false;
       }
       });
-    </script>
+    </script>-->
   
     <div id="outerContainer">
 
@@ -179,7 +179,7 @@ See https://github.com/adobe-type-tools/cmap-resources
         <div id="secondaryToolbar" class="secondaryToolbar hidden doorHangerRight">
           <div id="secondaryToolbarButtonContainer">
             
-            <button id="secondaryOpenFile" class="secondaryToolbarButton visibleLargeView" title="Open File" tabindex="51" data-l10n-id="open_file" disabled>
+            <button id="secondaryOpenFile" class="secondaryToolbarButton visibleLargeView" title="Open File" tabindex="51" data-l10n-id="open_file" >
               <span data-l10n-id="open_file_label">Open</span>
             </button>
 
@@ -294,7 +294,7 @@ See https://github.com/adobe-type-tools/cmap-resources
               </div>
               <div id="toolbarViewerRight">
                 
-                <button id="openFile" class="toolbarButton hiddenLargeView" title="Open File" tabindex="31" data-l10n-id="open_file" disabled>
+                <button id="openFile" class="toolbarButton hiddenLargeView" title="Open File" tabindex="31" data-l10n-id="open_file" >
                   <span data-l10n-id="open_file_label">Open</span>
                 </button>
 

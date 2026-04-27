@@ -1,0 +1,197 @@
+{% extends "servicesupport/layout.html" %}
+{% block title %}Review STD — {{ report.subject|truncatechars:50 }}{% endblock %}
+
+{% block body %}
+<div class="max-w-4xl mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-6">
+
+  <!-- Breadcrumb -->
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center gap-2 text-xs font-mono text-slate-400">
+      <a href="{% url 'std' %}" class="hover:text-brand-yellow transition">STD List</a>
+      <span>›</span>
+      <a href="{% url 'std_detail' report.id %}" class="hover:text-brand-yellow transition">STD-{{ report.created_at.year }}-{{ report.id|stringformat:"04d" }}</a>
+      <span>›</span>
+      <span class="text-slate-600">Review</span>
+    </div>
+    <a href="{% url 'std_detail' report.id %}" class="font-mono text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:border-brand-yellow transition">
+      View Full Report →
+    </a>
+  </div>
+
+  <!-- Current status banner -->
+  <div class="mb-4 rounded-xl px-4 py-2.5 flex items-center gap-3
+    {% if report.status == 'approved' %}bg-blue-50 border border-blue-200
+    {% elif report.status == 'submitted' %}bg-amber-50 border border-amber-200
+    {% else %}bg-slate-50 border border-slate-200{% endif %}">
+    <span class="font-mono text-xs font-bold
+      {% if report.status == 'approved' %}text-blue-700
+      {% elif report.status == 'submitted' %}text-amber-700
+      {% else %}text-slate-500{% endif %}">
+      {{ report.get_status_display|upper }}
+    </span>
+    <span class="text-xs
+      {% if report.status == 'approved' %}text-blue-600
+      {% elif report.status == 'submitted' %}text-amber-600
+      {% else %}text-slate-500{% endif %}">
+      {% if report.status == 'approved' %}
+        Report is approved. Use "Approve &amp; Publish" below to make it visible to all engineers.
+      {% elif report.status == 'submitted' %}
+        Awaiting your review. Fill the assessment below and choose an action.
+      {% endif %}
+    </span>
+  </div>
+
+  <!-- Report summary -->
+  <div class="bg-brand-dark rounded-xl border border-slate-700 p-3 sm:p-4 mb-4">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+      <div>
+        <p class="font-mono text-xs text-slate-500 mb-0.5">Product</p>
+        <p class="text-white font-semibold text-sm">{{ report.product }}</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs text-slate-500 mb-0.5">End User</p>
+        <p class="text-white text-sm">{{ report.end_user|default:"—" }}</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs text-slate-500 mb-0.5">Prepared By</p>
+        <p class="text-white text-sm">{{ report.prepared_by.get_full_name|default:report.prepared_by.username }}</p>
+      </div>
+      <div>
+        <p class="font-mono text-xs text-slate-500 mb-0.5">Submitted</p>
+        <p class="text-white font-mono text-sm">{{ report.submitted_at|date:"d M Y"|default:"—" }}</p>
+      </div>
+    </div>
+    <div class="mt-2 pt-2 border-t border-slate-700">
+      <p class="text-xs text-slate-300"><span class="text-slate-500 font-mono">Subject:</span> {{ report.subject }}</p>
+    </div>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <!-- ── REVIEWER ASSESSMENT ──────────────────────────────── -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-4">
+      <div class="px-4 py-2.5 bg-brand-dark rounded-t-xl border-b border-slate-700 flex items-center gap-2">
+        <span class="font-mono text-xs text-brand-yellow font-bold">R1</span>
+        <h2 class="font-mono text-xs text-brand-yellow font-semibold uppercase tracking-widest">Reviewer Assessment</h2>
+      </div>
+      <div class="p-3 sm:p-4">
+
+        <div class="mb-2">
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Applicable for CNC/Servo/Robot/RM Models</label>
+          <input type="text" name="applicable_models" value="{{ report.applicable_models|default:'' }}"
+            placeholder="e.g. FS31iB, FS0i-F — or All CNC"
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div>
+            <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Useful for Telephonic?</label>
+            <select name="useful_telephonic" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+              <option value="">—</option>
+              <option value="yes" {% if report.useful_telephonic == True %}selected{% endif %}>Yes</option>
+              <option value="no"  {% if report.useful_telephonic == False %}selected{% endif %}>No</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Supports MTTR?</label>
+            <select name="supports_mttr" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+              <option value="">—</option>
+              <option value="yes" {% if report.supports_mttr == True %}selected{% endif %}>Yes</option>
+              <option value="no"  {% if report.supports_mttr == False %}selected{% endif %}>No</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Special Tool Used?</label>
+            <input type="text" name="special_tool" value="{{ report.special_tool|default:'' }}" placeholder="Nil"
+              class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+          </div>
+          <div>
+            <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Alternate Process?</label>
+            <input type="text" name="alternate_process" value="{{ report.alternate_process|default:'' }}" placeholder="Nil"
+              class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Reviewer Remarks</label>
+          <textarea name="reviewer_remarks" rows="2" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ report.reviewer_remarks|default:'' }}</textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Comment for Author (logged in approval trail)</label>
+          <textarea name="comment" rows="2" placeholder="Optional — visible to the author in approval log"
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── APPROVAL LOG ───────────────────────────────────────── -->
+    {% if log %}
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-4">
+      <div class="px-4 py-2.5 bg-brand-dark rounded-t-xl border-b border-slate-700 flex items-center gap-2">
+        <span class="font-mono text-xs text-brand-yellow font-bold">R2</span>
+        <h2 class="font-mono text-xs text-brand-yellow font-semibold uppercase tracking-widest">Approval History</h2>
+      </div>
+      <div class="divide-y divide-slate-100">
+        {% for entry in log %}
+        <div class="px-4 py-2.5 flex items-start gap-3">
+          <span class="shrink-0 mt-0.5 inline-block font-mono text-xs px-2 py-0.5 rounded-full whitespace-nowrap
+            {% if entry.action == 'published' %}bg-green-100 text-green-700
+            {% elif entry.action == 'approved' %}bg-blue-100 text-blue-700
+            {% elif entry.action == 'rejected' %}bg-red-100 text-red-700
+            {% elif entry.action == 'submitted' %}bg-amber-100 text-amber-700
+            {% else %}bg-slate-100 text-slate-500{% endif %}">
+            {{ entry.action|upper }}
+          </span>
+          <div class="min-w-0">
+            <p class="text-sm text-slate-700">{{ entry.actor.get_full_name|default:entry.actor.username }}
+              <span class="text-slate-400 font-normal text-xs">— {{ entry.created_at|date:"d M Y, H:i" }}</span>
+            </p>
+            {% if entry.comment %}<p class="text-xs text-slate-500 italic mt-0.5 truncate">{{ entry.comment }}</p>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ── DECISION BUTTONS ─────────────────────────────────── -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+      <p class="font-mono text-xs text-slate-500 uppercase tracking-widest mb-3">Decision</p>
+
+      <div class="flex flex-col sm:flex-row gap-2">
+
+        <!-- Reject -->
+        <button type="submit" name="action" value="reject"
+          class="flex-1 min-h-[44px] rounded-xl border-2 border-red-300 text-red-700 bg-red-50 font-mono font-semibold text-sm hover:bg-red-100 transition flex items-center justify-center gap-2">
+          <span class="text-lg leading-none">✕</span> Send Back to Author
+        </button>
+
+        <!-- Approve only (not published yet) -->
+        {% if report.status == "submitted" %}
+        <button type="submit" name="action" value="approve"
+          class="flex-1 min-h-[44px] rounded-xl border-2 border-blue-300 text-blue-700 bg-blue-50 font-mono font-semibold text-sm hover:bg-blue-100 transition flex items-center justify-center gap-2">
+          <span class="text-lg leading-none">✓</span> Approve
+        </button>
+        {% endif %}
+
+        <!-- Approve & Publish — available from BOTH submitted AND approved -->
+        <button type="submit" name="action" value="publish"
+          class="flex-1 min-h-[44px] rounded-xl bg-brand-dark text-brand-yellow border-2 border-brand-yellow font-mono font-semibold text-sm hover:bg-brand-yellow hover:text-brand-dark transition flex items-center justify-center gap-2">
+          <span class="text-lg leading-none">★</span> Approve &amp; Publish
+        </button>
+
+      </div>
+
+      <div class="mt-3 flex flex-col sm:flex-row gap-1 text-xs font-mono text-slate-400">
+        <span class="flex items-center gap-1"><span class="text-blue-500">✓ Approve</span> — visible to reviewers &amp; author only.</span>
+        <span class="hidden sm:block">·</span>
+        <span class="flex items-center gap-1"><span class="text-brand-yellow">★ Publish</span> — visible to ALL engineers.</span>
+      </div>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

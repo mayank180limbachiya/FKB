@@ -1,257 +1,184 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        {% load static %}
-        <title>{% block title %}Service Support{% endblock %}</title> 
-        <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">  
-        <script src="{% static 'js/bootstrap.min.js' %}"></script>
-        <meta name="theme-color" content="yellow"/>
-        {% if request.user.is_superuser %}
-        {% else %}
-        <script>
-            // Disable right-click
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-            });
-        </script>
-        {% endif %}
-        <script type="text/javascript"> $(document).ready(function() {
-            $(window).keyup(function(e){
-              if(e.keyCode == 44){
-                $("body").hide();
-              }
-        
-            }); });
+<html lang="en" x-data="{ mobileOpen: false }">
+<head>
+    {% load static %}
+    <title>{% block title %}Service Support{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="theme-color" content="#0f172a"/>
+    <link rel="shortcut icon" type="image/png" href="{% static 'servicesupport/fav.png' %}"/>
 
-    $(window).keyup(function(e){
-    if(e.keyCode == 44){
-        copyToClipboard();
-    }
-    });
-        </script>
-        <script>
-        document.onkeyup = function(evt) {
-        evt = evt || window.event;
-        var charCode = evt.keyCode || evt.which;
-        var charStr = String.fromCharCode(charCode);
-        if (charCode == 44) {
-            alert("Print Screen Not Allowed In This Page");
-            for (let i = 0; i < 5; i++) {
-                
-                alert("Not Allowed to take Screen Shot"+i);
-                navigator.clipboard.writeText("Not Allowed to take Screen Shot."+ i);
-            }
-            navigator.clipboard.writeText("Not Allowed to take Screen Shot.");
-            navigator.clipboard.writeText("Not Allowed to take Screen Shot.");
-            window.location.href = "{% url 'index' %}"
-        }
-        
-        };
-        
-        </script>
-        
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-       
-        <link rel="shortcut icon" type="image/png" href="{% static 'servicesupport/fav.png' %}"/>
-        <!-- Latest compiled and minified CSS 
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        
-        -->
-        <!-- Latest compiled JavaScript 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.2/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>  
-        <script src= "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js"></script>  
-        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/ui-lightness/jquery-ui.css" rel="stylesheet" type="text/css" /> -->
-    </head>
-    
-    {% if request.user.is_superuser %}
-    <style>
-        @media print {
-    body {
-        visibility: hidden;
-    }
-    #section-to-print {
-        visibility: visible;
-        position: absolute;
-        left: 0;
-        top: 0;
-    }
-    }
-    </style>    
-    {% else %}
-    <style>
-    .hidden {
-        display: none;
-    }
-    body {
-            user-select: none;
-        }
-    
-    
-    </style>
-    <style  media="print">
-        BODY {display:none;visibility:hidden;}
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
     <script>
-        document.addEventListener('keydown', function(event) {
-        if (event.ctrlKey && event.key === 's') {
-          event.preventDefault();
-          event.stopPropagation();
-          alert('Save Not Allowed');
-          return false;
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { yellow:'#FFDD00', dark:'#0f172a', gray:'#1e293b', muted:'#64748b', light:'#f8fafc' }
+                    },
+                    fontFamily: {
+                        sans: ['IBM Plex Sans','sans-serif'],
+                        mono: ['IBM Plex Mono','monospace'],
+                    }
+                }
+            }
         }
-        });
-      </script>
-    {% endif %}
+    </script>
+
     <style>
-       ::-moz-selection { /* Code for Firefox */
-        background: yellow;
+        body { font-family:'IBM Plex Sans',sans-serif; }
+        ::selection { background:#FFDD00; color:#0f172a; }
+        ::-webkit-scrollbar { width:5px; height:5px; }
+        ::-webkit-scrollbar-track { background:#1e293b; }
+        ::-webkit-scrollbar-thumb { background:#FFDD00; border-radius:3px; }
+        .nav-active { border-bottom:2px solid #FFDD00; }
+        .table-scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        /* Prevent iOS zoom on input focus */
+        input,select,textarea { font-size:16px !important; }
+        @media(min-width:640px){ input,select,textarea { font-size:14px !important; } }
+        /* Card hover only on pointer devices */
+        @media(hover:hover){
+            .feature-card { transition:transform .2s ease,box-shadow .2s ease; }
+            .feature-card:hover { transform:translateY(-3px); box-shadow:0 8px 30px rgba(255,221,0,.12); }
         }
-
-        ::selection {
-        background: yellow;
-        }
-       
-        .dropdown:hover>.dropdown-menu {
-            display: block;
-        }
-        .dropdown>.dropdown-toggle:active {
-            pointer-events: none;
-        }
-
-        table.table-fit {
-            width: auto !important;
-            table-layout: auto !important;
-        }
-        table.table-fit thead th, table.table-fit tfoot th {
-            width: auto !important;
-        }
-        table.table-fit tbody td, table.table-fit tfoot td {
-            width: auto !important;
-        }
-        .table {
-            margin: 0 auto;
-            width: 80%;
-        }
-        
-   </style>
-   
-        
-    <body>
-        
-        {% load static %}
-        
-        {% if flag != 12 %}
-        <div class="sticky-top" id="content">
-        <nav class="navbar navbar-expand-md navbar-light" style="background-color: #FFDD00;">
-            <a class="navbar-brand" href="{% url 'index' %}"><h2>Support </h2> </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent"> 
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item ">
-                        <a class="nav-link fs-5 {% if flag == 1 %}active{% endif %}" href="{% url 'index' %}"> {% if flag == 1 %}<Kbd class="card-text">{% endif %}Home{% if flag == 1 %}</Kbd>{% endif %} </a>
-                    </li>    
-                    <li class="nav-item">
-                        <a class="nav-link fs-5 {% if flag == 6 %}active{% endif %}" href="{% url 'alarm' %}">{% if flag == 6 %}<Kbd class="card-text">{% endif %}Alarm {% if flag == 6 %}</Kbd>{% endif %}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link fs-5 {% if flag == 7 %}active{% endif %}" href="{% url 'specification' %}">{% if flag == 7 %}<Kbd class="card-text">{% endif %}Specification{% if flag == 7 %}</Kbd>{% endif %}</a>
-                    </li>
-                    <li class="nav-item ">
-                        <a class="nav-link fs-5 {% if flag == 4 %}active{% endif %}" href="{% url 'training' %}">{% if flag == 4 %}<Kbd class="card-text">{% endif %}Training{% if flag == 4 %}</Kbd>{% endif %}</a>
-                    </li>
-                    <li class="nav-item ">
-                        <a class="nav-link fs-5 {% if flag == 5 %}active{% endif %}" href="{% url 'softwaretool' %}">{% if flag == 5 %}<Kbd class="card-text">{% endif %}Software Tools{% if flag == 5 %}</Kbd>{% endif %}</a>
-                    </li>
-                    <!--
-                    <li class="nav-item ">
-                        <a class="nav-link {% if flag == 3 %}active{% endif %}" href="{% url 'std' %}"> STD Data </a>
-                    </li>
-                    -->
-                    <li class="nav-item ">
-                        <a class="nav-link fs-5 {% if flag == 10 %}active{% endif %}" href="{% url 'manual' %}">{% if flag == 10 %}<Kbd class="card-text">{% endif %}Manual{% if flag == 10 %}</Kbd>{% endif %} </a>
-                    </li>
-                    {% if request.user.is_superuser %}
-                    <li class="nav-item ">
-                        <a class="nav-link fs-5 {% if flag == 14 %}active{% endif %}" href="{% url 'admin_data' %}">{% if flag == 14 %}<Kbd class="card-text">{% endif %}Admin{% if flag == 14 %}</Kbd>{% endif %} </a>
-                    </li>
-                    {% endif %}
-                </ul>
-                {% if user.is_authenticated %}
-                <ul class="navbar-nav ml-auto">    
-                    <li class="nav-item ">
-                        <a class="nav-link fs-5" href="{% url 'logout' %}">Sign Out</a>
-                    </li>
-                </ul>
-                {% else %}
-                <ul class="navbar-nav ml-auto">    
-                    <li class="nav-item ">
-                        <a class="nav-link fs-5" href="{% url 'login' %}">Sign In/ Register</a>
-                    </li>
-                </ul>
-                {% endif %}
-
-            </div>
-        </nav>
-        <div class="text-white" style="padding: 5px; background-color: black">
-                <small>
-                    <div style="float:left;">
-                        {% if flag == 6 %}
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <a href="{% url 'alarmbytext' %}"><button type="button"  style="background-color: black;" class="btn btn-dark btn-sm">AL by Text</button></a>
-                            <a href="{% url 'alarmbynumber' %}"><button type="button"  style="background-color: black;" class="btn btn-dark btn-sm">AL by Number</button></a>
-                            <a href="{% url 'alarmbyled' %}"><button type="button"  style="background-color: black;" class="btn btn-dark btn-sm">AL by LED</button></a>
-                        </div>
-                        {% endif %}
-                        {% if flag == 7 %}
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <a href="{% url 'specification' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">Search by Parent Spec</button></a>
-                            <a href="{% url 'equ' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">Search Equivalent/Parent Spec</button></a>
-                            <a href="{% url 'specrequest' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">Request for Part add</button></a>
-                        </div>
-                        {% endif %}
-                        {% if flag == 5 %}
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                            <a href="{% url 'vrdy' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">VRDY OFF</button></a>
-                            <a href="{% url 'wn69' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">WN 69</button></a>
-                            <a href="{% url 'nmi' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">PC50 & NMI</button></a>
-                            <a href="{% url 'belttention' %}"><button type="button" style="background-color: black;" class="btn btn-dark btn-sm">Belt tention</button></a>
-                        </div>
-                            {% endif %}
-
-                    </div>
-                    <div style="float:right;">
-                        {% if user.is_authenticated %}
-                            Signed in as <strong>{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</strong> - <a class="link-light" href="{% url 'changepassword' %}">Change Password</a>
-                        {% else %}
-                            Not signed In.
-                        {% endif %}
-                    </div>
-                </small>
-            <div style="clear: both;"></div>       
-        </div>
-        </div>
+        {% if not request.user.is_superuser %}
+        body { user-select:none; }
+        @media print { body { display:none; visibility:hidden; } }
         {% endif %}
-       
-        {% for message in messages %}
-        <div class="alert {{ message.tags }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-            </button>
+    </style>
+
+    {% if not request.user.is_superuser %}
+    <script>
+        document.addEventListener('contextmenu',e=>e.preventDefault());
+        document.addEventListener('keydown',function(e){
+            if(e.ctrlKey&&e.key==='s'){e.preventDefault();alert('Save Not Allowed');}
+        });
+        document.onkeyup=function(e){
+            if((e.keyCode||e.which)===44){
+                alert("Screenshots are not allowed.");
+                navigator.clipboard.writeText("Not Allowed.");
+                window.location.href="{% url 'index' %}";
+            }
+        };
+    </script>
+    {% endif %}
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body class="bg-brand-light min-h-screen flex flex-col">
+
+{% if flag != 12 %}
+<header class="sticky top-0 z-50 bg-brand-dark border-b border-yellow-500/20 shadow-lg">
+    <nav class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8">
+        <div class="flex items-center justify-between h-12 sm:h-14">
+
+            <!-- Logo -->
+            <a href="{% url 'index' %}" class="shrink-0">
+                <span class="font-mono font-bold text-brand-yellow text-base sm:text-xl tracking-tight">SUPPORT<span class="opacity-40 text-white"></span></span>
+            </a>
+
+            <!-- Desktop nav — lg+ only -->
+            <div class="hidden lg:flex items-center">
+                {% for url_name,label,flag_val in nav_items %}{% endfor %}
+                <a href="{% url 'index' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-slate-300 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 1 %}nav-active text-brand-yellow{% endif %}">Home</a>
+                <a href="{% url 'alarm' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-slate-300 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 6 %}nav-active text-brand-yellow{% endif %}">Alarm</a>
+                <a href="{% url 'specification' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-slate-300 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 7 %}nav-active text-brand-yellow{% endif %}">Specification</a>
+                <a href="{% url 'training' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-slate-300 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 4 %}nav-active text-brand-yellow{% endif %}">Training</a>
+                <a href="{% url 'softwaretool' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-slate-300 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 5 %}nav-active text-brand-yellow{% endif %}">Tools</a>
+                <a href="{% url 'manual' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-slate-300 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 10 %}nav-active text-brand-yellow{% endif %}">Manual</a>
+                <a href="{% url 'std' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-slate-300 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 3 %}nav-active text-brand-yellow{% endif %}">STD</a>
+                {% if request.user.is_superuser %}
+                <a href="{% url 'admin_data' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-amber-400 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 14 %}nav-active{% endif %}">Admin</a>
+                {% endif %}
+            </div>
+
+            <div class="flex items-center gap-2">
+                {% if user.is_authenticated %}
+                <span class="hidden xl:block text-xs text-slate-400 font-mono truncate max-w-36">{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</span>
+                <a href="{% url 'logout' %}" class="min-h-[36px] flex items-center text-xs px-2.5 py-1.5 rounded border border-slate-600 text-slate-300 hover:border-brand-yellow hover:text-brand-yellow transition whitespace-nowrap">Sign Out</a>
+                {% else %}
+                <a href="{% url 'login' %}" class="min-h-[36px] flex items-center text-xs px-2.5 py-1.5 rounded bg-brand-yellow text-brand-dark font-semibold hover:bg-yellow-300 transition">Sign In</a>
+                {% endif %}
+                <!-- Hamburger: mobile + tablet -->
+                <button @click="mobileOpen=!mobileOpen" class="lg:hidden min-h-[36px] min-w-[36px] flex items-center justify-center text-slate-300 hover:text-brand-yellow rounded transition">
+                    <svg x-show="!mobileOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    <svg x-show="mobileOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
         </div>
-        {% endfor %}
 
-        {% block body %}
-        {% endblock %}
+        <!-- Mobile / Tablet dropdown menu -->
+        <div x-show="mobileOpen" x-transition class="lg:hidden border-t border-slate-700 py-2">
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-1 mb-2">
+                <a href="{% url 'index' %}" class="flex items-center px-3 py-3 text-sm text-slate-300 hover:text-brand-yellow hover:bg-slate-800 rounded-lg transition {% if flag == 1 %}text-brand-yellow bg-slate-800{% endif %}">Home</a>
+                <a href="{% url 'alarm' %}" class="flex items-center px-3 py-3 text-sm text-slate-300 hover:text-brand-yellow hover:bg-slate-800 rounded-lg transition {% if flag == 6 %}text-brand-yellow bg-slate-800{% endif %}">Alarm</a>
+                <a href="{% url 'specification' %}" class="flex items-center px-3 py-3 text-sm text-slate-300 hover:text-brand-yellow hover:bg-slate-800 rounded-lg transition {% if flag == 7 %}text-brand-yellow bg-slate-800{% endif %}">Specification</a>
+                <a href="{% url 'training' %}" class="flex items-center px-3 py-3 text-sm text-slate-300 hover:text-brand-yellow hover:bg-slate-800 rounded-lg transition {% if flag == 4 %}text-brand-yellow bg-slate-800{% endif %}">Training</a>
+                <a href="{% url 'softwaretool' %}" class="flex items-center px-3 py-3 text-sm text-slate-300 hover:text-brand-yellow hover:bg-slate-800 rounded-lg transition {% if flag == 5 %}text-brand-yellow bg-slate-800{% endif %}">Software Tools</a>
+                <a href="{% url 'manual' %}" class="flex items-center px-3 py-3 text-sm text-slate-300 hover:text-brand-yellow hover:bg-slate-800 rounded-lg transition {% if flag == 10 %}text-brand-yellow bg-slate-800{% endif %}">Manual</a>
+                <a href="{% url 'std' %}" class="px-2 xl:px-3 py-2 text-xs xl:text-sm font-medium text-slate-300 hover:text-brand-yellow transition whitespace-nowrap {% if flag == 3 %}nav-active text-brand-yellow{% endif %}">STD</a>
+                {% if request.user.is_superuser %}<a href="{% url 'admin_data' %}" class="flex items-center px-3 py-3 text-sm text-amber-400 hover:text-brand-yellow hover:bg-slate-800 rounded-lg transition">Admin</a>{% endif %}
+                {% if user.is_authenticated %}<a href="{% url 'changepassword' %}" class="flex items-center px-3 py-3 text-sm text-slate-400 hover:text-brand-yellow hover:bg-slate-800 rounded-lg transition">Change Password</a>{% endif %}
+            </div>
+            {% if user.is_authenticated %}
+            <div class="border-t border-slate-700 pt-2 px-3">
+                <p class="text-xs text-slate-500 font-mono">Signed in as <span class="text-slate-300">{{ user.first_name|capfirst }} {{ user.last_name|capfirst }}</span></p>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
 
-        {% if flag == 1 %}
-        <div class="fixed-bottom">
-            <div class="text-center" style="padding: 5px; border-top: #737373 solid 0.2px; background-color: white">
-                <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
-            </div>    
-        </div>  
-        {% endif %}      
-    </body>
+    <!-- Sub-nav -->
+    {% if flag == 6 or flag == 7 or flag == 5 %}
+    <div class="bg-brand-gray border-t border-slate-700">
+        <div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-2 flex gap-2 flex-wrap">
+            {% if flag == 6 %}
+                <a href="{% url 'alarmbytext' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-brand-yellow text-brand-dark font-semibold">AL by Text</a>
+                <!--<a href="{% url 'alarmbynumber' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-slate-700 text-slate-200 hover:bg-brand-yellow hover:text-brand-dark transition">AL by Number</a> -->
+                <a href="{% url 'alarmbyled' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-slate-700 text-slate-200 hover:bg-brand-yellow hover:text-brand-dark transition">AL by LED</a>
+            {% endif %}
+            {% if flag == 7 %}
+                <a href="{% url 'specification' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-brand-yellow text-brand-dark font-semibold">Parent Spec</a>
+                <a href="{% url 'equ' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-slate-700 text-slate-200 hover:bg-brand-yellow hover:text-brand-dark transition">Equivalent</a>
+                <a href="{% url 'specrequest' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-slate-700 text-slate-200 hover:bg-brand-yellow hover:text-brand-dark transition">Request Part</a>
+            {% endif %}
+            {% if flag == 5 %}
+                <a href="{% url 'vrdy' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-slate-700 text-slate-200 hover:bg-brand-yellow hover:text-brand-dark transition">VRDY OFF</a>
+                <a href="{% url 'wn69' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-slate-700 text-slate-200 hover:bg-brand-yellow hover:text-brand-dark transition">WN 69</a>
+                <a href="{% url 'nmi' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-slate-700 text-slate-200 hover:bg-brand-yellow hover:text-brand-dark transition">PC50 &amp; NMI</a>
+                <a href="{% url 'belttention' %}" class="font-mono text-xs px-3 py-1.5 rounded-full bg-slate-700 text-slate-200 hover:bg-brand-yellow hover:text-brand-dark transition">Belt Tension</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</header>
+{% endif %}
+
+{% for message in messages %}
+<div x-data="{show:true}" x-show="show" x-transition
+     class="mx-3 sm:mx-6 mt-3 px-4 py-3 rounded-lg flex items-start justify-between gap-3 text-sm
+     {% if 'error' in message.tags %}bg-red-900/60 border border-red-500 text-red-200
+     {% elif 'success' in message.tags %}bg-green-900/60 border border-green-500 text-green-200
+     {% else %}bg-blue-900/60 border border-blue-500 text-blue-200{% endif %}">
+    <span class="flex-1 text-sm">{{ message }}</span>
+    <button @click="show=false" class="shrink-0 opacity-60 hover:opacity-100 text-lg leading-none">✕</button>
+</div>
+{% endfor %}
+
+<main class="flex-1 min-w-0">
+    {% block body %}{% endblock %}
+</main>
+
+{% if flag == 1 %}
+<footer class="border-t border-slate-200 bg-white mt-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between text-xs text-slate-400">
+        <span class="font-mono">Service Support</span>
+        <span>FANUC INDIA</span>
+    </div>
+</footer>
+{% endif %}
+
+</body>
 </html>

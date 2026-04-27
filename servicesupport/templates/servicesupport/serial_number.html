@@ -1,0 +1,44 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+{% load static %}
+<br>
+
+<div class="container mt-5">
+    <button class="btn btn-primary mb-3" onclick="fetchLatestSerialNumber()">Fetch Last Serial Number</button>
+    <form id="serialForm" method="post" action="{% url 'serial_gen' %}" class="mb-3">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="serialNo" class="form-label">Serial No:</label>
+            <input type="text" id="serial_no" name="serial_no" class="form-control" value="" readonly>
+        </div>
+        <div class="mb-3">
+            <label for="addText" class="form-label">Add Text:</label>
+            <textarea id="add_text" name="add_text" class="form-control" rows="5" maxlength="150"></textarea>
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+    </form>
+</div>
+
+<script>
+    // Function to fetch latest serial number from Django backend
+    function fetchLatestSerialNumber() {
+        fetch("{% url 'get_latest_serial_number' %}") // Assuming there's a Django view to fetch the latest serial number
+            .then(response => response.json())
+            .then(data => {
+                var latestSerialNo = parseInt(data.serial_no, 16);
+                document.getElementById("serial_no").value = latestSerialNo.toString(16).toUpperCase();
+            })
+            .catch(error => {
+                console.error('Error fetching latest serial number:', error);
+                alert('Error fetching latest serial number')
+            });
+    }
+
+    // Call the function to fetch latest serial number when the page loads
+
+</script>
+
+
+{% endblock %}

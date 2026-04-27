@@ -1,0 +1,137 @@
+{% extends "servicesupport/layout.html" %}
+{% block title %}STD Reports — Service Support{% endblock %}
+{% block body %}
+
+<div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-8">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6">
+    <div>
+      <p class="font-mono text-xs text-brand-yellow tracking-widest uppercase mb-1">Knowledge Base</p>
+      <h1 class="text-xl sm:text-2xl font-semibold text-brand-dark">Service Technical Discussion</h1>
+      <p class="text-sm text-slate-500 mt-0.5">Critical failure diagnosis reports from field engineers.</p>
+    </div>
+    {% if user.is_authenticated %}
+    <div class="flex gap-2 flex-wrap">
+      <a href="{% url 'std_import' %}"
+         class="self-start sm:self-auto min-h-[40px] flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-300 text-slate-600 font-mono text-sm hover:border-brand-yellow hover:text-brand-dark transition">
+        📄 Import from Word
+      </a>
+      <a href="{% url 'std_new' %}"
+         class="self-start sm:self-auto min-h-[40px] flex items-center gap-2 px-5 py-2 rounded-xl bg-brand-dark text-brand-yellow font-mono font-semibold text-sm border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">
+        + New Report
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Filter bar -->
+  <form method="get" class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-5 mb-5 shadow-sm">
+    <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3">
+      <div class="flex-1 min-w-0 sm:min-w-48">
+        <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Search</label>
+        <input type="text" name="q" value="{{ q }}" placeholder="Subject, end-user, MR no..."
+          class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+      </div>
+      <div class="sm:w-36">
+        <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Product</label>
+        <select name="product" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+          <option value="">All Products</option>
+          {% for val,label in product_choices %}<option value="{{ val }}" {% if product == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      {% if is_reviewer %}
+      <div class="sm:w-36">
+        <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Status</label>
+        <select name="status" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+          <option value="">All Status</option>
+          {% for val,label in status_choices %}<option value="{{ val }}" {% if status == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </div>
+      {% endif %}
+      <button type="submit" class="w-full sm:w-auto min-h-[44px] rounded-lg bg-brand-dark text-brand-yellow font-mono text-sm px-5 py-2.5 hover:bg-brand-yellow hover:text-brand-dark transition border border-brand-yellow">Search →</button>
+      {% if q or product or status %}
+      <a href="{% url 'std' %}" class="w-full sm:w-auto min-h-[44px] flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 text-xs font-mono px-4 hover:border-slate-400 transition">Clear</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <!-- Table -->
+  {% if page_obj %}
+  <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+    <div class="table-scroll">
+      <table class="w-full text-sm" style="min-width:680px">
+        <thead>
+          <tr class="bg-brand-dark border-b border-slate-700">
+            <th class="text-left px-4 py-3 font-mono text-xs text-brand-yellow">STD No.</th>
+            <th class="text-left px-4 py-3 font-mono text-xs text-slate-400">Subject</th>
+            <th class="text-left px-4 py-3 font-mono text-xs text-slate-400">Product</th>
+            <th class="text-left px-4 py-3 font-mono text-xs text-slate-400">End User</th>
+            <th class="text-left px-4 py-3 font-mono text-xs text-slate-400">Status</th>
+            <th class="text-left px-4 py-3 font-mono text-xs text-slate-400">By</th>
+            <th class="text-left px-4 py-3 font-mono text-xs text-slate-400 w-24">Date</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for r in page_obj %}
+          <tr class="hover:bg-amber-50 transition">
+            <td class="px-4 py-3">
+              <a href="{% url 'std_detail' r.id %}" class="font-mono text-xs text-blue-600 hover:underline whitespace-nowrap">
+                STD-{{ r.created_at.year }}-{{ r.id|stringformat:"04d" }}
+              </a>
+            </td>
+            <td class="px-4 py-3 text-sm text-slate-700">
+              <a href="{% url 'std_detail' r.id %}" class="hover:text-brand-dark">
+                {{ r.subject|truncatechars:70 }}
+              </a>
+            </td>
+            <td class="px-4 py-3 font-mono text-xs text-slate-600 whitespace-nowrap">{{ r.product }}</td>
+            <td class="px-4 py-3 text-xs text-slate-600 whitespace-nowrap">{{ r.end_user|default:"—"|truncatechars:25 }}</td>
+            <td class="px-4 py-3 whitespace-nowrap">
+              {% if r.status == "published" %}
+                <span class="inline-block font-mono text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">Published</span>
+              {% elif r.status == "approved" %}
+                <span class="inline-block font-mono text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">Approved</span>
+              {% elif r.status == "submitted" %}
+                <span class="inline-block font-mono text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">In Review</span>
+              {% elif r.status == "rejected" %}
+                <span class="inline-block font-mono text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">Rejected</span>
+              {% else %}
+                <span class="inline-block font-mono text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">Draft</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{{ r.prepared_by.get_full_name|default:r.prepared_by.username }}</td>
+            <td class="px-4 py-3 font-mono text-xs text-slate-400 whitespace-nowrap">{{ r.created_at|date:"d M Y" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-5 sm:mt-6"><ul class="flex items-center justify-center gap-1 flex-wrap">
+    {% if page_obj.has_previous %}
+    <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page=1&q={{ q }}&product={{ product }}&status={{ status }}">First</a></li>
+    <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.previous_page_number }}&q={{ q }}&product={{ product }}&status={{ status }}">← Prev</a></li>
+    {% endif %}
+    {% for p in page_obj.paginator.page_range %}{% if p <= page_obj.number|add:3 and p >= page_obj.number|add:-3 %}
+    <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border transition {% if page_obj.number == p %}bg-brand-dark text-brand-yellow border-brand-yellow{% else %}bg-white text-slate-600 border-slate-200 hover:border-brand-yellow{% endif %}" href="?page={{ p }}&q={{ q }}&product={{ product }}&status={{ status }}">{{ p }}</a></li>
+    {% endif %}{% endfor %}
+    {% if page_obj.has_next %}
+    <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.next_page_number }}&q={{ q }}&product={{ product }}&status={{ status }}">Next →</a></li>
+    <li><a class="min-h-[36px] flex items-center px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.paginator.num_pages }}&q={{ q }}&product={{ product }}&status={{ status }}">Last</a></li>
+    {% endif %}
+  </ul></nav>
+  {% endif %}
+
+  {% else %}
+  <div class="bg-white rounded-xl border border-dashed border-slate-300 px-6 py-16 text-center">
+    <p class="font-mono text-slate-400 text-sm mb-3">No STD reports found.</p>
+    <a href="{% url 'std_new' %}" class="inline-block font-mono text-xs px-4 py-2 rounded-lg bg-brand-dark text-brand-yellow border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">Create First Report →</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

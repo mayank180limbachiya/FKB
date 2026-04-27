@@ -17,8 +17,22 @@
         var all_data = copyText  +"\n"+ copyText1 + "\n"+ copyText2;
         console.log(copyText.bold())
         console.log(all_data)
+        unsecuredCopyToClipboard(all_data)
         navigator.clipboard.writeText(all_data);
         alert("Copied the text");
+    }
+    function unsecuredCopyToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+        } catch (err) {
+            console.error('Unable to copy to clipboard', err);
+        }
+        document.body.removeChild(textArea);
     }
     function maxlenghth_alarmbynumber_number() {
         var user_name = document.getElementById("alarm_text").value;

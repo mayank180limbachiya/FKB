@@ -1,159 +1,93 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}Training — Service Support{% endblock %}
 {% block body %}
 {% load static %}
-<script>
-    function max_length_training_search() {
-        var user_name = document.getElementById("search").value;
-        if (user_name.length == 50) {
-          alert("Spec enter limit is 50 Char");
-        }
-      }
-</script>
-<br>
-<div class="container"  style="border-bottom: rgb(158, 158, 158) solid 1px;">
-    <form method="get" action="{% url 'training' %}"> 
-    {% csrf_token %}
-    <div class="row align-items-center">
-        <div class="col-12 col-md-1">
-            <h5>Product:</h5>
-        </div>    
-        <div class="col-6 col-md-2 mb-2">
-            <select class="form-select" aria-label="Default select example" name="Product" required>
-                {% if User_input.Product != None %}
-                <option value="{{User_input.Product}}">{{User_input.Product}}</option>
-                {% endif %}
-                <option value="all">all</option>
-                {% for productdata in product_type %}
-                <option value="{{productdata.product}}">{{productdata.product}}</option>
-                {% endfor %}
-            </select>
-        </div>    
-        <div class="col-12 col-md-2">
-            <h5> Training Search:</h5>
-        </div>
-        <div class="col-8 col-md-3 mb-3">              
-            <input type="text" id="search" maxlength="50" onkeyup="max_length_training_search()" class="form-control" name="Training_Data" value="{%if User_input.Training %}{{User_input.value}}{%endif%}"  placeholder="Search Training Document" id="Training_Data">
-        </div>
-        <div class="col-4 col-md-1 mb-3" >
-            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
-        </div>
-        <div class="col-6 col-md-2">
-            <div class="float-end">
-                <div class="input-group input-group-sm mb-0 text-end"> 
-                <h6> No. of Row:</h6></div>
-            </div>
-        </div>
-        <div class="col-3 col-md-1" > 
-            <div class="input-group input-group-sm mb-0">           
-                <input  min="1" max="200" type="number" class="form-control" name="limit" value="{%if User_input.limit %}{{User_input.limit}}{%else%}10{%endif%}">
-            </div>
-        </div>
-    </div>    
-    </form>        
-    <br>
-</div>    
-        
-</div>    
-<div class="container">
-    <br>
-    {% if page_obj %}
-    <div class="table-responsive">
-    <table class="table table-striped table-bordered table-hover ">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Product</th>
-                <th scope="col">System_name</th>
-                <th scope="col">Training_Name</th>
-                <th scope="col">Link</th>
-              </tr>
-        </thead>      
-        <tbody>  
-        {% for Trainingdata in page_obj %}
-        <tr>
-            <th class="text-end" scope="row">{{ forloop.counter|add:User_input.line_index_adder }}</th>
-            <td>{{Trainingdata.Product_name}}</td>
-            <td>{{Trainingdata.System_name}}</td>
-            <td>{{Trainingdata.Training_Name}}</td>
-            <td>
-            <form method="get" action="{% url 'pdf' %}">
-                {% csrf_token %}
-                <button type="submit"  id="link" name="link" value="{{Trainingdata.Training_storage.url}}" class="btn btn-link btn-sm">Open</button>
-            </form>
-            </td>
-            <!--<td><a href="/static{{Trainingdata.Training_storage.url}}" target="_new" class="link">Open</a></td>-->
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>   
-    </div>     
-</div> 
-<br>
-{% if page_obj.has_other_pages %}
-    <nav>
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1&Product={{User_input.Product}}&limit={{User_input.limit}}&Training_Data={{User_input.Training}}">
-                        First
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&Product={{User_input.Product}}&limit={{User_input.limit}}&Training_Data={{User_input.Training}}">
-                        Previous
-                    </a>
-                </li>
-            {% endif %}
+<div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-8">
 
-            {% for page_number in page_obj.paginator.page_range %}
-                {% if page_number <= page_obj.number|add:3 and page_number >= page_obj.number|add:-3 %}
-                    {% if page_obj.number == page_number %}
-                        <li class="page-item active">
-                            <a class="page-link" href="?page={{ page_number }}&Product={{User_input.Product}}&limit={{User_input.limit}}&Training_Data={{User_input.Training}}">
-                                {{ page_number }}
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_number }}&Product={{User_input.Product}}&limit={{User_input.limit}}&Training_Data={{User_input.Training}}">
-                                {{ page_number }}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
+  <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-5 mb-5 sm:mb-6 shadow-sm">
+    <form method="get" action="{% url 'training' %}">
+      {% csrf_token %}
+      <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3">
+        <div class="sm:w-44">
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Product</label>
+          <select name="Product" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow" required>
+            {% if User_input.Product %}<option value="{{ User_input.Product }}" selected>{{ User_input.Product }}</option>{% endif %}
+            <option value="all">All</option>
+            {% for p in product_type %}<option value="{{ p.product }}">{{ p.product }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="flex-1 min-w-0 sm:min-w-48">
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Search</label>
+          <input type="text" name="Training_Data" id="search" maxlength="50"
+            value="{% if User_input.Training %}{{ User_input.value }}{% endif %}"
+            placeholder="Search training documents..."
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+        </div>
+        <div class="w-full sm:w-24">
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Rows</label>
+          <input type="number" name="limit" min="1" max="200" value="{% if User_input.limit %}{{ User_input.limit }}{% else %}10{% endif %}"
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+        </div>
+        <button type="submit" class="w-full sm:w-auto min-h-[44px] rounded-lg bg-brand-dark text-brand-yellow font-mono font-semibold text-sm px-6 py-2.5 hover:bg-brand-yellow hover:text-brand-dark transition border border-brand-yellow">EXEC →</button>
+      </div>
+    </form>
+  </div>
 
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&Product={{User_input.Product}}&limit={{User_input.limit}}&Training_Data={{User_input.Training}}">
-                        Next
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&Product={{User_input.Product}}&limit={{User_input.limit}}&Training_Data={{User_input.Training}}">
-                        Last
-                    </a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
-    
-{% endif %}
-{% else %}
-
-<div class="container">
-<div class="card">
-    <div class="card-body">
-        No Data Available - Kindly Search with key values.
+  {% if page_obj %}
+  <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+    <div class="px-4 sm:px-5 py-3 bg-brand-dark border-b border-slate-700">
+      <h2 class="font-mono text-sm text-brand-yellow font-semibold">Training Documents</h2>
     </div>
-</div>
-</div>
-<div class="fixed-bottom">
-    <div class="text-center" style="padding: 5px; border-top: #737373 solid 0.2px; background-color: white">
-        <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
-    </div>    
-</div>
-{% endif %}
+    <div class="table-scroll">
+      <table class="w-full text-sm" style="min-width:560px">
+        <thead>
+          <tr class="border-b border-slate-100 bg-slate-50">
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase w-10">#</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase">Product</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase">System</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase">Training Name</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 uppercase w-20">Open</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for t in page_obj %}
+          <tr class="hover:bg-amber-50 transition">
+            <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">{{ forloop.counter|add:User_input.line_index_adder }}</td>
+            <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-700 whitespace-nowrap">{{ t.Product_name }}</td>
+            <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-600 whitespace-nowrap">{{ t.System_name }}</td>
+            <td class="px-3 sm:px-4 py-3 text-sm text-slate-700">{{ t.Training_Name }}</td>
+            <td class="px-3 sm:px-4 py-3">
+              <form method="get" action="{% url 'pdf' %}">{% csrf_token %}
+                <button type="submit" name="link" value="{{ t.Training_storage.url }}" class="min-h-[32px] font-mono text-xs px-3 py-1.5 rounded-lg bg-brand-dark text-brand-yellow border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">Open</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-5 sm:mt-6"><ul class="flex items-center justify-center gap-1 flex-wrap">
+    {% if page_obj.has_previous %}
+    <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page=1&Product={{ User_input.Product }}&limit={{ User_input.limit }}&Training_Data={{ User_input.Training }}">First</a></li>
+    <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.previous_page_number }}&Product={{ User_input.Product }}&limit={{ User_input.limit }}&Training_Data={{ User_input.Training }}">← Prev</a></li>
+    {% endif %}
+    {% for p in page_obj.paginator.page_range %}{% if p <= page_obj.number|add:3 and p >= page_obj.number|add:-3 %}
+    <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border transition {% if page_obj.number == p %}bg-brand-dark text-brand-yellow border-brand-yellow{% else %}bg-white text-slate-600 border-slate-200 hover:border-brand-yellow{% endif %}" href="?page={{ p }}&Product={{ User_input.Product }}&limit={{ User_input.limit }}&Training_Data={{ User_input.Training }}">{{ p }}</a></li>
+    {% endif %}{% endfor %}
+    {% if page_obj.has_next %}
+    <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.next_page_number }}&Product={{ User_input.Product }}&limit={{ User_input.limit }}&Training_Data={{ User_input.Training }}">Next →</a></li>
+    <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.paginator.num_pages }}&Product={{ User_input.Product }}&limit={{ User_input.limit }}&Training_Data={{ User_input.Training }}">Last</a></li>
+    {% endif %}
+  </ul></nav>
+  {% endif %}
+
+  {% else %}
+  <div class="bg-white rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
+    <p class="font-mono text-slate-400 text-sm">No data — search with a product or keyword.</p>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

@@ -1,17 +1,20 @@
-from django.urls import path
+from django.urls import path,include
 from . import views
+from rest_framework import routers,serializers,viewsets
+from django.conf import settings
+from rest_framework.routers import DefaultRouter
+from django.conf.urls.static import static
 
+router = DefaultRouter()
+router.register(r'stocks', views.StockViewSet)
 
 urlpatterns = [
-    path('', views.home, name='index'),  
-    
-
-    #path("", views.index, name="index"),  # flag 1
+    path("", views.index, name="index"),  # flag 1
     path("login", views.login_view, name="login"),  # flag 12
     path("logout", views.logout_view, name="logout"),  # flag 13
     path("register", views.register, name="register"),  # flag 2
     path("lostpassword", views.lostpassword, name="lostpassword"),  # flag 2
-    path("std", views.std, name="std"),  # flag 3
+    #path("std", views.std, name="std"), 
     path("training", views.training, name="training"),  # flag 4
     path("softwaretool", views.softwaretool, name="softwaretool"),  # flag 5
     path("softwaretool/VRDY", views.softvrdy, name="vrdy"),  # flag 5
@@ -37,4 +40,30 @@ urlpatterns = [
     path('repair_list',views.repair_list,name='repair_list'),
     path('repair_list/<str:list_id>',views.checklist,name='checklist'),
     path('images/<str:spec>',views.photo,name='images'),
-]
+    path('profile',views.profile,name='profile'),
+    path('serial_gen',views.serial_gen,name='serial_gen'),
+    path('get_latest_serial_number',views.get_latest_serial_number,name="get_latest_serial_number"),
+
+    path('rest/alarm',views.Alarm_search.as_view()),
+    path('rest/systems',views.Systems.as_view()),
+    path('rest/training',views.Training_search.as_view()),
+    path('rest/parentspec',views.Parent_spec.as_view()),
+    path('rest/childspec',views.Child_spec.as_view()),
+    path('rest/parentspec/<str:part_id>',views.Parent_child.as_view()),
+    path('rest/parentavailable',views.Parent_available.as_view()),
+    path('rest/manual',views.Manual.as_view()),
+    path('stock',views.receive_stock_data, name="stock"),
+    path('stocks',views.stocks,name="stocks"),
+    path('api/',include(router.urls)),
+ 
+    path("std",                        views.std_list,   name="std"),  # flag 3
+    path("std/new",                    views.std_form,   name="std_new"),  # flag 3
+    path("std/<int:report_id>/edit",   views.std_form,   name="std_edit"),  # flag 3
+    path("std/<int:report_id>",        views.std_detail, name="std_detail"),  # flag 3
+    path("std/<int:report_id>/review", views.std_review, name="std_review"), # flag 3
+    path("std/import",                  views.std_import,         name="std_import"), # flag 3
+    path("std/import/preview",          views.std_import_preview, name="std_import_preview"), # flag 3
+] 
+
+if settings.DEBUG :
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

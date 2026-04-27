@@ -1,101 +1,76 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}Sign In — Service Support{% endblock %}
 {% block body %}
 {% load static %}
+
 <script>
-    function maxlenghth_login_user() {
-      var user_name = document.getElementById("username").value;
-      if (user_name.length == 30) {
-        alert("UserName limit is 30 Char");
-      }
-    }
-    function maxleghth_login_pass() {
-      var user_name = document.getElementById("password").value;
-      if (user_name.length == 20) {
-        alert("Password limit is 20 Char");
-      }
-    }
-    function show_password(ID) {
-      let x = document.getElementById(ID);
-      if (x.type === "password") {
-        x.type = "text";
-      } else {
-        x.type = "password";
-      }
-    }
+  function showPass(id) {
+    const f = document.getElementById(id);
+    f.type = f.type === 'password' ? 'text' : 'password';
+  }
 </script>
 
-<section class="h-100">
-    <div class="container h-100">
-        <div class="row justify-content-sm-center h-100">
-            <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
-                <div class="row">
-                    <div class="col">
-                        <div class="text-center my-5">
-                            <img src="{% static 'servicesupport/oneFanuc.png' %}" alt="logo" width="150">
-                        </div>
-                    </div>
-                    <div class="col">    
-                        <div class="text-center my-5">
-                            <img src="{% static 'servicesupport/Service First Logo.png' %}" alt="logo" width="200">
-                        </div>
-                    </div>
-                </div>        
-                <div class="card shadow-lg">
-                    <div class="card-body p-5">
-                        <h1 class="fs-4 card-title fw-bold mb-4">Login</h1>
-                        <form method="POST" class="needs-validation" novalidate="" autocomplete="off" action="{% url 'login' %}" method="post">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="mb-2 text-muted" for="email">User Name</label>
-                                <input id="username" type="text" maxlength = "30" name="username" class="form-control" id="username" value="" onkeyup='maxlenghth_login_user()' required autofocus>
-                                <div class="invalid-feedback">
-                                    UserName is invalid
-                                </div>
-                            </div>
+<div class="min-h-screen flex items-center justify-center bg-brand-dark px-4 py-12">
+  <div class="w-full max-w-sm">
 
-                            <div class="mb-3">
-                                <div class="mb-2 w-100">
-                                    <label class="text-muted"  maxlength = "20" for="password">Password</label>
-                                    <a href="{% url 'lostpassword' %}" class="float-end">
-                                        Forgot Password?
-                                    </a>
-                                </div>
-                                    <div class="input-group mb-3">
-                                        <input type="password"  maxlength = "50" name="password" class="form-control" onkeyup="maxleghth_login_pass()" id="password" aria-describedby="button-addon2" required >
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="show_password('password')"><img src="{% static 'servicesupport/eye.svg' %}"></button>
-                                        </div>    
-                                    </div>
-                            </div>
-
-                            <div class="d-flex align-items-center">
-                            <!-- 
-                                <div class="form-check">
-                                    <input type="checkbox" name="remember" id="remember" class="form-check-input">
-                                    <label for="remember" class="form-check-label">Remember Me</label>
-                                </div>
-                            -->
-                                <button type="submit" class="btn btn-primary ms-auto">
-                                    Login
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card-footer py-3 border-0">
-                        <div class="text-center">
-                            Don't have an account? - Contact IT support <!--<a href="{% url 'register' %}" class="text-dark">Create One</a>-->
-                        </div>
-                        <div class="text-center">
-                            Go to Home Page <a href="{% url 'index' %}" class="text-dark">link</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-center mt-5 text-muted">
-                    Copyright &copy; 2023 &mdash; ServiceSupport
-                </div>
-            </div>
-        </div>
+    <!-- Logos -->
+    <div class="flex items-center justify-center gap-8 mb-10">
+      <img src="{% static 'servicesupport/oneFanuc.png' %}" alt="FANUC" class="h-10 object-contain opacity-90">
+      <div class="w-px h-8 bg-slate-600"></div>
+      <img src="{% static 'servicesupport/Service First Logo.png' %}" alt="Service First" class="h-10 object-contain opacity-90">
     </div>
-</section>   
+
+    <!-- Card -->
+    <div class="bg-brand-gray rounded-2xl border border-slate-700 overflow-hidden">
+      <div class="px-8 pt-8 pb-6">
+        <p class="font-mono text-xs text-brand-yellow tracking-widest uppercase mb-1">Service Portal</p>
+        <h1 class="text-xl font-semibold text-white mb-6">Sign In</h1>
+
+        <form method="POST" action="{% url 'login' %}" autocomplete="off">
+          {% csrf_token %}
+
+          <!-- Username -->
+          <div class="mb-4">
+            <label class="block text-xs font-mono text-slate-400 uppercase tracking-widest mb-1.5">Username</label>
+            <input type="text" name="username" id="username" maxlength="30" required autofocus
+              class="w-full bg-brand-dark border border-slate-600 rounded-lg px-3 py-2.5 text-sm text-white font-mono placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-yellow focus:border-brand-yellow transition"
+              placeholder="your username">
+          </div>
+
+          <!-- Password -->
+          <div class="mb-6">
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="text-xs font-mono text-slate-400 uppercase tracking-widest">Password</label>
+              <a href="{% url 'lostpassword' %}" class="text-xs text-slate-500 hover:text-brand-yellow transition">Forgot password?</a>
+            </div>
+            <div class="relative">
+              <input type="password" name="password" id="password" maxlength="50" required
+                class="w-full bg-brand-dark border border-slate-600 rounded-lg px-3 py-2.5 pr-10 text-sm text-white font-mono placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-yellow focus:border-brand-yellow transition"
+                placeholder="••••••••">s
+              <button type="button" onclick="showPass('password')"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-brand-yellow transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit"
+            class="w-full bg-brand-yellow text-brand-dark font-mono font-bold text-sm py-2.5 rounded-lg hover:bg-yellow-300 transition">
+            Sign In →
+          </button>
+        </form>
+      </div>
+
+      <div class="px-8 py-4 bg-brand-dark border-t border-slate-700 text-center space-y-1">
+        <p class="text-xs text-slate-500">Don't have an account? Contact IT support.</p>
+        <a href="{% url 'index' %}" class="text-xs text-slate-400 hover:text-brand-yellow transition">← Back to Home</a>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-slate-600 mt-6 font-mono">© 2024 Service Support — FANUC India</p>
+  </div>
+</div>
 {% endblock %}

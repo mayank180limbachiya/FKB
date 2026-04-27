@@ -1,119 +1,39 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}Register — Service Support{% endblock %}
 {% block body %}
 {% load static %}
-<div class="text-center">
-    Only admin having authority to register User
-</div>
-<div class="text-center">
-    Go to  <b>Home Page</b> <a href="{% url 'index' %}" class="text-dark">link</a>
-</div>
-<div class="text-center">
-    Go to <b>login Page</b> <a href="{% url 'login' %}" class="text-dark">link</a>
-</div>
-<!--
-<script>
-    function maxlenghth_login_user() {
-      var user_name = document.getElementById("username").value;
-      if (user_name.length == 30) {
-        alert("UserName limit is 30 Char");
-      }
-    }
-    function maxlength_login_pass() {
-      var user_name = document.getElementById("password").value;
-      if (user_name.length == 20) {
-        alert("Password limit is 20 Char");
-      }
-    }
-    function maxlength_login_first(){
-        var user_name = document.getElementById("first").value;
-        if (user_name.length == 16) {
-            alert("First Name limit is 16 Char");
-        }
-    }
-    function maxlength_login_last(){
-        var user_name = document.getElementById("last").value;
-        if (user_name.length == 16) {
-            alert("Last Name limit is 16 Char");
-        }
-    }
-</script>
 
-<section class="h-100">
-    <div class="container h-100">
-        <div class="row justify-content-sm-center h-100">
-            <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
-                <div class="row">
-                    <div class="col">
-                        <div class="text-center my-5">
-                            <img src="{% static 'servicesupport/oneFanuc.png' %}" alt="logo" width="150">
-                        </div>
-                    </div>
-                    <div class="col">    
-                        <div class="text-center my-5">
-                            <img src="{% static 'servicesupport/Service First Logo.png' %}" alt="logo" width="200">
-                        </div>
-                    </div>
-                </div>        
-                <div class="card shadow-lg">
-                    <div class="card-body p-5">
-                        <h1 class="fs-4 card-title fw-bold mb-4">Register</h1>
-                        <form method="POST" class="needs-validation" novalidate="" autocomplete="off" action="{% url 'register' %}" method="post">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label class="mb-2 text-muted" for="email">User Name</label>
-                                <input id="username" type="text" maxlength = "30" name="username" class="form-control" id="username" value="{%if user_data.username %}{{user_data.username}}{%endif%}" onkeyup='maxlenghth_login_user()' required autofocus>
-                            </div>
-                            <div class="mb-3">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <div class="mb-1 w-50">
-                                            <label class="text-muted"   for="password">First Name</label>
-                                        </div>
-                                        <input id="first" type="text" maxlength = "16" class="form-control" onkeyup="maxlength_login_first()" name="first" value="{%if user_data.first %}{{user_data.first}}{%endif%}" required>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="mb-1 w-50">
-                                        <label class="text-muted"   for="password">Last Name</label>
-                                        </div>
-                                        <input id="last" type="text" maxlength = "16" class="form-control" onkeyup="maxlength_login_last()" name="last" value="{%if user_data.last %}{{user_data.last}}{%endif%}" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="mb-2 text-muted" for="email">Email id</label>
-                                <input id="username" type="email" maxlength = "70" name="email" class="form-control" id="email"  onkeyup='maxlength_login_email()' value="{%if user_data.email %}{{user_data.email}}{%endif%}" required >
-                            </div>
-                            <div class="mb-3">
-                                <div class="mb-2 w-100">
-                                    <label class="text-muted" for="password">Password</label>
-                                </div>
-                                <input id="password" type="password" maxlength = "20" class="form-control" onkeyup="maxlength_login_pass()" name="password" required>
-                            </div>
-                        
-                            <div class="mb-2">
-                                <div class="mb-2 w-100">
-                                    <label class="text-muted"  for="password">Confirm Password</label>
-                                </div>
-                                <input type="password"  id="confirmation" class="form-control"  name="confirmation" required>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                Back to <a class="text-dark" href="{% url 'login' %}"> Log in</a>
-                                <button type="submit" class="btn btn-primary ms-auto">
-                                    Register
-                                </button>
-                            </div>
+<div class="min-h-[calc(100vh-56px)] flex items-center justify-center bg-brand-dark px-4 py-10">
+  <div class="w-full max-w-sm text-center">
 
-                        </form>
-                    </div>
-                    
-                </div>
-                <div class="text-center mt-5 text-muted">
-                    Copyright &copy; 2023 &mdash; ServiceSupport
-                </div>
-            </div>
-        </div>
+    <div class="flex items-center justify-center gap-6 mb-8">
+      <img src="{% static 'servicesupport/oneFanuc.png' %}" alt="FANUC" class="h-8 sm:h-10 object-contain opacity-90">
+      <div class="w-px h-7 bg-slate-600"></div>
+      <img src="{% static 'servicesupport/Service First Logo.png' %}" alt="Service First" class="h-8 sm:h-10 object-contain opacity-90">
     </div>
-</section>   
--->
+
+    <div class="bg-brand-gray rounded-2xl border border-slate-700 overflow-hidden">
+      <div class="px-8 pt-8 pb-6">
+        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
+          <svg class="w-7 h-7 text-brand-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <p class="font-mono text-xs text-brand-yellow tracking-widest uppercase mb-2">Access Restricted</p>
+        <h1 class="text-lg font-semibold text-white mb-3">Registration Not Available</h1>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          Only administrators can create new accounts.<br>
+          Please contact your IT support team to get access.
+        </p>
+      </div>
+      <div class="px-8 py-4 bg-brand-dark border-t border-slate-700 flex items-center justify-between">
+        <a href="{% url 'login' %}" class="text-xs text-slate-400 hover:text-brand-yellow transition">← Sign In</a>
+        <a href="{% url 'index' %}" class="text-xs text-slate-400 hover:text-brand-yellow transition">Home →</a>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-slate-600 mt-5 font-mono">© 2024 Service Support — FANUC India</p>
+  </div>
+</div>
+
 {% endblock %}

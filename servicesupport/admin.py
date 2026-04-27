@@ -11,7 +11,9 @@ from .models import (
     manual,
     Training_model,
     analytics,
-    spec_details,
+    spec_details,links,UserData,Serial_Number,Stock,Storage_loc,Plant,
+    STDReport, 
+    STDApprovalLog
 )
 
 from import_export.admin import ImportExportModelAdmin
@@ -104,3 +106,53 @@ class analytics(admin.ModelAdmin):
 class spec_details(admin.ModelAdmin):
     list_display = ("spec_no","weight")
     pass
+
+@admin.register(links)
+class links(admin.ModelAdmin):
+    list_display = ("id","name","link_name")
+    pass
+
+@admin.register(UserData)
+class UserData(admin.ModelAdmin):
+    list_display = ("id","user")
+    pass
+
+@admin.register(Serial_Number)
+class Serial_Number(admin.ModelAdmin):
+    list_display = ("id","user","serial_no")
+    pass
+
+@admin.register(Stock)
+class Stock(admin.ModelAdmin):
+    list_display = ("material","plant","available")
+    search_fields =["material__spec_no"]
+    pass
+
+@admin.register(Storage_loc)
+class Storage_loc(admin.ModelAdmin):
+    list_display = ("storage_location","name")
+    pass
+
+@admin.register(Plant)
+class Plant(admin.ModelAdmin):
+    list_display = ("name","code","short_name")
+    pass
+
+class STDApprovalLogInline(admin.TabularInline):
+    model   = STDApprovalLog
+    extra   = 0
+    readonly_fields = ("action", "actor", "comment", "created_at")
+    can_delete      = False
+
+@admin.register(STDReport)
+class STDReportAdmin(admin.ModelAdmin):
+    list_display    = ("id", "std_number_display", "subject", "product",
+                       "status", "prepared_by", "reviewed_by", "created_at")
+    list_filter     = ("status", "product")
+    search_fields   = ("subject", "end_user", "mr_no", "controller_model")
+    readonly_fields = ("created_at", "updated_at", "submitted_at", "approved_at")
+    inlines         = [STDApprovalLogInline]
+ 
+    @admin.display(description="STD Number")
+    def std_number_display(self, obj):
+        return f"STD-{obj.created_at.year}-{obj.id:04d}"

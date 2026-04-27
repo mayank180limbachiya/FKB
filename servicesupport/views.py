@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render , get_object_or_404, redirect
 from django.urls import reverse
 from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth.models import User
@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib import messages
 from django.db import IntegrityError
 from django.contrib.admin.views.decorators import staff_member_required
+from django.utils import timezone
 # url handling
 from urllib.parse import quote
 import re ,csv
@@ -27,6 +28,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
 
+from .models import STDReport, STDApprovalLog
+
 import servicesupport
 from .models import (
     alarm_detail,
@@ -40,7 +43,13 @@ from .models import (
     Training_model,
     analytics,
     spec_details,
+    Serial_Number,
+    Stock,
+    STDReport, 
+    STDApprovalLog
 )
+
+from .std_import_parser import parse_std_docx
 
 def index(request):
     return render(
@@ -295,7 +304,29 @@ def logout_view(request):
     )
 
 
-
+@login_required
+def profile(request):
+    user = request.user
+    user_details = User.objects.get(username=user)
+    links_data = links.objects.all()
+    if request.method == "POST" and request.user.is_authenticated:
+        Data_1 = request.POST["1"]
+        Data_2 = request.POST["2"]
+        Data_3 = request.POST["3"]
+        Data_4 = request.POST["4"]
+        Data_5 = request.POST["5"]
+        list_data=[Data_1,Data_2,Data_3,Data_4,Data_5]  
+    print(user_details)
+    return render(
+        request,
+        "servicesupport/profile.html",
+        {
+            "flag": 13,
+            'user_details':user_details,
+            'links':links_data,
+            'list':list_data
+        },
+    )
 
 
 
@@ -851,6 +882,17 @@ def pdf(request):
             },
         )
 
+@login_required
+def stocks(request):
+    return render(
+            request,
+            "servicesupport/stocks.html",
+            {
+                "flag": 14,
+            },
+        )
+
+
 
 @login_required
 @staff_member_required
@@ -1040,4 +1082,835 @@ def photo(request, spec):
     #        "error": "GET request required."
     #   }, status=400)   
 
+
+def Stock_update(request):
+    if request.method == "POST":
+        pass
+
+
+
+@csrf_exempt
+def receive_stock_data(request):
+    if request.method == 'POST':
+            item = json.loads(request.body)
+            
+            Stock.objects.all().delete()
+            # Extract relevant fields from JSON data
+            for data in item:
+                
+                    material_id = data.get('Material')
+                    if material_id is not None:    
+                        plant_id = data.get('Plant')
+                        storage_id = data.get('Storage Location')
+                        special_stock = data.get('Special Stock')
+                        special_stock_number = data.get('Special stock number')
+                        available = data.get('Unrestricted')
+                        transit = data.get('Transit and Transfer')
+                        returns = data.get('Returns')
+                        
+                        # Check if the material exists in spec_details
+                        material_instance, created = spec_details.objects.get_or_create(spec_no=material_id)
+                        plant_instance = Plant.objects.get(code=plant_id)
+                        
+                        storage_instance = None
+                        if storage_id is not None:
+                            storage_instance = Storage_loc.objects.get(storage_location=storage_id)
+
+                        # Create or update Stock instance
+                        stock_instance = Stock.objects.create(
+                                material=material_instance,
+                                plant=plant_instance,
+                                storage=storage_instance,
+                                special_stock=special_stock,
+                                special_stock_number=special_stock_number,
+                                available=available,
+                                transit=transit,
+                                returns=returns,
+                                
+                            )
+            
+            return JsonResponse({'message': 'Data saved successfully.'})
+        
+        #except Exception as e:
+        #    return JsonResponse({'error': str(e)}, status=400)
+    
+    else:
+        return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
+
+import pandas as pd
+
+@csrf_exempt
+def receive_stock_data2(request):
+    if request.method == 'POST':
+        #try:
+            items = json.loads(request.body)
+            
+            # Convert JSON data to pandas DataFrame
+            df = pd.DataFrame(items)
+            
+            # Delete all existing Stock objects
+            Stock.objects.all().delete()
+            
+            # Fetch existing data for material from spec_details table
+            spec_details_data = spec_details.objects.all().values_list('spec_no', 'id')
+            spec_details_df = pd.DataFrame(spec_details_data, columns=['spec_no', 'id'])
+            
+            # Merge DataFrame with spec_details data to map spec_no to material_id
+            df = df.merge(spec_details_df, how='left', left_on='Material', right_on='spec_no')
+            df.drop(columns=['spec_no'], inplace=True)
+            df.rename(columns={'id': 'material'}, inplace=True)
+            
+            # Create new materials for missing spec_no
+            missing_materials = df[df['material'].isnull()]['Material'].unique()
+            for material in missing_materials:
+                new_material = spec_details.objects.create(spec_no=material)
+                df.loc[df['Material'] == material, 'material'] = new_material.id
+            
+            # Fetch existing data for plant from Plant table
+            plant_data = Plant.objects.all().values_list('code', 'id')
+            plant_df = pd.DataFrame(plant_data, columns=['code', 'id'])
+            
+            # Merge DataFrame with Plant data to map code to plant_id
+            df = df.merge(plant_df, how='left', left_on='Plant', right_on='code')
+            df.drop(columns=['code'], inplace=True)
+            df.rename(columns={'id': 'plant'}, inplace=True)
+            
+            # Handle empty storage locations
+            df['storage'] = df['Storage Location'].apply(lambda x: Storage_loc.objects.get(storage_location=x).id if pd.notnull(x) else None)
+            
+            # Drop the 'Storage Location' column
+            df.drop(columns=['Storage Location'], inplace=True)
+            
+            # Create Stock objects from DataFrame
+            Stock.objects.bulk_create(
+                Stock(
+                    material_id=row['material'],
+                    plant_id=row['plant'],
+                    storage_id=row['storage'],
+                    special_stock=row['Special Stock'],
+                    special_stock_number=row['Special stock number'],
+                    batch=row['Batch'],
+                    available=row['Unrestricted'],
+                    transit=row['Transit and Transfer'],
+                    returns=row['Returns']
+                )
+                for _, row in df.iterrows()
+            )
+            
+            return JsonResponse({'message': 'Data saved successfully.'})
+        
+        #except Exception as e:
+        #    return JsonResponse({'error': str(e)}, status=400)
+    
+    else:
+        return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
 # Create your views here.
+@login_required
+def serial_gen(request):
+    serial_no = Serial_Number.objects.order_by('updated_at').first()
+
+    if request.method == "POST":
+        SerialNumber = request.POST["serial_no"]
+        add_text_data = request.POST["add_text"]
+        data = Serial_Number(
+                serial_no=SerialNumber,
+                add_text=add_text_data,
+                user=request.user,
+            )
+        data.save()
+
+    return render(
+        request,
+        "servicesupport/serial_number.html",
+        {
+            "serial_no": serial_no,
+        }
+    )
+
+def get_latest_serial_number(request):
+    # Fetch the latest serial number from the database
+    if Serial_Number.objects.count()==0:
+        data = Serial_Number(
+                serial_no="0",
+                add_text="",
+                user=request.user,
+            )
+        data.save()
+        
+    latest_serial_number = Serial_Number.objects.latest('updated_at')
+    
+    
+        
+    # Convert the serial number to hexadecimal
+    latest_serial_hex = hex(int(latest_serial_number.serial_no, 16) + 1)
+    
+    # Return the serial number as JSON response
+    return JsonResponse({'serial_no': latest_serial_hex})
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
+
+from .models import *
+from .serializers import *
+from django.db.models import Q
+
+# Create your views here.
+
+@permission_classes((AllowAny, ))
+class Alarm_search(APIView, LimitOffsetPagination):
+    def get(self, request,*args, **kwargs):
+
+        # if Query Params
+        search_para = self.request.query_params.get("alarm",None)
+        search_system = self.request.query_params.get("system",None)
+
+        if search_para and search_system: # alarm filter
+            queryset = alarm_detail.objects.filter(system_type__system_names=search_system).filter(
+                Q(alarm_description__contains=search_para)
+                | Q(alarm_number__contains=search_para)
+                | Q(alarm_data__contains=search_para)
+            )
+        elif search_system:
+            queryset = alarm_detail.objects.filter(system_type__system_names=search_system)    
+        elif search_para:
+            queryset = alarm_detail.objects.filter(
+                Q(alarm_description__contains=search_para)
+                | Q(alarm_number__contains=search_para)
+                | Q(alarm_data__contains=search_para)
+            )
+        else:
+            queryset = alarm_detail.objects.all()   
+
+         
+        results = self.paginate_queryset(queryset, request, view=self)
+        serializer = CustomAlarmSerializer(results, many=True)
+        return self.get_paginated_response(serializer.data)
+
+@permission_classes((AllowAny, ))
+class Systems(APIView):
+    def get(self, request,*args, **kwargs):
+        search_para = self.request.query_params.get("view",None)
+        if search_para:
+            if search_para == "alarm":
+                Product_withALarm = alarm_detail.objects.values_list("system_type", flat=True).distinct()
+                queryset = system_types.objects.filter(id__in=Product_withALarm).all()
+            elif search_para == "manual":
+                Product_withManual = manual.objects.values_list("Product_name",flat=True).distinct()
+                queryset = system_types.objects.filter(id__in=Product_withManual).all()
+        else:    
+            queryset = system_types.objects.all()
+        serializers = CustomSystemsSerializer(queryset,many=True)
+        return Response(serializers.data)
+
+@permission_classes((AllowAny, ))
+class Training_search(APIView, LimitOffsetPagination):
+    def get(self, request,*args, **kwargs):
+        
+        search_para = self.request.query_params.get("training",None)
+
+        if search_para:
+            queryset = Training_model.objects.filter(
+                Q(Training_Name__contains=search_para)
+                | Q(Training_details__contains=search_para)
+            )
+        else:
+            queryset = Training_model.objects.all()
+
+        results = self.paginate_queryset(queryset, request, view=self)
+        serializer = CustomTrainingSerializer(results, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
+
+@permission_classes((AllowAny, ))
+class Parent_spec(APIView, LimitOffsetPagination):
+    def get(self, request, *args, **kwargs):
+        search_para = self.request.query_params.get("spec",None)
+        if search_para:
+            queryset = specification.objects.filter(parentspec__contains=search_para)
+        else:
+            queryset = specification.objects.all()    
+
+        results = self.paginate_queryset(queryset,request, view=self)
+        serializers = CustomParent_specSerializer(results, many=True)
+        return self.get_paginated_response(serializers.data)  
+
+@permission_classes((AllowAny, ))
+class Child_spec(APIView, LimitOffsetPagination):
+    def get(self, request, *args, **kwargs):
+        search_para = self.request.query_params.get("spec",None)
+        search_para_flag= self.request.query_params.get("flag",None)
+        if search_para and search_para_flag:
+            if search_para_flag=="new":
+                queryset= equ.objects.filter(spec__contains=search_para)
+            elif search_para_flag=="old":
+                queryset= equ.objects.filter(equspec__contains=search_para)    
+        elif search_para:
+            queryset= equ.objects.filter(spec__contains=search_para) |equ.objects.filter(equspec__contains=search_para)
+        else:    
+            queryset = equ.objects.all()
+
+        results = self.paginate_queryset(queryset,request, view=self)
+        serializers = CustomChild_specSerializer(results, many=True)
+        return self.get_paginated_response(serializers.data)  
+
+@permission_classes((AllowAny, ))
+class Parent_child(APIView):
+    def get(self,request,part_id, *args, **kwargs):
+        parent_spec = specification.objects.filter(id=part_id).first()
+        if not parent_spec:
+            # Handle the case when the parent specification with the given ID is not found
+            return Response({"error": "Parent specification not found"}, status=404)
+        filter_q= specification.objects.filter(id=part_id).values_list("parentspec", flat=True)
+        
+        queryset = specification.objects.filter(parentspec__exact=filter_q[0]).all()
+
+        ChildSpec = queryset.values_list("childspec", flat=True)
+        queryset2 = equ.objects.none()
+        queryset3 = equ.objects.none()
+        for s in ChildSpec:
+            queryset2 =  queryset2 | equ.objects.filter(spec__exact=s).exclude(
+                reuse__exact="",
+                info__exact="",
+                equspec__exact="",
+                srno__exact="",
+                trno__exact="",
+            ).all()   # New Equ parts search
+            queryset3 = queryset3 | equ.objects.filter(equspec__exact=s).all() # Old Equ parts Search
+        
+        serializers = CustomParent_childSerializer(queryset,many=True) # Parent parts child specs
+        serializers1 = CustomChild_specSerializer(queryset2,many=True) # New equ Serializer 
+        serializers2 = CustomChild_specSerializer(queryset3,many=True) # Old Equ Serializer
+
+        response_data = {
+            'queryset1': serializers.data,
+            'queryset2': serializers1.data,
+            'queryset3': serializers2.data
+        }
+
+        return Response(response_data)
+
+@permission_classes((AllowAny, ))
+class Parent_available(APIView):     
+    def get(self,request, *args, **kwargs):
+        search_para = self.request.query_params.get("spec",None)
+
+        if search_para:
+            queryset = specification.objects.filter(childspec__exact=search_para).all()
+        else:
+            return Response({"error": "Parent specification not found"}, status=404)
+        
+        serializers = CustomParent_childSerializer(queryset,many=True) # Parent parts child specs
+        return Response(serializers.data)
+
+@permission_classes((AllowAny, ))
+class Manual(APIView, LimitOffsetPagination):
+    def get(self, request,*args, **kwargs):
+        
+        search_para = self.request.query_params.get("manual",None)
+        search_product = self.request.query_params.get("product",None)
+
+        if search_para and search_product:
+            queryset = manual.objects.filter(Manual_Name__contains=search_para).filter(system_type__system_names=search_product)
+        elif search_product:
+            queryset = manual.objects.filter(system_type__system_names=search_product)
+        elif search_para:
+            queryset = manual.objects.filter(Manual_Name__contains=search_para)
+        else:
+            queryset = manual.objects.all()
+
+        results = self.paginate_queryset(queryset, request, view=self)
+        serializer = CustomManualSerializer(results, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
+    
+
+class StockViewSet(viewsets.ModelViewSet):
+    queryset = Stock.objects.all()
+    serializer_class = CustomStocksSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    search_fields = ['spec', 'description']  # General search fields
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        request = self.request
+        search_spec = request.query_params.get('columns[0][search][value]', None)
+        search_name = request.query_params.get('columns[1][search][value]', None)
+        
+        search_plant = request.query_params.get('columns[2][search][value]', None)
+        search_storage_location = request.query_params.get('columns[3][search][value]', None)
+        print(search_spec)
+        print(search_name)
+        print(search_plant)
+        print(search_storage_location)
+        if search_spec:
+            queryset = queryset.filter(material__spec_no__icontains=search_spec)
+        if search_name:
+            queryset = queryset.filter(material__description__icontains=search_spec)
+        if search_plant:
+            queryset = queryset.filter(plant__name__icontains=search_plant)
+        if search_storage_location:
+            queryset = queryset.filter(storage__storage_location__icontains=search_storage_location)
+
+        # Handle global search
+        search_value = request.query_params.get('search[value]', None)
+        if search_value:
+            queryset = queryset.filter(
+                Q(material__spec_no__icontains=search_value) |
+                Q(material__description__icontains=search_value) |
+                Q(plant__name__icontains=search_value)
+            )
+
+         # Handle sorting
+        order_column_index = request.query_params.get('order[0][column]', None)
+        order_dir = request.query_params.get('order[0][dir]', 'asc')
+        if order_column_index is not None:
+            columns = ['material', 'material_name', 'plant',"storage","special_stock","special_stock_number","available","transit","returns"]
+            order_column = columns[int(order_column_index)]
+            if order_dir == 'desc':
+                order_column = '-' + order_column
+            queryset = queryset.order_by(order_column)
+
+        return queryset    
+
+ 
+# ── HELPER ────────────────────────────────────────────────────
+ 
+def is_reviewer(user):
+    """True if user belongs to Reviewer/Manager/ST_Reviewer group, or is superuser."""
+    return user.is_superuser or user.groups.filter(
+        name__in=["Reviewer", "Manager", "ST_Reviewer"]
+    ).exists()
+ 
+ 
+# ── 1. LIST ───────────────────────────────────────────────────
+ 
+@login_required
+def std_list(request):
+    q       = request.GET.get("q", "").strip()
+    product = request.GET.get("product", "")
+    status  = request.GET.get("status", "")
+ 
+    if is_reviewer(request.user):
+        reports = STDReport.objects.select_related("prepared_by", "reviewed_by")
+    else:
+        reports = STDReport.objects.filter(
+            Q(prepared_by=request.user) | Q(status="published")
+        ).select_related("prepared_by")
+ 
+    if q:
+        reports = reports.filter(
+            Q(subject__icontains=q)          |
+            Q(end_user__icontains=q)         |
+            Q(controller_model__icontains=q) |
+            Q(mr_no__icontains=q)
+        )
+    if product:
+        reports = reports.filter(product=product)
+    if status:
+        reports = reports.filter(status=status)
+ 
+    page_obj = Paginator(reports, 15).get_page(request.GET.get("page", 1))
+    add_analytics(request.user, "std", request)
+ 
+    return render(request, "servicesupport/std_list.html", {
+        "flag":            3,
+        "page_obj":        page_obj,
+        "q":               q,
+        "product":         product,
+        "status":          status,
+        "is_reviewer":     is_reviewer(request.user),
+        "product_choices": STDReport._meta.get_field("product").choices,
+        "status_choices":  STDReport._meta.get_field("status").choices,
+    })
+ 
+ 
+# ── 2. CREATE / EDIT ──────────────────────────────────────────
+ 
+@login_required
+def std_form(request, report_id=None):
+    report = None
+    if report_id:
+        report = get_object_or_404(STDReport, id=report_id)
+        if report.prepared_by != request.user and not is_reviewer(request.user):
+            messages.error(request, "You don't have permission to edit this report.")
+            return HttpResponseRedirect(reverse("std"))
+        if report.status in ("approved", "published") and not is_reviewer(request.user):
+            messages.error(request, "Approved report — contact a reviewer to edit.")
+            return HttpResponseRedirect(reverse("std_detail", args=[report_id]))
+ 
+    if request.method == "POST":
+        action = request.POST.get("action", "save_draft")
+ 
+        # Parse dynamic parts rows
+        specs   = request.POST.getlist("part_spec[]")
+        qtys    = request.POST.getlist("part_qty[]")
+        reasons = request.POST.getlist("part_reason[]")
+        parts   = [
+            {"spec": s.strip(), "qty": q.strip(), "reason": r.strip()}
+            for s, q, r in zip(specs, qtys, reasons)
+            if s.strip()
+        ]
+ 
+        fields = {
+            "subject":              request.POST.get("subject", "").strip(),
+            "product":              request.POST.get("product", ""),
+            "content_type":         request.POST.get("content_type", "Content/Solution"),
+            "controller_model":     request.POST.get("controller_model", ""),
+            "controller_sl_no":     request.POST.get("controller_sl_no", ""),
+            "machine_model":        request.POST.get("machine_model", ""),
+            "machine_sl_no":        request.POST.get("machine_sl_no", ""),
+            "rm_model":             request.POST.get("rm_model", ""),
+            "rm_sl_no":             request.POST.get("rm_sl_no", ""),
+            "machine_tool_builder": request.POST.get("machine_tool_builder", ""),
+            "configuration":        request.POST.get("configuration", ""),
+            "end_user":             request.POST.get("end_user", ""),
+            "application":          request.POST.get("application", ""),
+            "mr_no":                request.POST.get("mr_no", ""),
+            "is_multiple_visit":    request.POST.get("is_multiple_visit") == "on",
+            "visits_count":         int(request.POST.get("visits_count") or 1),
+            "hours_count":          int(request.POST.get("hours_count") or 0),
+            "repeat_visit_reason":  request.POST.get("repeat_visit_reason", ""),
+            "reason_for_subject":   request.POST.get("reason_for_subject", ""),
+            "problem_reported":     request.POST.get("problem_reported", ""),
+            "problem_observation":  request.POST.get("problem_observation", ""),
+            "problem_suspected":    request.POST.get("problem_suspected", ""),
+            "problem_history":      request.POST.get("problem_history", ""),
+            "external_disturbance": request.POST.get("external_disturbance", ""),
+            "occurrence_count":     request.POST.get("occurrence_count", ""),
+            "diagnosis_info":       request.POST.get("diagnosis_info", ""),
+            # CKEditor submits content via hidden textarea — these are the HTML strings
+            "analysis":             request.POST.get("analysis", ""),
+            "solution":             request.POST.get("solution", ""),
+            "additional_info":      request.POST.get("additional_info", ""),
+            "parts_used_json":      json.dumps(parts),
+        }
+ 
+        if not fields["subject"]:
+            messages.error(request, "Subject is required.")
+            return render(request, "servicesupport/std_form.html", {
+                "flag":            3,
+                "report":          report,
+                "product_choices": STDReport._meta.get_field("product").choices,
+                "content_choices": STDReport._meta.get_field("content_type").choices,
+                "system_types":    system_types.objects.all(),
+            })
+ 
+        if report is None:
+            report = STDReport(prepared_by=request.user)
+ 
+        for k, v in fields.items():
+            setattr(report, k, v)
+ 
+        if action == "submit":
+            report.status       = "submitted"
+            report.submitted_at = timezone.now()
+        else:
+            # Don't downgrade if already approved/published (reviewer editing)
+            if report.status not in ("approved", "published", "submitted"):
+                report.status = "draft"
+ 
+        report.save()
+ 
+        STDApprovalLog.objects.create(
+            report=report,
+            action=action,
+            actor=request.user,
+            comment="Submitted for review" if action == "submit" else "Saved draft",
+        )
+ 
+        if action == "submit":
+            messages.success(request, f"'{report.subject[:40]}' submitted for review.")
+        else:
+            messages.success(request, "Draft saved.")
+ 
+        return HttpResponseRedirect(reverse("std_detail", args=[report.id]))
+ 
+    return render(request, "servicesupport/std_form.html", {
+        "flag":            3,
+        "report":          report,
+        "product_choices": STDReport._meta.get_field("product").choices,
+        "content_choices": STDReport._meta.get_field("content_type").choices,
+        "system_types":    system_types.objects.all().select_related("product_name"),
+    })
+ 
+ 
+# ── 3. DETAIL ─────────────────────────────────────────────────
+ 
+@login_required
+def std_detail(request, report_id):
+    report = get_object_or_404(STDReport, id=report_id)
+ 
+    # Access control — drafts/rejected only visible to author + reviewers
+    if report.status not in ("published", "approved", "submitted"):
+        if report.prepared_by != request.user and not is_reviewer(request.user):
+            messages.error(request, "This report is not yet published.")
+            return HttpResponseRedirect(reverse("std"))
+ 
+    log = report.approval_log.select_related("actor").all()
+    add_analytics(request.user, "std", request)
+ 
+    # Reviewer can access review panel from submitted OR approved state
+    can_review = is_reviewer(request.user) and report.status in ("submitted", "approved")
+ 
+    return render(request, "servicesupport/std_detail.html", {
+        "flag":        3,
+        "report":      report,
+        "log":         log,
+        "is_reviewer": is_reviewer(request.user),
+        "can_review":  can_review,
+        "can_edit": (
+            report.prepared_by == request.user and
+            report.status in ("draft", "rejected")
+        ) or is_reviewer(request.user),
+    })
+ 
+ 
+# ── 4. REVIEW / APPROVE / PUBLISH ────────────────────────────
+ 
+@login_required
+def std_review(request, report_id):
+    if not is_reviewer(request.user):
+        messages.error(request, "You don't have reviewer access.")
+        return HttpResponseRedirect(reverse("std"))
+ 
+    report = get_object_or_404(STDReport, id=report_id)
+ 
+    # Allow access from submitted AND approved (so reviewer can still publish after approve)
+    if report.status not in ("submitted", "approved"):
+        messages.error(request, f"Cannot review a report with status '{report.get_status_display()}'.")
+        return HttpResponseRedirect(reverse("std_detail", args=[report_id]))
+ 
+    if request.method == "POST":
+        action  = request.POST.get("action", "").strip()
+        comment = request.POST.get("comment", "").strip()
+ 
+        # Always save reviewer fields regardless of action
+        report.applicable_models = request.POST.get("applicable_models", "")
+        report.useful_telephonic = request.POST.get("useful_telephonic") == "yes"
+        report.supports_mttr     = request.POST.get("supports_mttr") == "yes"
+        report.special_tool      = request.POST.get("special_tool", "")
+        report.alternate_process = request.POST.get("alternate_process", "")
+        report.reviewer_remarks  = request.POST.get("reviewer_remarks", "")
+        report.reviewed_by       = request.user
+ 
+        # ── Status transition ──────────────────────────────────
+        if action == "approve":
+            report.status      = "approved"
+            report.approved_at = timezone.now()
+            msg = "Report approved. Use 'Approve & Publish' to make it visible to all engineers."
+ 
+        elif action == "publish":
+            report.status      = "published"                          # ← KEY FIX
+            report.approved_at = report.approved_at or timezone.now() # set if not already set
+            msg = "Report published — now visible to all engineers."
+ 
+        elif action == "reject":
+            report.status = "rejected"
+            msg = "Report sent back to author for revision."
+ 
+        else:
+            messages.error(request, f"Unknown action: '{action}'")
+            return HttpResponseRedirect(reverse("std_review", args=[report_id]))
+ 
+        # ── Save FIRST, then log ───────────────────────────────
+        report.save()
+ 
+        STDApprovalLog.objects.create(
+            report=report,
+            action=action,
+            actor=request.user,
+            comment=comment or msg,
+        )
+ 
+        messages.success(request, msg)
+        return HttpResponseRedirect(reverse("std_detail", args=[report.id]))
+ 
+    # GET — show review form
+    log = report.approval_log.select_related("actor").all()
+    return render(request, "servicesupport/std_review.html", {
+        "flag":   3,
+        "report": report,
+        "log":    log,
+    })
+
+
+
+# ── Helpers ───────────────────────────────────────────────────
+ 
+def _session_key(request):
+    """Unique session key per user so parallel uploads don't clash."""
+    return f'std_import_{request.user.pk}'
+ 
+ 
+def _cleanup_img_dir(img_dir):
+    """Delete imported images folder if it exists."""
+    if img_dir and os.path.isdir(img_dir):
+        try:
+            shutil.rmtree(img_dir)
+        except Exception:
+            pass
+ 
+ 
+# ── View 1: Upload page ───────────────────────────────────────
+ 
+@login_required
+def std_import(request):
+    """GET — show the upload page."""
+    return render(request, 'servicesupport/std_import.html', {'flag': 3})
+ 
+ 
+# ── View 2: Parse + Preview + Save ───────────────────────────
+ 
+@login_required
+def std_import_preview(request):
+    """
+    POST  → parse the uploaded .docx, store field data in session
+             (images are on disk as /media/std_imports/<uuid>/...),
+             then show the editable preview page.
+ 
+    GET ?save=1 → read session data, create STDReport draft,
+                  redirect to edit page.
+    """
+ 
+    # ── POST: parse file ──────────────────────────────────────
+    if request.method == 'POST':
+        uploaded = request.FILES.get('docx_file')
+        if not uploaded:
+            messages.error(request, 'Please select a .docx file.')
+            return HttpResponseRedirect(reverse('std_import'))
+ 
+        if not uploaded.name.lower().endswith('.docx'):
+            messages.error(request, 'Only .docx files are supported.')
+            return HttpResponseRedirect(reverse('std_import'))
+ 
+        if uploaded.size > 30 * 1024 * 1024:
+            messages.error(request, 'File is too large (max 30 MB).')
+            return HttpResponseRedirect(reverse('std_import'))
+ 
+        # Clean up any previous incomplete import for this user
+        skey = _session_key(request)
+        prev = request.session.get(skey)
+        if prev:
+            _cleanup_img_dir(prev.get('_img_dir'))
+ 
+        try:
+            data = parse_std_docx(uploaded, media_root=settings.MEDIA_ROOT)
+        except Exception as e:
+            messages.error(request, f'Could not read the file: {e}')
+            return HttpResponseRedirect(reverse('std_import'))
+ 
+        # Store in session — analysis/solution contain only small URL strings now
+        session_data = {k: v for k, v in data.items() if not k.startswith('_') or k == '_img_dir'}
+        session_data['_img_dir']   = data.get('_img_dir', '')
+        session_data['_filename']  = uploaded.name
+        request.session[skey]      = session_data
+        request.session.modified   = True
+ 
+        # Build parts_list for template display
+        try:
+            parts_list = json.loads(data.get('parts_used_json', '[]'))
+        except Exception:
+            parts_list = []
+ 
+        return render(request, 'servicesupport/std_import_preview.html', {
+            'flag':            3,
+            'data':            data,
+            'parts_list':      parts_list,
+            'filename':        uploaded.name,
+            'product_choices': STDReport._meta.get_field('product').choices,
+            'content_choices': STDReport._meta.get_field('content_type').choices,
+        })
+ 
+    # ── GET ?save=1: write draft to database ──────────────────
+    if request.GET.get('save') == '1':
+        skey = _session_key(request)
+        data = request.session.get(skey)
+ 
+        if not data:
+            messages.error(request, 'Session expired. Please upload the file again.')
+            return HttpResponseRedirect(reverse('std_import'))
+ 
+        try:
+            # Allow engineer to override any field from the preview form GET params
+            overridable = (
+                'subject', 'product', 'content_type',
+                'controller_model', 'controller_sl_no',
+                'rm_model', 'rm_sl_no',
+                'machine_model', 'machine_sl_no',
+                'machine_tool_builder', 'configuration',
+                'end_user', 'application', 'mr_no',
+                'visits_count', 'hours_count',
+                'repeat_visit_reason', 'reason_for_subject',
+                'problem_reported', 'problem_observation',
+                'problem_suspected', 'problem_history',
+                'external_disturbance', 'occurrence_count',
+                'diagnosis_info', 'analysis', 'solution',
+                'additional_info', 'parts_used_json',
+            )
+            for field in overridable:
+                if field in request.GET and request.GET[field].strip():
+                    data[field] = request.GET[field]
+ 
+            report = STDReport(
+                prepared_by          = request.user,
+                status               = 'draft',
+                subject              = data.get('subject', ''),
+                product              = data.get('product', ''),
+                content_type         = data.get('content_type', 'Content/Solution'),
+                controller_model     = data.get('controller_model', ''),
+                controller_sl_no     = data.get('controller_sl_no', ''),
+                rm_model             = data.get('rm_model', ''),
+                rm_sl_no             = data.get('rm_sl_no', ''),
+                machine_model        = data.get('machine_model', ''),
+                machine_sl_no        = data.get('machine_sl_no', ''),
+                machine_tool_builder = data.get('machine_tool_builder', ''),
+                configuration        = data.get('configuration', ''),
+                end_user             = data.get('end_user', ''),
+                application          = data.get('application', ''),
+                mr_no                = data.get('mr_no', ''),
+                visits_count         = int(data.get('visits_count') or 1),
+                hours_count          = int(data.get('hours_count') or 0),
+                repeat_visit_reason  = data.get('repeat_visit_reason', ''),
+                reason_for_subject   = data.get('reason_for_subject', ''),
+                problem_reported     = data.get('problem_reported', ''),
+                problem_observation  = data.get('problem_observation', ''),
+                problem_suspected    = data.get('problem_suspected', ''),
+                problem_history      = data.get('problem_history', ''),
+                external_disturbance = data.get('external_disturbance', ''),
+                occurrence_count     = data.get('occurrence_count', ''),
+                diagnosis_info       = data.get('diagnosis_info', ''),
+                analysis             = data.get('analysis', ''),
+                solution             = data.get('solution', ''),
+                additional_info      = data.get('additional_info', ''),
+                parts_used_json      = data.get('parts_used_json', '[]'),
+            )
+            report.save()
+ 
+            STDApprovalLog.objects.create(
+                report  = report,
+                action  = 'imported',
+                actor   = request.user,
+                comment = f"Imported from Word: {data.get('_filename', '?')}",
+            )
+ 
+            # Clear session
+            del request.session[skey]
+            request.session.modified = True
+ 
+            messages.success(
+                request,
+                f"Draft saved as STD-{report.created_at.year}-{report.id:04d}. "
+                f"Review the content and submit when ready."
+            )
+            return HttpResponseRedirect(reverse('std_edit', args=[report.id]))
+ 
+        except Exception as e:
+            # Don't clean up images — user may retry
+            messages.error(request, f'Error saving draft: {e}')
+            return HttpResponseRedirect(reverse('std_import'))
+ 
+    return HttpResponseRedirect(reverse('std_import'))

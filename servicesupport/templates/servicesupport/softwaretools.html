@@ -1,42 +1,46 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}Software Tools — Service Support{% endblock %}
 {% block body %}
-<br>
-<div class="container">
-<div class="row">
-  <div class="col-12 col-md-3 mb-3">
-    <div class="card" style="width: 15rem;">
-      <div class="card-body">
-        <h5 class="card-title">VRDY OFF</h5>
-        <p class="card-text">401 VRDY OFF alarm Diag. tool. It will give signal missing based on DGN 358 value</p>
-        <a href="{% url 'vrdy' %}" class="card-link">OPEN</a>
-      </div>
-    </div>
+<div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-6 sm:py-10">
+  <div class="mb-6 sm:mb-8">
+    <p class="font-mono text-xs text-brand-yellow tracking-widest uppercase mb-1">Diagnostics</p>
+    <h1 class="text-xl sm:text-2xl font-semibold text-brand-dark">Software Tools</h1>
+    <p class="text-sm text-slate-500 mt-1">Select a diagnostic tool to identify and troubleshoot alarm conditions.</p>
   </div>
-  <div class="col-12 col-md-3 mb-3">  
-    <div class="card" style="width: 15rem;">
-      <div class="card-body">
-        <h5 class="card-title">WN 69</h5>
-        <p class="card-text">WN 69 diag. tool. It will give tentative problem at which DO module, Output signal having issue.</p>
-        <a href="{% url 'wn69' %}" class="card-link">OPEN</a>
+  <!-- 1 col mobile, 2 col tablet, 3 col desktop -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+    <a href="{% url 'vrdy' %}" class="feature-card group block bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6 hover:border-brand-yellow">
+      <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center mb-3 sm:mb-4">
+        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
       </div>
-    </div>  
-  </div>
-  <div class="col-12 col-md-3 mb-3">
-    <div class="card" style="width: 15rem;">
-      <div class="card-body">
-        <h5 class="card-title">PC50 & NMI</h5>
-        <p class="card-text">PC 50 Alarm or 971 NMI occurred alarm to diag. tool to find at which point communication interrupted.</p>
-        <a href="{% url 'nmi' %}" class="card-link">OPEN</a>
+      <h2 class="font-semibold text-brand-dark text-sm sm:text-base mb-1 group-hover:text-brand-yellow transition">VRDY OFF</h2>
+      <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">SV401 VRDY OFF alarm diagnostic. Identifies missing signals via DGN 358.</p>
+      <span class="mt-3 sm:mt-4 inline-block font-mono text-xs text-brand-yellow">Open tool →</span>
+    </a>
+    <a href="{% url 'wn69' %}" class="feature-card group block bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6 hover:border-brand-yellow">
+      <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center mb-3 sm:mb-4">
+        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg>
       </div>
-    </div>
+      <h2 class="font-semibold text-brand-dark text-sm sm:text-base mb-1 group-hover:text-brand-yellow transition">WN 69</h2>
+      <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">I/O Link DO alarm diagnostic. Identifies which DO module and output has an issue.</p>
+      <span class="mt-3 sm:mt-4 inline-block font-mono text-xs text-brand-yellow">Open tool →</span>
+    </a>
+    <a href="{% url 'nmi' %}" class="feature-card group block bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6 hover:border-brand-yellow">
+      <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-3 sm:mb-4">
+        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+      </div>
+      <h2 class="font-semibold text-brand-dark text-sm sm:text-base mb-1 group-hover:text-brand-yellow transition">PC50 &amp; NMI</h2>
+      <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">PC 50 / 971 NMI alarm diagnostic. Finds communication interruption point.</p>
+      <span class="mt-3 sm:mt-4 inline-block font-mono text-xs text-brand-yellow">Open tool →</span>
+    </a>
+    <a href="{% url 'belttention' %}" class="feature-card group block bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-6 hover:border-brand-yellow">
+      <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center mb-3 sm:mb-4">
+        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      </div>
+      <h2 class="font-semibold text-brand-dark text-sm sm:text-base mb-1 group-hover:text-brand-yellow transition">Belt Tension</h2>
+      <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">Belt tension calculation tool for spindle and servo drives.</p>
+      <span class="mt-3 sm:mt-4 inline-block font-mono text-xs text-brand-yellow">Open tool →</span>
+    </a>
   </div>
 </div>
-</div>
-
-<div class="fixed-bottom">
-  <div class="text-center" style="padding: 5px; border-top: #737373 solid 0.2px; background-color: white">
-      <a class="text-muted text-decoration-none" href="{% url 'index' %}"><small>Service Support  |</small></a><small class="m-1 p-1 fw-light">FANUC INDIA</small>
-  </div>    
-</div>  
 {% endblock %}

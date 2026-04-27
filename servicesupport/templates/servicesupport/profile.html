@@ -1,0 +1,59 @@
+{% extends "servicesupport/layout.html" %}
+
+{% block body %}
+
+{% load static %}
+<br>
+<div class="container">
+<h3>User Details:</h3>
+</div>
+<table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">Username</th>
+        
+        <th scope="col">Email</th>
+        <th scope="col">Groups Given</th>
+        <th scope="col">Last Login</th>
+        <th scope="col">User Joined</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{user_details.username}}</td>
+        <td>{{user_details.email}}</td>
+        <td>{%for group in user_details.groups.all %}
+      {{group.name}},{% endfor %}</td>
+        <td>{{user_details.last_login}}</td>
+        <td>{{user_details.date_joined}}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="container">
+    <br>
+<a class="btn btn-dark" href="{% url 'changepassword' %}"> Change Password</a>
+<a class="btn btn-dark" href="{% url 'logout' %}"> Sign Out </a>
+<a class="btn btn-dark" href="{% url 'index'%}"> Home </a>
+
+<br>
+<h3>Quick Links: Setting</h3>
+<br>
+<form method="post" action="{% url 'profile' %}">
+    {% csrf_token %}
+<div class="dropdown-cont">
+    {% if list %}
+    {% for k in 012345|make_list %}
+    <select class="chosen rank-select form-control" name="{{k}}" style="width: 350px;">
+        <option value="-1" {% if list %}{%else%}selected{%endif%}>Please Select</option>
+        {% for i in links %}
+        <option value="{{i.id}}"{% if list %}>{{i.name}}</option>
+        {%endfor%}
+    </select>
+    {% endfor %}
+    {%endif%}
+  </div>
+  <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
+  </form>
+</div>
+
+{% endblock %} 

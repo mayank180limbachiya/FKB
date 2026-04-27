@@ -1,15 +1,20 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}404 — Page Not Found{% endblock %}
 {% block body %}
-{% load static %}
-<div class="d-flex align-items-center justify-content-center vh-100">
-    <div class="text-center">
-        <h1 class="display-1 fw-bold">404</h1>
-        <p class="fs-3"> <span class="text-danger">Opps!</span> Page not found.</p>
-        <p class="lead">
-            The page you’re looking for doesn’t exist.
-        </p>
-        <a href="{% url 'index' %}" class="btn btn-primary">Go Home</a>
+
+<div class="min-h-[calc(100vh-56px)] flex items-center justify-center px-4 py-16">
+  <div class="text-center max-w-sm">
+    <p class="font-mono text-7xl sm:text-9xl font-bold text-brand-dark opacity-10 select-none leading-none mb-0">404</p>
+    <div class="-mt-4 sm:-mt-6">
+      <p class="font-mono text-xs text-brand-yellow tracking-widest uppercase mb-2">Page Not Found</p>
+      <h1 class="text-xl sm:text-2xl font-semibold text-brand-dark mb-2">Oops! Wrong turn.</h1>
+      <p class="text-sm text-slate-500 mb-8 leading-relaxed">The page you're looking for doesn't exist or may have been moved.</p>
+      <a href="{% url 'index' %}"
+        class="inline-flex items-center gap-2 min-h-[44px] px-6 py-2.5 rounded-lg bg-brand-dark text-brand-yellow font-mono font-semibold text-sm border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">
+        ← Go Home
+      </a>
     </div>
+  </div>
 </div>
-{% endblock %} 
+
+{% endblock %}

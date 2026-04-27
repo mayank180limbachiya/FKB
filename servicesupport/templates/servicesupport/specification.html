@@ -1,205 +1,104 @@
 {% extends "servicesupport/layout.html" %}
-
+{% block title %}Specification — Service Support{% endblock %}
 {% block body %}
-
-<br>
-
 <script>
-    
-    function maxlenghth_specification_spec() {
-        var user_name = document.getElementById("spec").value;
-        if (user_name.length == 40) {
-          alert("Spec enter limit is 40 Char");
-        }
-      }
-    
-      function image_view(spec) {
-       
-        // Show the mailbox and hide other views
-        document.querySelector('#modal-body').style.display = 'block';
-        document.querySelector('#modal-body').innerHTML = "";
-        document.querySelector('#exampleModalLabel').innerHTML = spec + "- Photo"
-        // Show the mailbox name
-        const view = document.querySelector('#modal-body');
-        
-        fetch('/images/'+spec)
-        .then(response => response.json())
-        .then(specs => {
-            specs.forEach(photo => {
-            let div = document.createElement('div');
-                div.className = "mail-border";
-                div.innerHTML = `
-                    <span class="col-3"> <img src="static${photo['photo']}" alt="${photo['photo']}" width="200" height="auto"></span>
-
-                `;
-            view.appendChild(div);
-            });
-        
-        })
-}
-</script>
-
-<div class="container"  style="border-bottom: rgb(158, 158, 158) solid 1px;">
-    <form method="get" action="{% url 'specification' %}"> 
-    
-    <div class="row align-items-center">
-        <div class="col-12 col-md-2">
-            <h5> Parent Spec:</h5>
-        </div>
-        <div class="col-8 col-md-4 mb-3">            
-            <input type="text" id="spec" maxlength="40" onkeyup="maxlenghth_specification_spec()" class="form-control" name="specno" value="{%if user_data.specno %}{{user_data.value}}{%endif%}" placeholder="Type Parent Spec only " id="specno" required>
-        </div>
-        <div class="col-4 col-md-2 mb-3" >
-            <button type="submit" class="btn btn-secondary" value="OK">EXEC</button>
-        </div>
-        <div class="col-6 col-md-2">
-            <div class="float-end">
-                <div class="input-group input-group-sm mb-0"> 
-                <h6> No. of Row:</h6></div>
-            </div>
-        </div>
-        <div class="col-3 col-md-1" > 
-            <div class="input-group input-group-sm mb-0">           
-                <input size="2"  min="1" max="200"  type="number" class="form-control" name="limit" value="{%if user_data.limit %}{{user_data.limit}}{%else%}25{%endif%}" id="specno">
-            </div>
-        </div>
-    </div>
-    </form>  
-    <br>  
-</div>    
-<br>
-
-<script>
-    document.addEventListener("visibilitychange", function() {
-        var contentElement = document.getElementById("content");
-        
-        if (document.visibilityState === 'visible') {
-            // Window is in focus, show content
-            contentElement.classList.remove("hidden");
-        } else {
-            // Window is out of focus, hide content
-            contentElement.classList.add("hidden");
-        }
+  function image_view(spec){
+    document.getElementById('modal-spec').innerText=spec+' — Photo';
+    document.getElementById('modal-body').innerHTML='<p class="text-slate-400 font-mono text-xs p-4">Loading...</p>';
+    document.getElementById('photo-modal').classList.remove('hidden');
+    fetch('/images/'+spec).then(r=>r.json()).then(specs=>{
+      const v=document.getElementById('modal-body');v.innerHTML='';
+      specs.forEach(p=>{const i=document.createElement('img');i.src='static'+p['photo'];i.className='w-36 sm:w-48 h-auto rounded-lg border border-slate-200';v.appendChild(i);});
     });
+  }
+  document.addEventListener('visibilitychange',function(){
+    const c=document.getElementById('spec-content');
+    if(c)c.style.display=document.visibilityState==='visible'?'':'none';
+  });
 </script>
-{% if page_obj %}
-<div class="text-center" id="content">
-    <div class="table-responsive">
-        <table class="table  table-bordered table-striped table-hover ">
-            <thead>
-                <tr> 
-                    <th scscope="col" style=" white-space: nowrap;"> #</th>
-                    <th scscope="col" style=" white-space: nowrap;"> Parent Spec</th>
-                    <th scscope="col" style=" white-space: nowrap;"> Parent Name</th>
-                    <th scscope="col" style=" white-space: nowrap;"> Child Spec</th>
-                    <th scscope="col" style=" white-space: nowrap;"> Child Name</th>
-                    <th scscope="col" style=" white-space: nowrap;"> QTY</th>
-                    <th scscope="col" style=" white-space: nowrap;"> Photo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for write in page_obj %} {% for b in photo %}
-                {% if forloop.counter == forloop.parentloop.counter %}
-                        <tr>
-                            <td class="text-end">{{forloop.counter|add:user_data.line_index_adder}}</td>
-                            <td style=" white-space: nowrap;"><a href="{% url 'spec_details' write.id %}">{{ write.parentspec }}</a></td>
-                            <td class="text-start" style=" white-space: nowrap;">{{ write.parentname }}</td>
-                            <td class="text-start" style=" white-space: nowrap;" id="{{forloop.counter}}">{{ write.childspec }}</td>
-                            <td class="text-start" style=" white-space: nowrap;">{{ write.childname }}</td>
-                            <td class="text-end" style=" white-space: nowrap;">{{ write.qty }}</td>
-                            <td class="text-end" style=" white-space: nowrap;"> {% if b == 1 %}<button type="button"  class="btn btn-primary btn-sm" onclick="image_view('{{write.childspec}}')" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                click
-                            </button>{% endif %} </td>
-                        </tr>
-                {% endif %}        
-                {% endfor %}{% endfor %}
-            </tbody>
+<div class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-5 sm:py-8">
+
+  <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-4 sm:p-5 mb-5 sm:mb-6 shadow-sm">
+    <form method="get" action="{% url 'specification' %}">
+      <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3">
+        <div class="flex-1 min-w-0 sm:min-w-48">
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Parent Spec</label>
+          <input type="text" name="specno" id="spec" maxlength="40" required value="{% if user_data.specno %}{{ user_data.value }}{% endif %}" placeholder="Enter parent spec only..."
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+        </div>
+        <div class="w-full sm:w-24">
+          <label class="block text-xs font-mono text-slate-500 mb-1 uppercase tracking-widest">Rows</label>
+          <input type="number" name="limit" min="1" max="200" value="{% if user_data.limit %}{{ user_data.limit }}{% else %}25{% endif %}"
+            class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+        </div>
+        <button type="submit" class="w-full sm:w-auto min-h-[44px] rounded-lg bg-brand-dark text-brand-yellow font-mono font-semibold text-sm px-6 py-2.5 hover:bg-brand-yellow hover:text-brand-dark transition border border-brand-yellow">EXEC →</button>
+      </div>
+    </form>
+  </div>
+
+  {% if page_obj %}
+  <div id="spec-content">
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+      <div class="table-scroll">
+        <table class="w-full text-sm" style="min-width:580px">
+          <thead><tr class="bg-brand-dark border-b border-slate-700">
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-500 w-10">#</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400 whitespace-nowrap">Parent Spec</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400 whitespace-nowrap">Parent Name</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-brand-yellow whitespace-nowrap">Child Spec</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-brand-yellow whitespace-nowrap">Child Name</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400 w-12">QTY</th>
+            <th class="text-left px-3 sm:px-4 py-3 font-mono text-xs text-slate-400 w-16">Photo</th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for write in page_obj %}{% for b in photo %}{% if forloop.counter == forloop.parentloop.counter %}
+            <tr class="hover:bg-amber-50 transition">
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-400">{{ forloop.counter|add:user_data.line_index_adder }}</td>
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs whitespace-nowrap"><a href="{% url 'spec_details' write.id %}" class="text-blue-600 hover:underline">{{ write.parentspec }}</a></td>
+              <td class="px-3 sm:px-4 py-3 text-sm text-slate-700 whitespace-nowrap">{{ write.parentname }}</td>
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-brand-yellow font-semibold whitespace-nowrap">{{ write.childspec }}</td>
+              <td class="px-3 sm:px-4 py-3 text-sm text-slate-700 whitespace-nowrap">{{ write.childname }}</td>
+              <td class="px-3 sm:px-4 py-3 font-mono text-xs text-slate-600 text-right">{{ write.qty }}</td>
+              <td class="px-3 sm:px-4 py-3">{% if b == 1 %}<button onclick="image_view('{{ write.childspec }}')" class="min-h-[30px] font-mono text-xs px-2 py-1 rounded-lg bg-brand-dark text-brand-yellow border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">View</button>{% endif %}</td>
+            </tr>
+            {% endif %}{% endfor %}{% endfor %}
+          </tbody>
         </table>
-    </div>       
-</div>
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body" id="modal-body">
-            
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        </div>
       </div>
     </div>
+
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-5 sm:mt-6"><ul class="flex items-center justify-center gap-1 flex-wrap">
+      {% if page_obj.has_previous %}
+      <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page=1&specno={{ user_data.specno }}&limit={{ user_data.limit }}">First</a></li>
+      <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.previous_page_number }}&specno={{ user_data.specno }}&limit={{ user_data.limit }}">← Prev</a></li>
+      {% endif %}
+      {% for p in page_obj.paginator.page_range %}{% if p <= page_obj.number|add:3 and p >= page_obj.number|add:-3 %}
+      <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border transition {% if page_obj.number == p %}bg-brand-dark text-brand-yellow border-brand-yellow{% else %}bg-white text-slate-600 border-slate-200 hover:border-brand-yellow{% endif %}" href="?page={{ p }}&specno={{ user_data.specno }}&limit={{ user_data.limit }}">{{ p }}</a></li>
+      {% endif %}{% endfor %}
+      {% if page_obj.has_next %}
+      <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.next_page_number }}&specno={{ user_data.specno }}&limit={{ user_data.limit }}">Next →</a></li>
+      <li><a class="min-h-[36px] flex items-center px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-mono border border-slate-200 text-slate-600 hover:border-brand-yellow bg-white transition" href="?page={{ page_obj.paginator.num_pages }}&specno={{ user_data.specno }}&limit={{ user_data.limit }}">Last</a></li>
+      {% endif %}
+    </ul></nav>
+    {% endif %}
   </div>
-  
-<br>
-{% if page_obj.has_other_pages %}
-    <nav>
-        <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-                <li class="page-item">
-                    <a class="page-link" href="?page=1&specno={{user_data.specno}}&limit={{user_data.limit}}">
-                        First
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
-                        Previous
-                    </a>
-                </li>
-            {% endif %}
+  {% else %}
+  <div class="bg-white rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center"><p class="font-mono text-slate-400 text-sm">No data — search with a parent spec number.</p></div>
+  {% endif %}
+</div>
 
-            {% for page_number in page_obj.paginator.page_range %}
-                {% comment %}
-                    This conditional allows us to display up to 3 pages before and after the current page
-                    If you decide to remove this conditional, all the pages will be displayed
-
-                    You can change the 3 to any number you want e.g
-                    To display only 5 pagination items, change the 3 to 2 (2 before and 2 after the current page)
-                {% endcomment %}
-                {% if page_number <= page_obj.number|add:3 and page_number >= page_obj.number|add:-3 %}
-                    {% if page_obj.number == page_number %}
-                        <li class="page-item active">
-                            <a class="page-link" href="?page={{ page_number }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
-                                {{ page_number }}
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_number }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
-                                {{ page_number }}
-                            </a>
-                        </li>
-                    {% endif %}
-                {% endif %}
-            {% endfor %}
-
-            {% if page_obj.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
-                        Next
-                    </a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&specno={{user_data.specno}}&limit={{user_data.limit}}">
-                        Last
-                    </a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
-{% endif %}
-{% else %}
-
-<div class="container">
-<div class="card">
-    <div class="card-body">
-        No Data Available - Kindly Search with Spec No.
+<!-- Photo Modal — fixed overlay, works on all sizes -->
+<div id="photo-modal" class="hidden fixed inset-0 bg-brand-dark/80 z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-sm sm:max-w-lg overflow-hidden shadow-xl">
+    <div class="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 bg-brand-dark">
+      <h3 id="modal-spec" class="font-mono text-sm text-brand-yellow font-semibold truncate"></h3>
+      <button onclick="document.getElementById('photo-modal').classList.add('hidden')" class="min-h-[32px] min-w-[32px] flex items-center justify-center text-slate-400 hover:text-white transition text-lg leading-none ml-2">✕</button>
     </div>
+    <div id="modal-body" class="p-4 sm:p-5 flex flex-wrap gap-3 min-h-28"></div>
+    <div class="px-4 sm:px-5 py-3 bg-slate-50 border-t border-slate-100 flex justify-end">
+      <button onclick="document.getElementById('photo-modal').classList.add('hidden')" class="min-h-[36px] font-mono text-xs px-4 py-2 rounded-lg border border-slate-300 text-slate-600 hover:border-brand-yellow transition">Close</button>
+    </div>
+  </div>
 </div>
-</div>
-{% endif %}
-<br>
 {% endblock %}

@@ -1,0 +1,247 @@
+{% extends "servicesupport/layout.html" %}
+{% block title %}Preview Import — {{ data.subject|default:"STD Report"|truncatechars:40 }}{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<style>
+.fl    { display:block; font-family:'IBM Plex Mono',monospace; font-size:.6rem; text-transform:uppercase; letter-spacing:.1em; color:#64748b; margin-bottom:.15rem; }
+.f-ok  { border-color:#86efac !important; background:#f0fdf4 !important; }
+.f-warn{ border-color:#fcd34d !important; background:#fffbeb !important; }
+.sh    { background:#0f172a; border-radius:8px 8px 0 0; padding:8px 12px; display:flex; align-items:center; gap:8px; }
+.sn    { font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:700; color:#FFDD00; }
+.st    { font-family:'IBM Plex Mono',monospace; font-size:.65rem; font-weight:600; color:#FFDD00; text-transform:uppercase; letter-spacing:.1em; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="max-w-5xl mx-auto px-3 sm:px-5 lg:px-8 py-4">
+
+  <!-- Header -->
+  <div class="bg-brand-dark rounded-xl px-4 py-3 mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div>
+      <p class="font-mono text-xs text-slate-400 mb-0.5">File: <span class="text-slate-300">{{ filename }}</span></p>
+      <h1 class="font-mono text-sm font-bold text-brand-yellow">Preview &amp; Confirm Import</h1>
+      <p class="text-xs text-slate-400 mt-0.5">Check every field. Edit anything incorrect, then click <strong class="text-white">Save as Draft</strong>.</p>
+    </div>
+    <div class="flex gap-2 shrink-0">
+      <a href="{% url 'std_import' %}" class="min-h-[38px] flex items-center font-mono text-xs px-4 rounded-lg border border-slate-600 text-slate-300 hover:border-slate-400 transition">← Upload again</a>
+      <button form="preview-form" type="submit" class="min-h-[38px] font-mono text-xs font-semibold px-5 rounded-lg bg-brand-yellow text-brand-dark hover:bg-yellow-300 transition">Save as Draft →</button>
+    </div>
+  </div>
+
+  <!-- Status strip -->
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+    {% for label, val, good in status_checks %}
+    <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 text-center">
+      <p class="font-mono text-xs text-slate-400">{{ label }}</p>
+      <p class="font-mono text-sm font-bold {% if good %}text-green-600{% else %}text-amber-500{% endif %}">{% if good %}✓ OK{% else %}⚠ Check{% endif %}</p>
+    </div>
+    {% empty %}
+    <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 text-center">
+      <p class="font-mono text-xs text-slate-400">Subject</p>
+      <p class="font-mono text-sm font-bold {% if data.subject %}text-green-600{% else %}text-amber-500{% endif %}">{% if data.subject %}✓ OK{% else %}⚠ Empty{% endif %}</p>
+    </div>
+    <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 text-center">
+      <p class="font-mono text-xs text-slate-400">Analysis</p>
+      <p class="font-mono text-sm font-bold {% if data.analysis %}text-green-600{% else %}text-amber-500{% endif %}">{% if data.analysis %}✓ Found{% else %}⚠ Empty{% endif %}</p>
+    </div>
+    <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 text-center">
+      <p class="font-mono text-xs text-slate-400">Solution</p>
+      <p class="font-mono text-sm font-bold {% if data.solution %}text-green-600{% else %}text-amber-500{% endif %}">{% if data.solution %}✓ Found{% else %}⚠ Empty{% endif %}</p>
+    </div>
+    <div class="bg-white rounded-lg border border-slate-200 px-3 py-2 text-center">
+      <p class="font-mono text-xs text-slate-400">Images</p>
+      <p class="font-mono text-sm font-bold text-blue-600" id="img-count">…</p>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# Form POSTs to std_import_preview?save=1 so large CKEditor content goes in POST body, not URL #}
+  <form method="POST" action="{% url 'std_import_preview' %}?save=1" id="preview-form">
+    {% csrf_token %}
+
+    <!-- ══ 01 IDENTIFICATION ══ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="sh"><span class="sn">01</span><span class="st">Report Identification</span></div>
+      <div class="p-3">
+        <div class="mb-2">
+          <label class="fl">Subject *{% if not data.subject %} <span class="text-amber-500">⚠ empty</span>{% endif %}</label>
+          <input type="text" name="subject" value="{{ data.subject }}" required
+            class="w-full rounded-lg border px-3 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.subject %}f-ok{% else %}f-warn{% endif %}">
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div class="col-span-2">
+            <label class="fl">Product *</label>
+            <select name="product" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+              <option value="">-- Select --</option>
+              {% for val,lbl in product_choices %}
+                <option value="{{ val }}" {% if data.product == val or data.product|lower == val|lower %}selected{% endif %}>{{ lbl }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-span-2">
+            <label class="fl">Content Type</label>
+            <select name="content_type" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-2 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow">
+              {% for val,lbl in content_choices %}
+                <option value="{{ val }}" {% if data.content_type == val %}selected{% endif %}>{{ lbl }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div><label class="fl">Controller Model</label><input type="text" name="controller_model" value="{{ data.controller_model }}" class="w-full rounded-lg border px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.controller_model %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+          <div><label class="fl">Controller S/N</label><input type="text" name="controller_sl_no" value="{{ data.controller_sl_no }}" class="w-full rounded-lg border px-2 py-1.5 text-sm font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.controller_sl_no %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+          <div><label class="fl">Laser/RO/RM Model</label><input type="text" name="rm_model" value="{{ data.rm_model }}" class="w-full rounded-lg border px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.rm_model %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+          <div><label class="fl">Laser/RO/RM S/N</label><input type="text" name="rm_sl_no" value="{{ data.rm_sl_no }}" class="w-full rounded-lg border px-2 py-1.5 text-sm font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.rm_sl_no %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div><label class="fl">Machine Model</label><input type="text" name="machine_model" value="{{ data.machine_model }}" class="w-full rounded-lg border px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.machine_model %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+          <div><label class="fl">Machine S/N</label><input type="text" name="machine_sl_no" value="{{ data.machine_sl_no }}" class="w-full rounded-lg border px-2 py-1.5 text-sm font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.machine_sl_no %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+          <div><label class="fl">Machine Tool Builder</label><input type="text" name="machine_tool_builder" value="{{ data.machine_tool_builder }}" class="w-full rounded-lg border px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.machine_tool_builder %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+          <div><label class="fl">Configuration</label><input type="text" name="configuration" value="{{ data.configuration }}" class="w-full rounded-lg border px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.configuration %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-2">
+          <div class="col-span-2"><label class="fl">End User</label><input type="text" name="end_user" value="{{ data.end_user }}" class="w-full rounded-lg border px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.end_user %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+          <div><label class="fl">Application</label><input type="text" name="application" value="{{ data.application }}" class="w-full rounded-lg border px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow border-slate-200 bg-slate-50"></div>
+          <div><label class="fl">MR No.</label><input type="text" name="mr_no" value="{{ data.mr_no }}" class="w-full rounded-lg border px-2 py-1.5 text-sm font-mono text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow {% if data.mr_no %}f-ok{% else %}border-slate-200 bg-slate-50{% endif %}"></div>
+        </div>
+        <div class="grid grid-cols-6 gap-2">
+          <div class="col-span-1"><label class="fl">Visits</label><input type="number" name="visits_count" value="{{ data.visits_count }}" min="1" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-mono text-center text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div class="col-span-1"><label class="fl">Hours</label><input type="number" name="hours_count" value="{{ data.hours_count }}" min="0" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm font-mono text-center text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div class="col-span-4"><label class="fl">Reason for Repeat Visits</label><input type="text" name="repeat_visit_reason" value="{{ data.repeat_visit_reason }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 02 PROBLEM DESCRIPTION ══ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="sh"><span class="sn">02</span><span class="st">Problem Description</span></div>
+      <div class="p-3 space-y-2">
+        {% for fname, flabel, fval in forloop.parentloop.empty %}{% endfor %}
+
+        <div><label class="fl">Reason for presenting {% if not data.reason_for_subject %}<span class="text-amber-500">⚠</span>{% endif %}</label><textarea name="reason_for_subject" rows="2" class="w-full rounded-lg border px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none {% if data.reason_for_subject %}f-ok{% else %}f-warn{% endif %}">{{ data.reason_for_subject }}</textarea></div>
+        <div><label class="fl">Problem as reported by End-user {% if not data.problem_reported %}<span class="text-amber-500">⚠</span>{% endif %}</label><textarea name="problem_reported" rows="2" class="w-full rounded-lg border px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none {% if data.problem_reported %}f-ok{% else %}f-warn{% endif %}">{{ data.problem_reported }}</textarea></div>
+        <div><label class="fl">Observation of the problem {% if not data.problem_observation %}<span class="text-amber-500">⚠</span>{% endif %}</label><textarea name="problem_observation" rows="2" class="w-full rounded-lg border px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none {% if data.problem_observation %}f-ok{% else %}f-warn{% endif %}">{{ data.problem_observation }}</textarea></div>
+        <div><label class="fl">Problem suspected by FSE/SRC</label><textarea name="problem_suspected" rows="2" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ data.problem_suspected }}</textarea></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div><label class="fl">History of the problem</label><textarea name="problem_history" rows="2" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ data.problem_history }}</textarea></div>
+          <div><label class="fl">External disturbance?</label><textarea name="external_disturbance" rows="2" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ data.external_disturbance }}</textarea></div>
+          <div><label class="fl">How many times occurred?</label><input type="text" name="occurrence_count" value="{{ data.occurrence_count }}" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-2 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow"></div>
+          <div><label class="fl">Diagnosis info as per manual</label><textarea name="diagnosis_info" rows="2" class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-yellow resize-none">{{ data.diagnosis_info }}</textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ 03 ANALYSIS ══ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="sh">
+        <span class="sn">03</span><span class="st">Analysis</span>
+        <span class="ml-auto font-mono text-xs {% if data.analysis %}text-green-400{% else %}text-amber-400{% endif %}">
+          {% if data.analysis %}✓ Extracted{% else %}⚠ Empty — fill manually{% endif %}
+        </span>
+      </div>
+      <textarea name="analysis" id="id_analysis">{{ data.analysis|safe }}</textarea>
+    </div>
+
+    <!-- ══ 04 SOLUTION ══ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="sh">
+        <span class="sn">04</span><span class="st">Solution</span>
+        <span class="ml-auto font-mono text-xs {% if data.solution %}text-green-400{% else %}text-amber-400{% endif %}">
+          {% if data.solution %}✓ Extracted{% else %}⚠ Empty — fill manually{% endif %}
+        </span>
+      </div>
+      <textarea name="solution" id="id_solution">{{ data.solution|safe }}</textarea>
+    </div>
+
+    <!-- ══ 05 PARTS ══ -->
+    {% if parts_list %}
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="sh"><span class="sn">05</span><span class="st">Parts Replaced</span><span class="ml-auto font-mono text-xs text-green-400">✓ {{ parts_list|length }} part(s)</span></div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm" style="min-width:400px">
+          <thead><tr class="bg-slate-50 border-b border-slate-100">
+            <th class="text-left px-3 py-2 font-mono text-xs text-slate-500">Specification</th>
+            <th class="text-left px-3 py-2 font-mono text-xs text-slate-500 w-16">Qty</th>
+            <th class="text-left px-3 py-2 font-mono text-xs text-slate-500">Reason</th>
+          </tr></thead>
+          <tbody>
+          {% for part in parts_list %}
+          <tr class="border-b border-slate-100">
+            <td class="px-3 py-2 font-mono text-xs">{{ part.spec }}</td>
+            <td class="px-3 py-2 font-mono text-xs text-center">{{ part.qty }}</td>
+            <td class="px-3 py-2 text-xs">{{ part.reason }}</td>
+          </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+    <input type="hidden" name="parts_used_json" value="{{ data.parts_used_json }}">
+
+    <!-- ══ 06 ADDITIONAL INFO ══ -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm mb-3">
+      <div class="sh"><span class="sn">06</span><span class="st">Additional Information</span></div>
+      <textarea name="additional_info" id="id_additional_info">{{ data.additional_info|safe }}</textarea>
+    </div>
+
+    <!-- ══ ACTION BAR ══ -->
+    <div class="sticky bottom-0 bg-brand-light border-t border-slate-200 pt-3 pb-4 flex flex-col sm:flex-row gap-2 justify-end">
+      <a href="{% url 'std_import' %}" class="w-full sm:w-auto min-h-[40px] flex items-center justify-center rounded-lg border border-slate-300 text-slate-600 font-mono text-xs px-5 hover:border-slate-400 transition">← Upload Different File</a>
+      <button type="submit" class="w-full sm:w-auto min-h-[40px] rounded-lg bg-brand-dark text-brand-yellow font-mono font-semibold text-sm px-6 border border-brand-yellow hover:bg-brand-yellow hover:text-brand-dark transition">Save as Draft →</button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+var CK_CONFIG = {
+  toolbar: [
+    { name: 'clipboard',   items: ['Undo','Redo','-','PasteText','PasteFromWord'] },
+    { name: 'basicstyles', items: ['Bold','Italic','Underline','Strike','-','RemoveFormat'] },
+    { name: 'paragraph',   items: ['NumberedList','BulletedList','-','JustifyLeft','JustifyCenter','JustifyRight'] },
+    { name: 'insert',      items: ['Image','Table','HorizontalRule'] },
+    { name: 'styles',      items: ['Format','FontSize'] },
+    { name: 'colors',      items: ['TextColor','BGColor'] },
+    { name: 'tools',       items: ['Maximize','Source'] },
+  ],
+  height: 350,
+  width: '100%',
+  allowedContent: true,
+  filebrowserUploadUrl:      '/ckeditor/upload/?csrfmiddlewaretoken={{ csrf_token }}',
+  filebrowserImageUploadUrl: '/ckeditor/upload/?csrfmiddlewaretoken={{ csrf_token }}',
+  skin: 'moono-lisa',
+  removePlugins: 'elementspath',
+  contentsCss: 'data:text/css,' + encodeURIComponent([
+    'body{font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#0f172a;padding:8px 12px;margin:0;}',
+    'p{margin:0.4em 0;}',
+    'table{border-collapse:collapse;width:100%;margin:0.5em 0;}',
+    'table td,table th{border:1px solid #d1d5db;padding:5px 8px;}',
+    'table th{background:#f1f5f9;font-weight:600;}',
+    'img{max-width:100%;height:auto;}',
+  ].join(''))
+};
+
+CKEDITOR.replace('id_analysis',        CK_CONFIG);
+CKEDITOR.replace('id_solution',        CK_CONFIG);
+CKEDITOR.replace('id_additional_info', CK_CONFIG);
+
+// Sync all editors on submit
+document.getElementById('preview-form').addEventListener('submit', function() {
+  for (var name in CKEDITOR.instances) {
+    CKEDITOR.instances[name].updateElement();
+  }
+});
+
+// Count images in analysis (just img src URLs now — fast)
+window.addEventListener('load', function() {
+  var ta = document.getElementById('id_analysis');
+  if (ta) {
+    var n = (ta.value.match(/<img/g) || []).length;
+    var el = document.getElementById('img-count');
+    if (el) el.textContent = n + ' image' + (n !== 1 ? 's' : '');
+  }
+});
+</script>
+{% endblock %}
